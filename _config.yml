@@ -9,7 +9,8 @@
 
 # If you are building a GitHub project page then use these settings:
 url: "http://NiccoloSacchi.github.io/amazon"
-baseurl: "/amazon"
+baseurl: "" 
+#"/amazon"
 
 # Of course don't forget to change the username and projectname to YOUR username and project
 
