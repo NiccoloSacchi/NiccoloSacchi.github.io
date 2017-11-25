@@ -61,7 +61,7 @@ d3.json("data/categories.json", function(data) {
     let diagonal = d3.svg.diagonal.radial()
         .projection((d) => [d.y, d.x / 180 * Math.PI]);
 
-    let svg = d3.select("body").append("svg")
+    let svg = d3.select("body").select("svg")
         .attr("width", width )
         .attr("height", height )
       .append("g")
