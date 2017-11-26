@@ -16,6 +16,11 @@
     width: 50px;
 }
 
+.node text.root_node {
+    font-size: 16px;
+    font-weight: bold;
+}
+
 .link {
   fill: none;
   stroke: #ccc;
@@ -35,9 +40,9 @@ div.tooltip {
     pointer-events: none;
 }
 
-svg {
-    border: 1px solid #ccc;
-}
+/*svg {*/
+    /*border: 1px solid #ccc;*/
+/*}*/
 
 /*circle.node {*/
     /*fill: lightsteelblue;*/

@@ -89,7 +89,7 @@ d3.json("data/categories.json", function(data) {
     );
 
     let tree = d3.layout.tree()
-        .size([360, diameter / 2 - 80])
+        .size([300, diameter / 2 - 80])
         .separation((a, b) => (a.parent == b.parent ? 1 : 10) / a.depth);
 
     let diagonal = d3.svg.diagonal.radial()
@@ -99,7 +99,7 @@ d3.json("data/categories.json", function(data) {
         .attr("width", width )
         .attr("height", height )
         .append("g")
-        .attr("transform", "translate(" +  width / 2 + "," + height / 2 + ")");
+        .attr("transform", "translate(" +  width / 2 + "," + height / 2 + ")rotate(30)");
 
     //create the tooltip that will be show on mouse over the nodes
     let tooltip = d3.select("body").append("div")
@@ -136,27 +136,26 @@ d3.json("data/categories.json", function(data) {
             //.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
             .on("click", click);
 
-        // <rect>
-        //     <title>Hello, World!</title>
-        // </rect>
         nodeEnter.append("circle")
             .style("stroke", (d) => stroke(d))
             .style("fill", (d) => fill(d))
-            // add the tooltip
+            // show the tooltip
             .on("mouseover", (d) => {
-                tooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-                tooltip.html(
-                    "<span><b>Count: </b>" + d.count.toLocaleString() + "</span>"
-                )
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
+                tooltip
+                    .transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                tooltip
+                    .html(
+                        "<span><b>Count: </b>" + d.count.toLocaleString() + "</span>")
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
             })
             .on("mouseout", (d) => {
-                tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+                tooltip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", 0);
             });
 
         nodeEnter.append("text")
@@ -182,16 +181,28 @@ d3.json("data/categories.json", function(data) {
 
         nodeUpdate.select("text")
             .style("fill-opacity", 1)
-            .attr("text-anchor", (d) => d.x < 180? "start" : "end")
+            .attr("class", "") // remove all previous classes (if it was a root before...)
+            .attr("text-anchor", (d) => (d.x < 180)? "start" : "end")
             .attr("transform", (d) => {
                 let trans = diameterScale(Math.sqrt(d.count)) + 5;
                 return d.x < 180 ? "translate(0)translate(" + trans + ")" : "rotate(180)translate(" + -trans + ")"
-            });
+            })
+            .filter((d) =>
+                // the root note should be represented in the middle
+                ArrayEquals(d.names, curr_root.names)
+            )
+            .attr("transform", (d) => "rotate(-90)translate(0," + (diameterScale(Math.sqrt(d.count))+10*d.names.length) +")")
+            .attr("text-anchor", "middle")
+            .attr("class", "root_node");
+            // .style({
+            //     "font-weight": "bold",
+            //     "font-size": "16"}
+            // )
 
         // TODO: appropriate transform
         let nodeExit = node.exit().transition()
             .duration(duration)
-            //.attr("transform", function(d) { return "diagonal(" + source.y + "," + source.x + ")"; })
+            // .attr("transform", function(d) { return "diagonal(" + source.y + "," + source.x + ")"; })
             .remove();
 
         nodeExit.select("circle")
@@ -226,11 +237,11 @@ d3.json("data/categories.json", function(data) {
             })
             .remove();
 
-        // Stash the old positions for transition.
-        nodes.forEach((d) => {
-            d.x0 = d.x;
-            d.y0 = d.y;
-        });
+        // // Stash the old positions for transition.
+        // nodes.forEach((d) => {
+        //     d.x0 = d.x;
+        //     d.y0 = d.y;
+        // });
     }
 
     // Toggle children on click.
