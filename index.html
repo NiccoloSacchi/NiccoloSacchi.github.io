@@ -7,13 +7,13 @@
 
 	<title>Amazon - product graph</title>
 
-	<meta name="author" content="Data Visualization Project">
+	<!--<meta name="author" content="Data Visualization Project">-->
 
 
-	<meta name="description" content="This is where I will tell my friends way too much about me">
+	<!--<meta name="description" content="This is where I will tell my friends way too much about me">-->
 
 
-	<link rel="alternate" type="application/rss+xml" title="Amazon - A virtual proof that name is awesome!" href="/feed.xml">
+	<!--<link rel="alternate" type="application/rss+xml" title="Amazon - A virtual proof that name is awesome!" href="/feed.xml">-->
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
@@ -22,14 +22,14 @@
 
 	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic">
 	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
-	<meta property="og:title" content="My website">
-	<meta property="og:description" content="This is where I will tell my friends way too much about me">
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="http://NiccoloSacchi.github.io/amazon/">
-	<link rel="canonical" href="http://NiccoloSacchi.github.io/amazon/">
-	<meta property="og:image" content="http://NiccoloSacchi.github.io/amazon/img/logo_1.jpg">
+	<!--<meta property="og:title" content="My website">-->
+	<!--<meta property="og:description" content="This is where I will tell my friends way too much about me">-->
+	<!--<meta property="og:type" content="website">-->
+	<!--<meta property="og:url" content="http://NiccoloSacchi.github.io/amazon/">-->
+	<!--<link rel="canonical" href="http://NiccoloSacchi.github.io/amazon/">-->
+	<!--<meta property="og:image" content="http://NiccoloSacchi.github.io/amazon/img/logo_2.jpg">-->
 
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/graph-style.css">
 	<!--<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.3.10/d3.min.js"></script>-->
 	<script src="https://d3js.org/d3.v3.min.js"></script>
 </head>
@@ -42,29 +42,30 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
-					</button>
+                </button>
 
-					<a class="navbar-brand">Data Visualization</a>
+                <a class="navbar-brand">Data Visualization</a>
+            </div>
 
-					</div>
+            <div class="collapse navbar-collapse" id="main-navbar">
+                <ul class="nav navbar-nav navbar-right">
 
-					<div class="collapse navbar-collapse" id="main-navbar">
-					<ul class="nav navbar-nav navbar-right">
+                </ul>
+            </div>
 
-					</ul>
-					</div>
-					<div class="avatar-container">
-					<div class="avatar-img-border">
-					<!--<a href="http://NiccoloSacchi.github.io/amazon ">-->
-					<img class="avatar-img" src="/img/logo_1.jpg">
-					</a>
-				</div>
+            <div class="avatar-container">
+                <div class="avatar-img-border">
+                    <!--<a href="http://NiccoloSacchi.github.io/amazon ">-->
+                    <img class="avatar-img" src="img/logo_2.jpg">
+                    </a>
+                </div>
 			</div>
 		</div>
 	</nav>
 
 	<script src="js/index.js"></script>
-	<svg></svg>
+	<svg id="categories_graph" ></svg>
+    <!--<button type="button" onclick="drawTree(2000)">click me!</button>-->
 
 	<footer>
 		<div class="container beautiful-jekyll-footer">
@@ -80,8 +81,8 @@
 					</p>
 					<!-- Please don't remove this, keep my open source work credited :) -->
 					<p class="theme-by text-muted">
-					Theme by
-					<a href="http://deanattali.com/beautiful-jekyll/">beautiful-jekyll</a>
+                        Theme by
+                        <a href="http://deanattali.com/beautiful-jekyll/">beautiful-jekyll</a>
 					</p>
 				</div>
 			</div>
@@ -100,3 +101,5 @@
 
 	<!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
 	<script src="js/main.js"></script>
+
+</body>
