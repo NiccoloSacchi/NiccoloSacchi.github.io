@@ -88,8 +88,10 @@ d3.json("data/categories.json", function(data) {
         [node_diameter[0], node_diameter[1]] // codomain (diameter of the nodes)
     );
 
+    let degrees = 300;
+    let degrees_half = degrees/2;
     let tree = d3.layout.tree()
-        .size([300, diameter / 2 - 80])
+        .size([degrees, diameter / 2 - 80])
         .separation((a, b) => (a.parent == b.parent ? 1 : 10) / a.depth);
 
     let diagonal = d3.svg.diagonal.radial()
@@ -99,7 +101,7 @@ d3.json("data/categories.json", function(data) {
         .attr("width", width )
         .attr("height", height )
         .append("g")
-        .attr("transform", "translate(" +  width / 2 + "," + height / 2 + ")rotate(30)");
+        .attr("transform", "translate(" +  width / 2 + "," + height / 2 + ")rotate(" + (360-degrees)/2 +")");
 
     //create the tooltip that will be show on mouse over the nodes
     let tooltip = d3.select("body").append("div")
@@ -159,7 +161,7 @@ d3.json("data/categories.json", function(data) {
             });
 
         nodeEnter.append("text")
-            .attr("text-anchor", (d) => d.x < 180? "start" : "end")
+            .attr("text-anchor", (d) => d.x < degrees_half? "start" : "end")
             // .attr("transform", (d) => { d.x < 180 ? "translate(0)" : "rotate(180)translate(-" + (d.name.length * 8.5)  + ")"})
             .style("fill-opacity", 1e-6)
             .html((d) =>
@@ -182,10 +184,10 @@ d3.json("data/categories.json", function(data) {
         nodeUpdate.select("text")
             .style("fill-opacity", 1)
             .attr("class", "") // remove all previous classes (if it was a root before...)
-            .attr("text-anchor", (d) => (d.x < 180)? "start" : "end")
+            .attr("text-anchor", (d) => (d.x < degrees_half)? "start" : "end")
             .attr("transform", (d) => {
                 let trans = diameterScale(Math.sqrt(d.count)) + 5;
-                return d.x < 180 ? "translate(0)translate(" + trans + ")" : "rotate(180)translate(" + -trans + ")"
+                return d.x < degrees_half ? "translate(0)translate(" + trans + ")" : "rotate(180)translate(" + -trans + ")"
             })
             .filter((d) =>
                 // the root note should be represented in the middle
