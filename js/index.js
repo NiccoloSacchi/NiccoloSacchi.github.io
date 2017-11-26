@@ -98,12 +98,13 @@ d3.json("data/categories.json", function(data) {
     let svg = d3.select("body").select("#categories_graph")
         .attr("width", width )
         .attr("height", height )
-        // .attr("preserveAspectRatio", "xMinYMin meet")
-        // .attr("viewBox", "0 0 200 200")
-        // //class to make it responsive
-        // .classed("svg-content-responsive", true)
         .append("g")
         .attr("transform", "translate(" +  width / 2 + "," + height / 2 + ")");
+
+    //create the tooltip that will be show on mouse over the nodes
+    let tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 
     let curr_root = pubs;
     roots.push(curr_root);
@@ -135,9 +136,28 @@ d3.json("data/categories.json", function(data) {
             //.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
             .on("click", click);
 
+        // <rect>
+        //     <title>Hello, World!</title>
+        // </rect>
         nodeEnter.append("circle")
             .style("stroke", (d) => stroke(d))
-            .style("fill", (d) => fill(d));
+            .style("fill", (d) => fill(d))
+            // add the tooltip
+            .on("mouseover", (d) => {
+                tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+                tooltip.html(
+                    "<span><b>Count: </b>" + d.count.toLocaleString() + "</span>"
+                )
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+            .on("mouseout", (d) => {
+                tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+            });
 
         nodeEnter.append("text")
             .attr("text-anchor", (d) => d.x < 180? "start" : "end")
