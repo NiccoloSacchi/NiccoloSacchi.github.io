@@ -63,8 +63,74 @@
 		</div>
 	</nav>
 
+    <header class="header-section ">
+        <div class="intro-header no-img">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                        <div class="page-heading">
+                            <h1>Amazon <br> product graph</h1>
+                            <hr class="small">
+                            <span class="page-subheading">Choose a product in an easy and intuitive way</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" role="main">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="main-explain-area jumbotron">
+                    <p style="text-align: justify;">
+                        Buying from huge e-commerce websites such as <b>Amazon</b> has many
+                        advantages, but, paradoxically, users are often confused by the vast
+                        variety of products. Users may have a rough idea about the characteristics
+                        of the product they want to buy (e.g. a high-end smartphone), and they often
+                        undergo the same process of comparing similar products. We aim to remove
+                        this redundancy and aid them in this task. We will use the Amazon
+                        reviews/products dataset, which contains relations among products such
+                        as <em>"bought together"</em>, <em>"bought after viewing"</em>. These
+                        relations will be used
+                        for creating a graph that represents competing products with similar
+                        characteristics, i.e. products that are viewed together but not bought
+                        together. Our assumption is that people
+                        interested in a certain product would have visualized and compared
+                        similar products prior to buying whichever they consider the best. By
+                        finding cliques and strongly connected components in this graph, we aim
+                        to cluster products into "competing groups" and find useful insights.
+                    </p>
+                </div>
+
+                <div class="posts-list">
+                    <article class="post-preview">
+                        <h2 class="post-title">Part 1</h2>
+                        <h3 class="post-subtitle">
+                            Building the category graph
+                        </h3>
+                        <div class="post-entry">
+                            We first create a graph to display all categories of the products
+                            , their hierarchical relations and the amount of products of a
+                            specific category. It helps the user have a intuitive
+                            and immediate view of the products offered by Amazon.
+                        </div>
+                        <svg id="categories_graph"></svg>
+                    </article>
+                    
+                    <article class="post-preview">
+                        <h2 class="post-title">Part 2</h2>
+                        <h3 class="post-subtitle">Part 2 subtitle</h3>
+                        <div class="post-entry"> Explanation </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 	<script src="js/index.js"></script>
-	<svg id="categories_graph" ></svg>
+	<!--<svg id="categories_graph" ></svg>-->
     <!--<button type="button" onclick="drawTree(2000)">click me!</button>-->
 
 	<footer>

@@ -9,7 +9,9 @@
 }
 
 .node text {
-    font: 10px sans-serif;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    /*font: 10px sans-serif;*/
     display: block;
     width: 50px;
 }
@@ -19,3 +21,26 @@
   stroke: #ccc;
   stroke-width: 1.5px;
 }
+
+svg {
+    border: 1px solid #ccc;
+}
+
+/*circle.node {*/
+    /*fill: lightsteelblue;*/
+    /*stroke: #555;*/
+    /*stroke-width: 3px;*/
+/*}*/
+/*circle.leaf {*/
+    /*stroke: #fff;*/
+    /*stroke-width: 1.5px;*/
+/*}*/
+/*path.hull {*/
+    /*fill: lightsteelblue;*/
+    /*fill-opacity: 0.3;*/
+/*}*/
+/*line.link {*/
+    /*stroke: #333;*/
+    /*stroke-opacity: 0.5;*/
+    /*pointer-events: none;*/
+/*}*/

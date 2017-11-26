@@ -55,7 +55,7 @@ d3.json("data/categories.json", function(data) {
     // let pubs = {"names": [""], "children": convert_map(data), 'count': 1, 'isleaf': false};
     pubs = data; // store the data in a "global" variable
 
-    let body = document.getElementsByTagName("body")[0];
+    let body = document.getElementsByClassName("posts-list")[0];
     let diameter = body.clientWidth;
 
     let margin = {top: 20, right: 120, bottom: 20, left: 120},
