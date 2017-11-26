@@ -9,6 +9,32 @@
 //     });
 // }
 
+// attach the .equals method to Array's prototype to call it on any array
+ArrayEquals = (array1, array2) => {
+    // if the other array is a falsy value, return
+    if (!array1 || !array2)
+        return false;
+
+    // compare lengths - can save a lot of time
+    if (array1.length != array2.length)
+        return false;
+
+    for (let i = 0, l=array1.length; i < l; i++) {
+        // Check if we have nested arrays
+        if (array1[i] instanceof Array && array2[i] instanceof Array) {
+            // recurse into the nested arrays
+            if (!ArrayEquals(array1[i], array2[i]))
+                return false;
+        }
+        else if (array1[i] != array2[i]) {
+            // Warning - two different object instances will never be equal: {x:20} != {x:20}
+            return false;
+        }
+    }
+    return true;
+};
+
+// todo: this function is present in d3
 function scaleLinear(domain, codomain){
     return (x) => codomain[0] + (codomain[1]-codomain[0])*(x-domain[0])/(domain[1]-domain[0])
 }
@@ -32,39 +58,26 @@ function stroke(node){
     return "blue";
 }
 
-// function resizeTree(){
-//     let body = document.getElementsByTagName("body")[0];
-//     let diameter = body.clientWidth;
-//
-//     let categories_graph = document.getElementsByTagName("categories_graph");
-//     categories_graph.innerHTML = "";
-//
-//     var width = diameter;
-//     var height = diameter;
-//
-//     let svg = d3.select("body").select("#categories_graph")
-//         .attr("width", width )
-//         .attr("height", height )
-//         .append("g")
-//         .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
-//
-// }
-
 let pubs;
 d3.json("data/categories.json", function(data) {
     // let pubs = {"names": [""], "children": convert_map(data), 'count': 1, 'isleaf': false};
     pubs = data; // store the data in a "global" variable
 
-    let body = document.getElementsByClassName("posts-list")[0];
-    let diameter = body.clientWidth;
+    // let body = document.getElementsByClassName("posts-list")[0];
+    // let diameter = body.clientWidth;
 
-    let margin = {top: 20, right: 120, bottom: 20, left: 120},
-        width = diameter,
-        height = diameter;
+    let width = $("#categories_graph").parent().width();
+    let height = 600;
+
+    let diameter = height;
+
+    // let margin = {top: 20, right: 120, bottom: 20, left: 120},
+        // width = diameter,
+        // height = diameter;
 
     let i = 0,
         duration = 350,
-        root;
+        roots=[];
 
     let node_diameter = [2, 25];
     // let max_count = pubs["children"].map(e => e.count).reduce((e1, e2) => (e1>e2) ? e1 : e2);
@@ -90,21 +103,23 @@ d3.json("data/categories.json", function(data) {
         // //class to make it responsive
         // .classed("svg-content-responsive", true)
         .append("g")
-        .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+        .attr("transform", "translate(" +  width / 2 + "," + height / 2 + ")");
 
-    root = pubs;
-    root.x0 = height / 2;
-    root.y0 = 0;
+    let curr_root = pubs;
+    roots.push(curr_root);
+    curr_root.x0 = height / 2;
+    curr_root.y0 = 0;
 
-    root.children.forEach(collapse); // start with all children collapsed
-    update(root);
+    curr_root.children.forEach(collapse); // start with all children collapsed
+    update(curr_root);
 
     d3.select(self.frameElement).style("height", "800px");
 
     function update(source) {
+        curr_root = roots[roots.length-1];
 
         // Compute the new tree layout.
-        let nodes = tree.nodes(root),
+        let nodes = tree.nodes(curr_root),
             links = tree.links(nodes);
 
         // Normalize for fixed-depth.
@@ -203,12 +218,27 @@ d3.json("data/categories.json", function(data) {
         if (d.isleaf){
             return
         }
+
         if (d.children) {
+            if (roots.length == 1){
+                // don't collapse the root "amazon"
+                return
+            }
+            // collapse
             d._children = d.children;
             d.children = null;
+
+            // restore the "parent" root
+            roots.pop();
+
         } else {
+            // expand
             d.children = d._children;
             d._children = null;
+
+            // this node must be the root now
+            curr_root = roots[roots.length-1];
+            roots.push(curr_root.children.find(node => ArrayEquals(node.names, d.names)))
         }
 
         update(d);
@@ -222,8 +252,5 @@ d3.json("data/categories.json", function(data) {
             d.children = null;
         }
     }
-    //
-    // resizeTree();
-    // window.addEventListener("resize", resizeTree);
 });
 
