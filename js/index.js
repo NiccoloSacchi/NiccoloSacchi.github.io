@@ -119,7 +119,7 @@ d3.json("data/categories.json", function(data) {
     d3.select(self.frameElement).style("height", "800px");
 
     function update(source) {
-        curr_root = roots[roots.length-1];
+        let curr_root = roots[roots.length-1];
 
         // Compute the new tree layout.
         let nodes = tree.nodes(curr_root),
@@ -136,12 +136,8 @@ d3.json("data/categories.json", function(data) {
         let nodeEnter = node.enter().append("g")
             .attr("class", "node")
             //.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
-            .on("click", click);
-
-        nodeEnter.append("circle")
-            .style("stroke", (d) => stroke(d))
-            .style("fill", (d) => fill(d))
-            // show the tooltip
+            .on("click", click)
+	    // show the tooltip
             .on("mouseover", (d) => {
                 tooltip
                     .transition()
@@ -149,7 +145,7 @@ d3.json("data/categories.json", function(data) {
                     .style("opacity", .9);
                 tooltip
                     .html(
-                        "<span><b>Count: </b>" + d.count.toLocaleString() + "</span>")
+                        "<span><b>Number of products: </b>" + d.count.toLocaleString() + "</span>")
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
             })
@@ -159,6 +155,10 @@ d3.json("data/categories.json", function(data) {
                     .duration(500)
                     .style("opacity", 0);
             });
+
+        nodeEnter.append("circle")
+            .style("stroke", (d) => stroke(d))
+            .style("fill", (d) => fill(d));
 
         nodeEnter.append("text")
             .attr("text-anchor", (d) => d.x < degrees_half? "start" : "end")
@@ -175,11 +175,16 @@ d3.json("data/categories.json", function(data) {
         // Transition nodes to their new position.
         let nodeUpdate = node.transition()
             .duration(duration)
-            .attr("transform", (d) => "rotate(" + (d.x - 90) + ")translate(" + d.y + ")")
+            .attr("transform", (d) => "rotate(" + (d.x - 90) + ")translate(" + d.y + ")");
 
         nodeUpdate.select("circle")
             .attr("r", (d) => diameterScale(Math.sqrt(d.count)))
-            .style("fill", (d) => fill(d));
+            .style("fill", (d) => fill(d))
+            // for the node in the middle show a "back" image
+            .filter((d) =>
+                ArrayEquals(d.names, curr_root.names) && !ArrayEquals(d.names, ["Amazon"]))
+            .style("fill", "")
+            .attr("fill", "url(#image)");
 
         nodeUpdate.select("text")
             .style("fill-opacity", 1)
@@ -190,16 +195,12 @@ d3.json("data/categories.json", function(data) {
                 return d.x < degrees_half ? "translate(0)translate(" + trans + ")" : "rotate(180)translate(" + -trans + ")"
             })
             .filter((d) =>
-                // the root note should be represented in the middle
+                // the root note should be represented in the middle, bigger and not rotated
                 ArrayEquals(d.names, curr_root.names)
             )
             .attr("transform", (d) => "rotate(-90)translate(0," + (diameterScale(Math.sqrt(d.count))+10*d.names.length) +")")
             .attr("text-anchor", "middle")
             .attr("class", "root_node");
-            // .style({
-            //     "font-weight": "bold",
-            //     "font-size": "16"}
-            // )
 
         // TODO: appropriate transform
         let nodeExit = node.exit().transition()
@@ -239,11 +240,11 @@ d3.json("data/categories.json", function(data) {
             })
             .remove();
 
-        // // Stash the old positions for transition.
-        // nodes.forEach((d) => {
-        //     d.x0 = d.x;
-        //     d.y0 = d.y;
-        // });
+        // Stash the old positions for transition.
+        nodes.forEach((d) => {
+            d.x0 = d.x;
+            d.y0 = d.y;
+        });
     }
 
     // Toggle children on click.
@@ -270,7 +271,7 @@ d3.json("data/categories.json", function(data) {
             d._children = null;
 
             // this node must be the root now
-            curr_root = roots[roots.length-1];
+            let curr_root = roots[roots.length-1];
             roots.push(curr_root.children.find(node => ArrayEquals(node.names, d.names)))
         }
 

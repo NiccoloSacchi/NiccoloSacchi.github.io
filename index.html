@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="en"><!-- Beautiful Jekyll | MIT license | Copyright Dean Attali 2016 -->
 <head>
 	<meta charset="utf-8">
@@ -13,14 +13,14 @@
 	<!--<meta name="description" content="This is where I will tell my friends way too much about me">-->
 
 
-	<!--<link rel="alternate" type="application/rss+xml" title="Amazon - A virtual proof that name is awesome!" href="/feed.xml">-->
+	<link rel="alternate" type="application/rss+xml" title="Amazon - A virtual proof that name is awesome!" href="/feed.xml">
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/bootstrap-social.css">
 	<link rel="stylesheet" href="css/main.css">
 
-	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic">
+	<!--<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic">-->
 	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
 	<!--<meta property="og:title" content="My website">-->
 	<!--<meta property="og:description" content="This is where I will tell my friends way too much about me">-->
@@ -116,8 +116,20 @@
                             and immediate view of the products offered by Amazon.
                         </div>
 
-                        <!--<div class="tooltip" style="opacity: 0"></div>-->
-                        <svg id="categories_graph"></svg>
+                        <script src="js/index.js"></script>
+                        <svg id="categories_graph" style="">
+                            <defs>
+                                <pattern id="image" x="0%" y="0%" height="100%" width="100%"
+                                         viewBox="0 0 512 512">
+                                    <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
+                                </pattern>
+                            </defs>
+
+                            <!--<g transform="translate(375,300)rotate(30)"><g class="node" transform="rotate(59.99999999999999)"><circle style="stroke: blue; fill: rgb(255, 255, 255);" fill="url(#image)" r="25"></circle><text text-anchor="middle" style="fill-opacity: 1;" transform="translate(35,2.1431318985078682e-15),rotate(-90)" class="root_node"><tspan x="0" dy="0.35em">Amazon</tspan></text></g></g>-->
+<!--<g transform="translate(10,10)rotate(30)">-->
+                            <!--<circle fill="url(#image)" cx="100" cy="100" r="50"  stroke="lightblue" stroke-width="0.5%" style="fill: 'blue'"></circle>-->
+<!--</g>-->
+                        </svg>
                     </article>
                     
                     <article class="post-preview">
@@ -129,11 +141,6 @@
             </div>
         </div>
     </div>
-
-
-	<script src="js/index.js"></script>
-	<!--<svg id="categories_graph" ></svg>-->
-    <!--<button type="button" onclick="drawTree(2000)">click me!</button>-->
 
 	<footer>
 		<div class="container beautiful-jekyll-footer">
