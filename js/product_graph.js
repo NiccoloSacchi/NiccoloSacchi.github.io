@@ -179,7 +179,10 @@ let tooltip = body.append("div")
 
 let vis = body.select("#product_graph")
    .attr("width", width)
-   .attr("height", height);
+   .attr("height", height)
+    .call(d3.behavior.zoom().on("zoom", () => {
+        vis.selectAll("g").attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+    }));
 
 // define arrow markers for graph links
 let defs = vis.append('defs');
