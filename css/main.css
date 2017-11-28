@@ -63,6 +63,8 @@ hr.small {
     font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     padding: 15px;
   /*padding: 15px inherit;*/
+    width: 700px;
+    margin:auto;
 }
 
 .hideme {
@@ -318,8 +320,15 @@ footer .theme-by {
 /* --- Post preview --- */
 
 .post-preview {
-  padding: 20px 0;
-  border-bottom: 1px solid #eee;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.post-preview h2,
+.post-preview h3,
+.post-preview div{
+    width: 800px;
+    margin: auto;
 }
 
 @media only screen and (min-width: 768px) {
@@ -348,7 +357,6 @@ footer .theme-by {
   margin-top: 0;
 }
 .post-preview .post-subtitle {
-  margin: 0;
   font-weight: 300;
   margin-bottom: 10px;
 }

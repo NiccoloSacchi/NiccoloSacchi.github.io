@@ -33,7 +33,7 @@
 	<!--<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.3.10/d3.min.js"></script>-->
 	<script src="https://d3js.org/d3.v3.min.js"></script>
 </head>
-<body>
+<body style="text-align: justify">
 	<nav class="navbar navbar-default navbar-fixed-top navbar-custom">
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -55,8 +55,8 @@
 
             <div class="avatar-container">
                 <div class="avatar-img-border">
-                    <!--<a href="http://NiccoloSacchi.github.io/amazon ">-->
-                    <img class="avatar-img" src="img/logo_2.jpg">
+                    <a onclick="window.open(document.getElementById('datavis_logo').getAttribute('src'))">
+                        <img id="datavis_logo" class="avatar-img" src="img/logo_2.jpg">
                     </a>
                 </div>
 			</div>
@@ -83,14 +83,15 @@
         <div class="row">
             <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
                 <div class="main-explain-area jumbotron">
-                    <p style="text-align: justify;">
+                    <p>
                         Buying from huge e-commerce websites such as <b>Amazon</b> has many
                         advantages, but, paradoxically, users are often confused by the vast
                         variety of products. Users may have a rough idea about the characteristics
                         of the product they want to buy (e.g. a high-end smartphone), and they often
                         undergo the same process of comparing similar products. We aim to remove
-                        this redundancy and aid them in this task. We will use the Amazon
-                        reviews/products dataset, which contains relations among products such
+                        this redundancy and aid them in this task. We will use the
+                        <a onclick="window.open('http://jmcauley.ucsd.edu/data/amazon/')"> Amazon
+                            dataset</a>, which contains relations among products such
                         as <em>"bought together"</em>, <em>"bought after viewing"</em>. These
                         relations will be used
                         for creating a graph that represents competing products with similar
@@ -107,7 +108,7 @@
                     <article class="post-preview">
                         <h2 class="post-title">Part 1</h2>
                         <h3 class="post-subtitle">
-                            Building the category graph
+                            Categories graph
                         </h3>
                         <div class="post-entry">
                             We first create a graph to display all categories of the products
@@ -141,9 +142,22 @@
                     
                     <article class="post-preview">
                         <h2 class="post-title">Part 2</h2>
-                        <h3 class="post-subtitle">Part 2 subtitle</h3>
-                        <div class="post-entry"> Explanation </div>
-                        <svg id="product_graph"></svg>
+                        <h3 class="post-subtitle">
+                            Products graph
+                        </h3>
+                        <div class="post-entry">
+                            The objective of the project is to show the relations among the
+                            products. A search bar will allow the user to search
+                            and visualize the goods they want to analyze. Thanks to this
+                            graph a <b>customer</b> can intuitively identify which product is the
+                            best while a <b>vendor</b> could verify whether its product is
+                            preferred or not to the other ones.
+                            <br>
+                            The <i>red nodes</i> represent products while the <i>blue</i> nodes
+                            represent a cluster of competing products. The <i>arrows</i> point in the
+                            direction of the best product.
+                        </div>
+                        <svg id="product_graph" style="margin-top: 20px"></svg>
                         <script src="js/product_graph.js"></script>
                     </article>
                 </div>
