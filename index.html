@@ -71,7 +71,7 @@
                         <div class="page-heading">
                             <h1>Amazon <br> product graph</h1>
                             <hr class="small">
-                            <span class="page-subheading">Choose a product in an easy and intuitive way</span>
+                            <span class="page-subheading">Compare products in an easy and intuitive way</span>
                         </div>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
 
     <div class="container" role="main">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
                 <div class="main-explain-area jumbotron">
                     <p style="text-align: justify;">
                         Buying from huge e-commerce websites such as <b>Amazon</b> has many
@@ -113,18 +113,30 @@
                             We first create a graph to display all categories of the products
                             , their hierarchical relations and the amount of products of a
                             specific category. It helps the user have a intuitive
-                            and immediate view of the products offered by Amazon.
+                            and immediate view both of the type and the amount products offered
+                            by Amazon.
                         </div>
-
-                        <svg id="categories_graph">
-                            <defs>
-                                <pattern id="image" x="0%" y="0%" height="100%" width="100%"
-                                         viewBox="0 0 512 512">
-                                    <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
-                                </pattern>
-                            </defs>
-                        </svg>
-                        <script src="js/categories_graph.js"></script>
+                        <table class="categories_table">
+                            <tr>
+                                <th>List view</th>
+                                <th>Tree view</th>
+                            </tr>
+                            <tr>
+                                <td id="category_view">
+                                </td>
+                                <td style="width: 100%;">
+                                    <svg id="categories_graph" width="100%">
+                                        <defs>
+                                            <pattern id="image" x="0%" y="0%" height="100%" width="100%"
+                                                     viewBox="0 0 512 512">
+                                                <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
+                                            </pattern>
+                                        </defs>
+                                    </svg>
+                                    <script src="js/categories_graph.js"></script>
+                                </td>
+                            </tr>
+                        </table>
                     </article>
                     
                     <article class="post-preview">
@@ -168,7 +180,7 @@
 		}
 	</script><script src="js/jquery-1.11.2.min.js"></script>
 
-	 doing something a bit funky here because I want to be careful not to include JQuery twice!
+	 <!--doing something a bit funky here because I want to be careful not to include JQuery twice!-->
 	<script src="js/bootstrap.min.js"></script>
 
 	<!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->

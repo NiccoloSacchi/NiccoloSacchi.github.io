@@ -1,4 +1,4 @@
-let width = document.getElementsByTagName("article")[0].clientWidth,     // svg width
+let width,     // svg width (computed afterwards)
     height = 600,     // svg height
     dr = 4,      // default point radius
     off = 15,    // cluster hull offset
@@ -14,7 +14,7 @@ function isGroup(d){
 }
 
 function belongToGroup(d) {
-    return isGroup(d) || d.group_data.size>1
+    return isGroup(d) || (d.group_data && d.group_data.size>1)
 }
 
 // let fill_ = d3.scale.category20();
@@ -178,11 +178,12 @@ let tooltip = body.append("div")
     .style("opacity", 0);
 
 let vis = body.select("#product_graph")
-   .attr("width", width)
-   .attr("height", height)
+    .attr("width", "100%")
+    .attr("height", height)
     .call(d3.behavior.zoom().on("zoom", () => {
         vis.selectAll("g").attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
     }));
+width = document.getElementById("product_graph").clientWidth;
 
 // define arrow markers for graph links
 let defs = vis.append('defs');

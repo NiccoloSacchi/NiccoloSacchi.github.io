@@ -3,18 +3,31 @@
 <head>
     <title> Categories graph </title>
 	<link rel="stylesheet" href="css/graph-style.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
 	<script src="https://d3js.org/d3.v3.min.js"></script>
 	<!--<script src="js/jquery-1.11.2.min.js"></script>-->
 </head>
 <body>
-	<svg id="categories_graph">
-        <defs>
-            <pattern id="image" x="0%" y="0%" height="100%" width="100%" viewBox="0 0 512 512">
-            <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
-            </pattern>
-        </defs>
-    </svg>
-    <article>
-        <script src="js/categories_graph.js"></script>
-    </article>
+    <table class="categories_table">
+        <tr>
+            <th>List view</th>
+            <th>Tree view</th>
+        </tr>
+        <tr>
+            <td id="category_view">
+            </td>
+            <td style="width: 100%;">
+                <svg id="categories_graph" width="100%">
+                    <defs>
+                        <pattern id="image" x="0%" y="0%" height="100%" width="100%"
+                                 viewBox="0 0 512 512">
+                            <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
+                        </pattern>
+                    </defs>
+                </svg>
+                <script src="js/categories_graph.js"></script>
+            </td>
+        </tr>
+    </table>
 </body>

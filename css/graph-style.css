@@ -63,3 +63,7 @@ div.tooltip {
     border-radius: 8px;
     pointer-events: none;
 }
+
+svg#product_graph {
+  border: 1px solid #ccc;
+}

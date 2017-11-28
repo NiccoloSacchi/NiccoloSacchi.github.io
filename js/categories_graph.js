@@ -63,24 +63,17 @@ d3.json("data/categories.json", function(data) {
     // let pubs = {"names": [""], "children": convert_map(data), 'count': 1, 'isleaf': false};
     pubs = data; // store the data in a "global" variable
 
-    // let body = document.getElementsByClassName("posts-list")[0];
-    // let diameter = body.clientWidth;
-    let width = document.getElementsByTagName("article")[0].clientWidth;
-    let height = 600;
-
-    let diameter = height;
-
     // let margin = {top: 20, right: 120, bottom: 20, left: 120},
-        // width = diameter,
-        // height = diameter;
+
+    let height = 530;
+    let width; // width will be computer after
+    let diameter = height;
 
     let i = 0,
         duration = 350,
         roots=[];
 
     let node_diameter = [2, 25];
-    // let max_count = pubs["children"].map(e => e.count).reduce((e1, e2) => (e1>e2) ? e1 : e2);
-    // let max_count = pubs["children"].map(e => e.count).reduce((e1, e2) => e1 + e2); pubs.count = max_count;
     let max_count = pubs["count"];
     let diameterScale = scaleLinear(
         [0, Math.sqrt(max_count)],  // domain (range of the count)
@@ -97,10 +90,13 @@ d3.json("data/categories.json", function(data) {
         .projection((d) => [d.y, d.x / 180 * Math.PI]);
 
     let svg = d3.select("body").select("#categories_graph")
-        .attr("width", width )
-        .attr("height", height )
+        .attr("width", "100%")
+        .attr("height", height)
         .append("g")
-        .attr("transform", "translate(" +  width / 2 + "," + height / 2 + ")rotate(" + (360-degrees)/2 +")");
+        .attr("transform", () => {
+            width = document.getElementById("categories_graph").clientWidth;
+            return "translate(" +  width / 2 + "," + (height / 2-60) + ")rotate(" + (360-degrees)/2 +")"
+        });
 
     //create the tooltip that will be show on mouse over the nodes
     let tooltip = d3.select("body").append("div")
@@ -113,7 +109,8 @@ d3.json("data/categories.json", function(data) {
     curr_root.y0 = 0;
 
     curr_root.children.forEach(collapse); // start with all children collapsed
-    update(curr_root);
+    update(curr_root); // update the graph
+    appendToList(curr_root); // update the list
 
     d3.select(self.frameElement).style("height", "800px");
 
@@ -257,21 +254,29 @@ d3.json("data/categories.json", function(data) {
                 // don't collapse the root "amazon"
                 return
             }
-            // collapse
+
+            // collapse tree
             d._children = d.children;
             d.children = null;
 
             // restore the "parent" root
             roots.pop();
 
+            // remove the last element from the list
+            let list = document.getElementById("category_view")
+            list.removeChild(list.childNodes[list.childNodes.length-1])
         } else {
-            // expand
+            // expand tree
             d.children = d._children;
             d._children = null;
 
             // this node must be the root now
-            let curr_root = roots[roots.length-1];
-            roots.push(curr_root.children.find(node => ArrayEquals(node.names, d.names)))
+            // let curr_root = roots[roots.length-1];
+            // let new_root = curr_root.children.find(node => ArrayEquals(node.names, d.names))
+            roots.push(d)
+
+            // show in the list the parent category
+            appendToList(d)
         }
 
         update(d);
@@ -284,6 +289,26 @@ d3.json("data/categories.json", function(data) {
             d._children.forEach(collapse);
             d.children = null;
         }
+    }
+
+    function appendToList(d) {
+        let parent = document.createElement("p");
+        let category_name = d.names.join(" & ")
+        parent.appendChild(document.createTextNode(category_name));
+        parent.addEventListener("click", () => {
+            // delete all the roots up to this one
+            roots = roots.slice(0, roots.indexOf(d))
+            collapse(d);
+
+            let list = document.getElementById("category_view")
+            while (list.childNodes[list.childNodes.length-1].innerText != category_name){
+                list.removeChild(list.childNodes[list.childNodes.length-1])
+            }
+            list.removeChild(list.childNodes[list.childNodes.length-1])
+
+            click(d)
+        });
+        document.getElementById("category_view").appendChild(parent)
     }
 });
 
