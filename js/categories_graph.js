@@ -39,7 +39,7 @@ function scaleLinear(domain, codomain){
     return (x) => codomain[0] + (codomain[1]-codomain[0])*(x-domain[0])/(domain[1]-domain[0])
 }
 
-function fill(node){
+function fill_category(node){
     if (node.isleaf) {
         return "LightGreen";
     }
@@ -65,8 +65,7 @@ d3.json("data/categories.json", function(data) {
 
     // let body = document.getElementsByClassName("posts-list")[0];
     // let diameter = body.clientWidth;
-
-    let width = $("#categories_graph").parent().width();
+    let width = document.getElementsByTagName("article")[0].clientWidth;
     let height = 600;
 
     let diameter = height;
@@ -158,7 +157,7 @@ d3.json("data/categories.json", function(data) {
 
         nodeEnter.append("circle")
             .style("stroke", (d) => stroke(d))
-            .style("fill", (d) => fill(d));
+            .style("fill", (d) => fill_category(d));
 
         nodeEnter.append("text")
             .attr("text-anchor", (d) => d.x < degrees_half? "start" : "end")
@@ -179,7 +178,7 @@ d3.json("data/categories.json", function(data) {
 
         nodeUpdate.select("circle")
             .attr("r", (d) => diameterScale(Math.sqrt(d.count)))
-            .style("fill", (d) => fill(d))
+            .style("fill", (d) => fill_category(d))
             // for the node in the middle show a "back" image
             .filter((d) =>
                 ArrayEquals(d.names, curr_root.names) && !ArrayEquals(d.names, ["Amazon"]))

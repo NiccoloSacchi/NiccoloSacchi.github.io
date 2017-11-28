@@ -1,32 +1,56 @@
-.node {
+/* category graph */
+#categories_graph .node {
   cursor: pointer;
 }
 
-.node circle {
+#categories_graph .node circle {
   /*fill: #fff;*/
   stroke: steelblue;
   stroke-width: 1.5px;
 }
 
-.node text {
+#categories_graph .node text {
     font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
-    /*font: 10px sans-serif;*/
     display: block;
     width: 50px;
 }
 
-.node text.root_node {
+#categories_graph .node text.root_node {
     font-size: 16px;
     font-weight: bold;
 }
 
-.link {
+#categories_graph .link {
   fill: none;
   stroke: #ccc;
   stroke-width: 1.5px;
 }
 
+/* clustproducter graph */
+#product_graph circle.node {
+    fill: lightsteelblue;
+    stroke: #555;
+    stroke-width: 3px;
+}
+
+#product_graph circle.leaf {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+#product_graph path.hull {
+    fill: lightsteelblue;
+    fill-opacity: 0.3;
+}
+
+#product_graph line.link {
+  stroke: #333;
+  stroke-opacity: 0.5;
+  pointer-events: none;
+}
+
+/* tooltip */
 div.tooltip {
     position: absolute;
     text-align: center;
@@ -39,26 +63,3 @@ div.tooltip {
     border-radius: 8px;
     pointer-events: none;
 }
-
-/*svg {*/
-    /*border: 1px solid #ccc;*/
-/*}*/
-
-/*circle.node {*/
-    /*fill: lightsteelblue;*/
-    /*stroke: #555;*/
-    /*stroke-width: 3px;*/
-/*}*/
-/*circle.leaf {*/
-    /*stroke: #fff;*/
-    /*stroke-width: 1.5px;*/
-/*}*/
-/*path.hull {*/
-    /*fill: lightsteelblue;*/
-    /*fill-opacity: 0.3;*/
-/*}*/
-/*line.link {*/
-    /*stroke: #333;*/
-    /*stroke-opacity: 0.5;*/
-    /*pointer-events: none;*/
-/*}*/

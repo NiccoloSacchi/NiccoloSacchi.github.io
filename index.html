@@ -116,26 +116,23 @@
                             and immediate view of the products offered by Amazon.
                         </div>
 
-                        <script src="js/index.js"></script>
-                        <svg id="categories_graph" style="">
+                        <svg id="categories_graph">
                             <defs>
                                 <pattern id="image" x="0%" y="0%" height="100%" width="100%"
                                          viewBox="0 0 512 512">
                                     <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
                                 </pattern>
                             </defs>
-
-                            <!--<g transform="translate(375,300)rotate(30)"><g class="node" transform="rotate(59.99999999999999)"><circle style="stroke: blue; fill: rgb(255, 255, 255);" fill="url(#image)" r="25"></circle><text text-anchor="middle" style="fill-opacity: 1;" transform="translate(35,2.1431318985078682e-15),rotate(-90)" class="root_node"><tspan x="0" dy="0.35em">Amazon</tspan></text></g></g>-->
-<!--<g transform="translate(10,10)rotate(30)">-->
-                            <!--<circle fill="url(#image)" cx="100" cy="100" r="50"  stroke="lightblue" stroke-width="0.5%" style="fill: 'blue'"></circle>-->
-<!--</g>-->
                         </svg>
+                        <script src="js/categories_graph.js"></script>
                     </article>
                     
                     <article class="post-preview">
                         <h2 class="post-title">Part 2</h2>
                         <h3 class="post-subtitle">Part 2 subtitle</h3>
                         <div class="post-entry"> Explanation </div>
+                        <svg id="product_graph"></svg>
+                        <script src="js/product_graph.js"></script>
                     </article>
                 </div>
             </div>
@@ -171,7 +168,7 @@
 		}
 	</script><script src="js/jquery-1.11.2.min.js"></script>
 
-	<!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
+	 doing something a bit funky here because I want to be careful not to include JQuery twice!
 	<script src="js/bootstrap.min.js"></script>
 
 	<!-- doing something a bit funky here because I want to be careful not to include JQuery twice! -->
