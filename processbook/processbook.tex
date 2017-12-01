@@ -79,7 +79,7 @@ Buying from huge e-commerce websites such as \emph{Amazon} has many advantages, 
 \subsection{Idea}
 The idea is to exploit the relations in the Amazon product graph, such as ``bought together'', ``also viewed'', and/or ``buy after viewing''. These links reflect the behaviour of the users that buy on the famous e-commerce website, and can be used for providing recommendations to new or inexperienced users who want to purchase a certain kind of product.
 
-At this point, a question naturally comes to mind: what is the added value to Amazon's website? It is true that these links can be found on Amazon, but they cannot offer a view ``as a whole''. From an article, a user can see the immediate neighbours, but that does not offer much information. On the contrary, if the user is presented with a visualization such as the one shown in \Cref{fig:graphNav}, it is very clear on which products users usually end up. In that example scenario, imagine that a user wants to buy some professional studio headphones, and has a rough idea of the characteristics of the product. By querying the graph, he/she can highlight relevant products and follow the path along the best product. Of course, \emph{best product} is relative; however, if many clients buy the same product after reviewing a set of other products, then it is very likely that the former has better characteristics.
+At this point, a question naturally comes to mind: what is the added value to Amazon's website? It is true that these links can be found on Amazon, but they cannot offer a view ``as a whole''. From an article, a user can see the immediate neighbours, but that does not offer much information. On the contrary, if the user is presented with a visualization such as the one shown in \Cref{fig:graphNav}, it is very clear on which products users usually end up. In that example scenario, imagine that a user wants to buy some professional studio headphones, and has a rough idea of the characteristics of the product. By querying the graph, he/she can highlight relevant products and follow the highlighted path along the best product. Of course, \emph{best product} is relative; however, if many clients buy the same product after reviewing a set of other products, then it is very likely that the former has better characteristics. Moreover, there are groups of products in which there is no preferred product, i.e. users do not show great propensity in buying one of them. Each one of these groups represent a cluster of competing products and the choice of the best one depends on the metric chosen by the user.
 
 \begin{figure}[H]
 	\centering{}
@@ -92,17 +92,24 @@ At this point, a question naturally comes to mind: what is the added value to Am
 We build groups of similar products using the \href{http://jmcauley.ucsd.edu/data/amazon/}. The dataset contains relations among products such as "bought together", "bought after viewing". These relations will be used for creating a graph that represents competing products with similar characteristics, i.e. products that are viewed together but not bought together. Our assumption is that people interested in a certain product would have visualized and compared similar products prior to buying whichever they consider the best.
 
 \section{The graph}
-At this stage, the graph is built by adding an edge between product A and product B if B is bought after viewing A. Conversely, if two products are frequently bought together, we remove the edge between them. In our context, a directed edge between A and B means ``B is better than A``, whereas an undirected edge (or, equivalently, two opposite directed edges) means ``A is competing with B''.
+At this stage, the graph is built by adding an edge between product A and product B if B is bought after viewing A. Conversely, if two products are frequently bought together, we remove the edge between them since they can not be considered as competing with eachother (e.g. a cover and a smartphone). In our context, a directed edge between A and B means ``B is better than A``, whereas an undirected edge (or, equivalently, two opposite directed edges) means ``A is competing with B''.
 
 It is easy to extend this definition to groups of competing products, that is, max-cliques. If some groups are totally interconnected, we can assume that they are in direct competition and that one is not necessarily better than the other.
 
 \section{Visualization}
 The basic (and draft) idea of the visualization is to have guided navigation from the idea of the user to the final result. In particular, the process should be as follows:
 \begin{enumerate}
-	\item The user is presented with a selector that navigates through the Amazon category tree, and allows him/her to select a category (e.g. headphones, mobile phones, laptops, etc.) Of course, it will also be possible to search for a category according to some keywords.
+	\item The user is presented with a selector that navigates through the Amazon category tree, and allows him/her to select a category (e.g. headphones, mobile phones, laptops, etc.). Of course, it will also be possible to search for a category according to some keywords.
 	\item Once a category is selected, the graph view appears. Initially, the full graph is shown, so that the user can get a sense of its topology (sparseness, attractors, cliques, etc.).
 	\item The user can query a few keywords and set a price range, which will cause the graph to highlight only relevant parts and collapse the rest. At this point, the user can inspect the paths between products, as well as the \emph{attractors}. The visualization will also provide some recommendations (automatic paths) and display the characteristics of the products, along with their differences.
 \end{enumerate}
 
+\section{Process}
+The hardest part of this project is to represent the graph of products without showing information in wich the user may not be interested in.
+\begin{enumerate}
+	\item We opted for \href{http://bl.ocks.org/GerHobbelt/3071239}{this} collapsible graph which would allow to "hide" all the competing products in one node and expand it only if the user is really interested in analazying them. 
+	\item Once we display all the products of a category the next step is to choose an intuitive and easy way to select only the parts of the graph in which the user is interested. A simple search box and more advanced visualization (e.g. highlight the path to the bests products, show a list of computed best products, photos and links to the products) will accomplish the task.
+\end{enumerate}
+ 
 
 \end{document}
