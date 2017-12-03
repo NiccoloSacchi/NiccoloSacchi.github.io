@@ -7,33 +7,38 @@
 
 	<title>Amazon - product graph</title>
 
-	<!--<meta name="author" content="Data Visualization Project">-->
-
-
-	<!--<meta name="description" content="This is where I will tell my friends way too much about me">-->
-
-
 	<link rel="alternate" type="application/rss+xml" title="Amazon - A virtual proof that name is awesome!" href="/feed.xml">
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
 
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/bootstrap-social.css">
 	<link rel="stylesheet" href="css/main.css">
-
-	<!--<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic">-->
 	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
-	<!--<meta property="og:title" content="My website">-->
-	<!--<meta property="og:description" content="This is where I will tell my friends way too much about me">-->
-	<!--<meta property="og:type" content="website">-->
-	<!--<meta property="og:url" content="http://NiccoloSacchi.github.io/amazon/">-->
-	<!--<link rel="canonical" href="http://NiccoloSacchi.github.io/amazon/">-->
-	<!--<meta property="og:image" content="http://NiccoloSacchi.github.io/amazon/img/logo_2.jpg">-->
+    <link rel="stylesheet" href="css/graph-style.css">
 
-	<link rel="stylesheet" href="css/graph-style.css">
-	<!--<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.3.10/d3.min.js"></script>-->
 	<script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="js/categories_graph.js"></script>
+    <script src="js/product_graph.js"></script>
 </head>
-<body style="text-align: justify">
+<body
+        style="text-align: justify"
+        onload="
+//            drawProductGraph('graph.json');
+            let p = new ProductGraph();
+            p.draw('product_graph', 'graph.json');
+            drawCategoryGraph();
+//            setInterval(()=>{
+//                p.net.nodes.forEach((node) => {
+//                    if (node instanceof ProductNode){
+//                        node.show = (Math.random()>0.5)
+//                        node.group_data.show = node.show
+//                        node.group_data.nodes.forEach(n => n.show = node.show)
+//                    }
+//                });
+//                p.updateGraph();
+//                }, 10000)
+">
+
 	<nav class="navbar navbar-default navbar-fixed-top navbar-custom">
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -84,6 +89,9 @@
         <div class="row">
             <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
                 <div class="main-explain-area jumbotron">
+                    <div class="get-started-wrap" style="text-align: center; margin-top: 25px;">
+                        <a class="btn btn-success btn-lg get-started-btn" href="products.html">Get Started!</a>
+                    </div>
                     <p>
                         Buying from huge e-commerce websites such as <b>Amazon</b> has many
                         advantages, but, paradoxically, users are often confused by the vast
@@ -135,7 +143,6 @@
                                             </pattern>
                                         </defs>
                                     </svg>
-                                    <script src="js/categories_graph.js"></script>
                                 </td>
                             </tr>
                         </table>
@@ -159,7 +166,6 @@
                             direction of the preferred product.
                         </div>
                         <svg id="product_graph" style="margin-top: 20px"></svg>
-                        <script src="js/product_graph.js"></script>
                     </article>
                 </div>
             </div>

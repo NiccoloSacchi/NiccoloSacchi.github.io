@@ -35,8 +35,9 @@
 }
 
 #product_graph circle.leaf {
-  stroke: #fff;
-  stroke-width: 1.5px;
+  /*stroke: #fff;*/
+    stroke: #555;
+    stroke-width: 2px;
 }
 
 #product_graph path.hull {

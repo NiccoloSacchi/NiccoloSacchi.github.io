@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {"name": "0", "group": 0},
+    {"name": "1", "group": 1},
+    {"name": "2", "group": 2},
+    {"name": "3", "group": 2},
+    {"name": "4", "group": 2} ],
+  "links": [
+    {"source": 0, "target": 1, "right": true, "left": false, "value": 1},
+    {"source": 0, "target": 2, "right": true, "left": false, "value": 1},
+    {"source": 0, "target": 3, "right": true, "left": false, "value": 1},
+    {"source": 1, "target": 0, "right": false, "left": true, "value": 1},
+    {"source": 1, "target": 4, "right": false, "left": true, "value": 1},
+    {"source": 2, "target": 1, "right": true, "left": false, "value": 1},
+    {"source": 3, "target": 0, "right": true, "left": false, "value": 1},
+    {"source": 4, "target": 2, "right": true, "left": false, "value": 1},
+    {"source": 4, "target": 3, "right": false, "left": true, "value": 1}]}

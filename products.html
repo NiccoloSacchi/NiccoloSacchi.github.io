@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html lang="en"><!-- Beautiful Jekyll | MIT license | Copyright Dean Attali 2016 -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>Products</title>
+
+    <link rel="alternate" type="application/rss+xml" title="Amazon - A virtual proof that name is awesome!" href="/feed.xml">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-social.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+    <link rel="stylesheet" href="css/graph-style.css">
+    <link rel="stylesheet" href="css/search-tool.css">
+
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="js/categories_graph.js"></script>
+    <script src="js/product_graph_search_tool.js"></script>
+</head>
+<body
+        class="search-page"
+        onload="drawCategoryGraph(); drawProductGraph('graph.json');" >
+
+    <!-- categories graph -->
+    <div>
+        <table class="categories_table"> <!--categories_table_search-page-->
+            <tr>
+                <th>List view</th>
+                <th>Tree view</th>
+            </tr>
+            <tr>
+                <td id="category_view">
+                </td>
+                <td style="width: 700px;">
+                    <svg id="categories_graph" width="500px"> <!--fill="#efe">-->
+                        <defs>
+                            <pattern id="image" x="0%" y="0%" height="100%" width="100%"
+                                     viewBox="0 0 512 512">
+                                <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
+                            </pattern>
+                        </defs>
+                    </svg>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <hr>
+
+    <!-- search box -->
+    <section class="webdesigntuts-workshop" style="margin: 15px 15px">
+        <div>
+            <input id="input_product" placeholder="What product are you looking for?">
+            <button onclick="searchProduct()">Search</button>
+        </div>
+    </section>
+
+    <!-- product graph -->
+    <div>
+        <svg id="product_graph" style="width: 50%"></svg>
+    </div>
+</body>
