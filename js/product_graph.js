@@ -131,7 +131,7 @@ class ProductGraph {
         let hulls = {};
 
         for (let n of this.net.nodes) {
-            if (n instanceof ProductNode){
+            if (n instanceof ProductNode && n.show){
                 if (n.group_data.nodes.length != 1 && n.group_data.expanded) {
                     // if this node belongs to a group with more than one node
                     // the draw the hull

@@ -27,16 +27,16 @@
             let p = new ProductGraph();
             p.draw('product_graph', 'graph.json');
             drawCategoryGraph();
-//            setInterval(()=>{
-//                p.net.nodes.forEach((node) => {
-//                    if (node instanceof ProductNode){
-//                        node.show = (Math.random()>0.5)
-//                        node.group_data.show = node.show
-//                        node.group_data.nodes.forEach(n => n.show = node.show)
-//                    }
-//                });
-//                p.updateGraph();
-//                }, 10000)
+            setInterval(()=>{
+                p.net.nodes.forEach((node) => {
+                    if (node instanceof ProductNode){
+                        node.show = (Math.random()>0.5)
+                        node.group_data.show = node.show
+                        node.group_data.nodes.forEach(n => n.show = node.show)
+                    }
+                });
+                p.updateGraph();
+                }, 10000)
 ">
 
 	<nav class="navbar navbar-default navbar-fixed-top navbar-custom">
