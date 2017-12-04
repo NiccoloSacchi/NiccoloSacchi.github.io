@@ -6,7 +6,7 @@ let autocomp
 function pageInit() {
     drawCategoryGraph();
     p = new ProductGraph();
-    p.draw('product_graph', 'graph.json');
+    p.draw('product_graph', 'graph_1.json');
     autocomp = new autoComplete({
         selector: '#input_product',
         minChars: 2,
@@ -241,7 +241,7 @@ class ProductGraph {
             if (error) throw error;
             // json =
             // {"nodes":
-            //      [{"name": nodeName, "group": groupId}, ...]
+            //      [{"asin": "B00AEVCRME", "name": "asd", "imUrl": "... .jpg", "price": 60.13, "numReviews": 36, "averageRating": 4.2, "helpfulFraction": 0.68, "brand": "CAD Audio", "salesRankCategory": "Musical Instruments", "salesRank": 38611, "group": 0, "component": 0, "hashColor": "#5feceb"}, ...]
             //  "links":
             //      [{"source": nodeId, "target": nodeId, "right": false, "left": true, "value": 1}, ...]}
 
@@ -252,8 +252,9 @@ class ProductGraph {
                         .map(i => i.name.split(" "))
                         .reduce((a, b) => a.concat(b)).map(i => i.toLowerCase())))
 
+            // convert the nodes to ProductNode
             let data = {"nodes":[], "links":[]};
-            data.nodes = json.nodes.map(n => new ProductNode(n.name, n.group));
+            data.nodes = json.nodes.map(n => new ProductNode(n.asin, n.name, n.imUrl, n.price, n.numReviews, n.averageRating, n.helpfulFraction, n.brand, n.salesRankCategory, n.salesRank, n.group, n.component, n.hashColor));
             data.links = json.links;
 
             for (let link of data.links) {
@@ -350,7 +351,10 @@ class ProductGraph {
             .attr("r", (d) =>  d instanceof GroupNode ? d.nodes.length + this.dr : this.dr + 1)
             .attr("cx", (d) => d.x)
             .attr("cy", (d) => d.y)
-            .style("fill", (d) => d.fill())//.group))
+            .style("fill",
+                (d) =>
+                    d.fill())
+            // .style("fill", (d) => "#ef2d12")
             .on("click", (d) => {
                 if (this.updateNetwork(d))
                 {
@@ -421,9 +425,22 @@ class Node{
 }
 
 class ProductNode extends Node{
-    constructor(name, group){
+    constructor(asin, name, imUrl, price, numReviews, averageRating, helpfulFraction, brand, salesRankCategory, salesRank, group, component, hashColor){
         super(group);
-        this.name = name;
+        this.asin = asin
+        this.name = name
+        this.group = group
+        this.imUrl = imUrl
+        this.price = price
+        this.numReviews = numReviews
+        this.averageRating = averageRating
+        this.helpfulFraction = helpfulFraction
+        this.brand = brand
+        this.salesRankCategory = salesRankCategory
+        this.salesRank = salesRank
+        this.group = group
+        this.component = component
+        this.hashColor = hashColor
         // this.group_data; set at runtime
     }
 
@@ -444,7 +461,8 @@ class ProductNode extends Node{
     }
 
     fill() {
-        return "red"
+        // return "red"
+        return this.hashColor
     }
 
     toBeShown(){
