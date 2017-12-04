@@ -1,3 +1,31 @@
+let p
+let choices = []
+let autocomp
+
+// functions to manage search and autocompletion
+function pageInit() {
+    drawCategoryGraph();
+    p = new ProductGraph();
+    p.draw('product_graph', 'graph.json');
+    autocomp = new autoComplete({
+        selector: '#input_product',
+        minChars: 2,
+        source: function (term, suggest) {
+            term = term.toLowerCase();
+            let matches = [];
+            for (let i = 0; i < choices.length; i++) {
+                if (choices[i].toLowerCase().indexOf(term)>=0) {
+                    matches.push(choices[i]);
+                }
+                if (matches.length >= 10) {
+                    break
+                }
+            }
+            suggest(matches);
+        }
+    });
+}
+
 class ProductGraph {
     constructor() {
         // default initializations of the parameters (can be changed before calling the draw
@@ -92,6 +120,7 @@ class ProductGraph {
                 links.push(new Link(s, t, link.left, link.right))
             }
         }
+
         this.net = {nodes: nodes, links: links};
     }
 
@@ -105,7 +134,10 @@ class ProductGraph {
             // expand the product nodes near the group node
             clicked.nodes.forEach(node => {
                 node.x = clicked.x + Math.random();
-                node.y = clicked.y + Math.random();})
+                node.y = clicked.y + Math.random();
+                node.px = node.x
+                node.py = node.y
+            })
             return true
         }
         if (clicked.collapsible()){
@@ -120,6 +152,9 @@ class ProductGraph {
                 clicked.group_data.nodes
                     .map(node => node.y)
                     .reduce((y1, y2) => y1+y2)/clicked.group_data.nodes.length;
+
+            clicked.group_data.px = clicked.group_data.x
+            clicked.group_data.py = clicked.group_data.y
             return true
         }
         // if I can not collapse nor expand then the network didn't changed
@@ -209,6 +244,14 @@ class ProductGraph {
             //      [{"name": nodeName, "group": groupId}, ...]
             //  "links":
             //      [{"source": nodeId, "target": nodeId, "right": false, "left": true, "value": 1}, ...]}
+
+            // give the autocompletion all the splitted names
+            choices = Array.from(
+                new Set(
+                    json.nodes
+                        .map(i => i.name.split(" "))
+                        .reduce((a, b) => a.concat(b)).map(i => i.toLowerCase())))
+
             let data = {"nodes":[], "links":[]};
             data.nodes = json.nodes.map(n => new ProductNode(n.name, n.group));
             data.links = json.links;
@@ -236,11 +279,11 @@ class ProductGraph {
         let nodes_show = this.net.nodes.filter(node => node.toBeShown());
         let link_show = this.net.links.filter(link => link.toBeShown());
 
-
         this.force = d3.layout.force()
             .nodes(nodes_show)
             .links(link_show)
             .size([this.width, this.height])
+            // .theta(1) // the smaller the more fluid
             .linkDistance((l, i) => {
                 // let n1 = l.source, n2 = l.target;
                 // // larger distance for bigger groups:
@@ -352,7 +395,6 @@ class ProductGraph {
 class Node{
     // represent a node to be drawn (can be either a cluster of products or a single product)
     // is an "interface" for ProductNode and ClusterNode (but there are no interfaces in ECMA5...)
-
     constructor(group){
         // todo show could be only a parameter of a GroupNode
         this.group = group;
@@ -386,7 +428,7 @@ class ProductNode extends Node{
     }
 
     expandable(){
-        // a ProductNode is not expandible
+        // a ProductNode is not expandable
         return false
     }
 

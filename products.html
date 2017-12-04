@@ -15,14 +15,16 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
     <link rel="stylesheet" href="css/graph-style.css">
     <link rel="stylesheet" href="css/search-tool.css">
+    <link rel="stylesheet" href="css/auto-complete.css">
 
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="js/categories_graph.js"></script>
-    <script src="js/product_graph_search_tool.js"></script>
+    <script src="js/product_graph.js"></script>
+    <script src="js/auto-complete.min.js"></script>
 </head>
 <body
         class="search-page"
-        onload="drawCategoryGraph(); drawProductGraph('graph.json');" >
+        onload="pageInit()">
 
     <!-- categories graph -->
     <div>
@@ -54,7 +56,8 @@
     <section class="webdesigntuts-workshop" style="margin: 15px 15px">
         <div>
             <input id="input_product" placeholder="What product are you looking for?">
-            <button onclick="searchProduct()">Search</button>
+            <!--<button onclick="searchProduct()">Search</button>-->
+            <button onclick="">Search</button>
         </div>
     </section>
 
