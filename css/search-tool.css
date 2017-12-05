@@ -45,6 +45,7 @@
     display: inline-block;
     font-size: 0px;
     margin: auto;
+    /*float: left;*/
     padding: 20px;
     position: relative;
     z-index: 1;

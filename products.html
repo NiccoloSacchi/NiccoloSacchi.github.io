@@ -26,6 +26,26 @@
         class="search-page"
         onload="pageInit()">
 
+    <div>
+        <!-- search box -->
+        <section class="webdesigntuts-workshop">
+            <div>
+                <input id="categorySearchBox" placeholder="category">
+                <button onclick="filterProducts(document.getElementById('categorySearchBox').value)">Search</button>
+            </div>
+        </section>
+
+        <!-- search box -->
+        <section class="webdesigntuts-workshop" >
+            <div>
+                <input id="productSearchBox" placeholder="product">
+                <button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>
+            </div>
+        </section>
+    </div>
+
+    <hr>
+
     <!-- categories graph -->
     <div>
         <table class="categories_table"> <!--categories_table_search-page-->
@@ -50,20 +70,10 @@
         </table>
     </div>
 
-    <hr>
-
-    <!-- search box -->
-    <section class="webdesigntuts-workshop" style="margin: 15px 15px">
-        <div>
-            <input id="searchBox" placeholder="What product are you looking for?">
-            <button onclick="filterProducts(document.getElementById('searchBox').value)">Search</button>
-            <!--<button onclick="">Search</button>-->
-        </div>
-    </section>
-
     <!-- product graph -->
     <div>
         <svg id="product_graph" style="width: 50%"></svg>
         <div id="prodUrl"> </div>
     </div>
+
 </body>
