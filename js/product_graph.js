@@ -44,6 +44,7 @@ function filterProducts(keywords){
 
     // mark a showable all the reachable nodes
     dfs_show(products)
+	find_paths(p.net.nodes)
 
     // if a group contains at least one product to be shown then show also this group
     p.net.nodes.forEach(n =>{
@@ -73,6 +74,34 @@ function dfs_show(nodes) {
     if (neighbours.length > 0) {
         dfs_show(neighbours)
     }
+}
+
+function find_paths(nodes) {
+	// Sort nodes by decreasing fan-in minus fan-out
+	best = nodes
+		.filter(a => a instanceof ProductNode && a.show)
+		.sort((a, b) => (b.incoming.length - b.neighbours.length) - (a.incoming.length - a.neighbours.length))
+	
+	nodes.forEach(n => [n.pred, n.dist, n.assigned] = [null, Infinity, false])
+	
+	queue = []
+	best.forEach(n => {
+		if (!n.assigned) {
+			queue.push(n)
+			n.dist = 0
+		}
+		while (queue.length > 0) {
+			u = queue.shift()
+			u.assigned = true
+			u.incoming.forEach(v => {
+				if (n.dist + 1 < v.dist) {
+					v.dist = n.dist + 1
+					v.pred = u
+					queue.push(v)
+				}
+			})
+		}
+	})
 }
 
 class ProductGraph {
@@ -307,7 +336,8 @@ class ProductGraph {
 
             // convert the nodes to ProductNode
             let data = {"nodes":[], "links":[]};
-            data.nodes = json.nodes.map(n => new ProductNode(n.asin, n.name, n.imUrl, n.price, n.numReviews, n.averageRating, n.helpfulFraction, n.brand, n.salesRankCategory, n.salesRank, n.group, n.component, n.hashColor));
+			let idx = 0 // HACK
+            data.nodes = json.nodes.map(n => new ProductNode(n.asin, n.name, n.imUrl, n.price, n.numReviews, n.averageRating, n.helpfulFraction, n.brand, n.salesRankCategory, n.salesRank, idx++/*n.group*/, n.component, n.hashColor));
             data.links = json.links.map(l => new Link(data.nodes[l.source], data.nodes[l.target], l.left, l.right));
             // source and target of the link are now pointers to the nodes
             // instead of just numbers
@@ -385,7 +415,7 @@ class ProductGraph {
             .attr("y1", (d) => d.source.y)
             .attr("x2", (d) => d.target.x)
             .attr("y2", (d) => d.target.y)
-            .style("stroke-width", (d) => 1 || d.size || 1);
+            .style("stroke-width", (d) => (d.size && d.size == 3) ? 3 : (1 || d.size || 1))
 
         let node = this.nodeg.selectAll("circle.node")
             .data(nodes_show, (n) => n.id())
@@ -417,11 +447,23 @@ class ProductGraph {
                 {
                     document.getElementById("prodUrl").innerHTML = d.link()
                 }
+				
+				// Show shortest path to best product
+				let node = d
+				while (node.pred != null) {
+					node.links[node.pred.id()].size = 3
+					node = node.pred
+				}
+				
+				link.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
             })
             .on("mouseout", (d) => {
                 this.tooltip.transition()
                     .duration(500)
                     .style("opacity", 0);
+				
+				this.net.links.forEach(l => l.size = 0)
+				link.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
             });
 
         // node.call(this.force.drag);
@@ -491,6 +533,8 @@ class ProductNode extends Node{
         this.hashColor = hashColor
 
         this.neighbours = []; // list of directly reachable nodes
+		this.incoming = []; // list of nodes that point towards this node
+		this.links = {};
         // this.group_data; set at runtime
     }
 
@@ -584,10 +628,14 @@ class Link {
         // do a DFS on the graph composed only by ProductNodes)
         if (this.source instanceof ProductNode && this.target instanceof ProductNode) {
             if (this.right) {
+				this.source.links[this.target.id()] = this
                 this.source.neighbours.push(this.target)
+				this.target.incoming.push(this.source)
             }
             if (this.left) {
+				this.target.links[this.source.id()] = this
                 this.target.neighbours.push(this.source)
+				this.source.incoming.push(this.target)
             }
         }
     }
