@@ -28,15 +28,9 @@
             p.draw('product_graph', 'graph_2.json');
             drawCategoryGraph();
             setInterval(()=>{
-                p.net.nodes.forEach((node) => {
-                    if (node instanceof ProductNode){
-                        node.show = (Math.random()>0.5)
-                        node.group_data.show = node.show
-                        node.group_data.nodes.forEach(n => n.show = node.show)
-                    }
-                });
+                p.net.nodes.forEach((node) => node.show = (Math.random()>0.5));
                 p.updateGraph();
-                }, 1000)
+            }, 1000)
 ">
 
 	<nav class="navbar navbar-default navbar-fixed-top navbar-custom">

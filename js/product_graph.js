@@ -7,9 +7,10 @@ function pageInit() {
     drawCategoryGraph();
     p = new ProductGraph();
     p.draw('product_graph', 'graph_1.json');
+
     autocomp = new autoComplete({
-        selector: '#input_product',
-        minChars: 2,
+        selector: '#searchBox',
+        minChars: 1,
         source: function (term, suggest) {
             term = term.toLowerCase();
             let matches = [];
@@ -24,6 +25,54 @@ function pageInit() {
             suggest(matches);
         }
     });
+}
+
+function filterProducts(keywords){
+    // set show to true only the product nodes corresponding with the keyword
+    let products = p.net.nodes.filter(n => {
+            if (n instanceof ProductNode) {
+                n.show = (n.name.toLowerCase().indexOf(keywords) >= 0)
+                // keep only the nodes with that keyword
+                return n.show
+            }
+            else {
+                // drop group nodes
+                return false
+            }
+        }
+    )
+
+    // mark a showable all the reachable nodes
+    dfs_show(products)
+
+    // if a group contains at least one product to be shown then show also this group
+    p.net.nodes.forEach(n =>{
+            if (n instanceof GroupNode){
+                // if (!n.nodes.every(n=>n.show) && !n.nodes.every(n=>!n.show)){
+                //     console.log("the shit hit the fan")
+                // }
+                // if so show also the respective group
+                n.show = n.nodes.map(n => n.show).includes(true)
+            }
+        }
+    )
+
+    p.updateGraph()
+}
+
+function dfs_show(nodes) {
+    // the bfs is done considering only the product nodes
+
+    // (unique) list of non-explored neighbours
+    let neighbours = Array.from(
+        new Set(
+            nodes
+                .reduce((acc, n) => acc.concat(n.neighbours.filter(n => !n.show)), [])));
+    // set the neighbours as seen
+    neighbours.forEach(n => n.show = true)
+    if (neighbours.length > 0) {
+        dfs_show(neighbours)
+    }
 }
 
 class ProductGraph {
@@ -81,9 +130,11 @@ class ProductGraph {
         // remove the groups with only one node and mark them as expanded
         // We always want to show directly the inner product
         nodes = nodes.filter(group => {
-            if (group instanceof GroupNode) {
-                group.expanded = (group.nodes.length == 1)
-                return !group.expanded // filter out the expanded groups
+            if (group instanceof GroupNode && group.nodes.length == 1) {
+                // if this group has only one element then delete this node (keep only
+                // the product node)
+                group.nodes[0].group_data = null;
+                return false // filter out this node
             }
             return true
         });
@@ -92,32 +143,32 @@ class ProductGraph {
         for (let link of data.links) {
             // link.source and link.target are ProductNodes
             let source = link.source,
-                target = link.target,
-                s, t;
+                target = link.target;
 
             // add the link between the two ProductNodes
-            s = source;
-            t = target;
-            links.push(new Link(s, t, link.left, link.right))
+            links.push(link)
 
-            // recall: if now a group is expanded then is because we don't wanna show it
-            // add the link between the two GroupNodes (if both are in 'nodes' are are different)
-            if (!source.group_data.expanded && !source.group_data.expanded && source.group!=target.group) {
-                s = source.group_data
-                t = target.group_data
-                links.push(new Link(s, t, link.left, link.right))
-            }
+            // add also a link between the GroupNodes (only if different)
+            if (source.group!=target.group) {
+                let s, t;
+                if (source.group_data && target.group_data) {
+                    // add the link between the two groups
+                    s = source.group_data
+                    t = target.group_data
+                    links.push(new Link(s, t, link.left, link.right))
+                }
 
-            if (!target.group_data.expanded) {
-                s = source
-                t = target.group_data
-                links.push(new Link(s, t, link.left, link.right))
-            }
+                if (target.group_data) {
+                    s = source
+                    t = target.group_data
+                    links.push(new Link(s, t, link.left, link.right))
+                }
 
-            if (!source.group_data.expanded) {
-                s = source.group_data;
-                t = target;
-                links.push(new Link(s, t, link.left, link.right))
+                if (source.group_data) {
+                    s = source.group_data;
+                    t = target;
+                    links.push(new Link(s, t, link.left, link.right))
+                }
             }
         }
 
@@ -164,18 +215,19 @@ class ProductGraph {
     convexHulls() {
         // constructs the shadows for the "opened" clusters
         let hulls = {};
+        let gm = {};
 
         for (let n of this.net.nodes) {
             if (n instanceof ProductNode && n.show){
-                if (n.group_data.nodes.length != 1 && n.group_data.expanded) {
-                    // if this node belongs to a group with more than one node
-                    // the draw the hull
+                // if the ProductNode belongs to an expanded group draw the hull
+                if (n.group_data && n.group_data.expanded) {
                     let i = n.group,
                         l = hulls[i] || (hulls[i] = []);
                     l.push([n.x - this.off, n.y - this.off]);
                     l.push([n.x - this.off, n.y + this.off]);
                     l.push([n.x + this.off, n.y - this.off]);
                     l.push([n.x + this.off, n.y + this.off]);
+                    gm[i] = gm[i] || (gm[i] = n.group_data) // store the pointer o the group
                 }
             }
         }
@@ -183,7 +235,8 @@ class ProductGraph {
         // create convex hulls
         let hullset = [];
         for (let i in hulls) {
-            hullset.push({group: i, path: d3.geom.hull(hulls[i])});
+            // bind the hull to the respective group
+            hullset.push({group: gm[i], path: d3.geom.hull(hulls[i])});
         }
 
         return hullset;
@@ -255,14 +308,9 @@ class ProductGraph {
             // convert the nodes to ProductNode
             let data = {"nodes":[], "links":[]};
             data.nodes = json.nodes.map(n => new ProductNode(n.asin, n.name, n.imUrl, n.price, n.numReviews, n.averageRating, n.helpfulFraction, n.brand, n.salesRankCategory, n.salesRank, n.group, n.component, n.hashColor));
-            data.links = json.links;
-
-            for (let link of data.links) {
-                // source and target of the link are now pointers to the structure
-                // of a node instead of just numbers
-                link.source = data.nodes[link.source];
-                link.target = data.nodes[link.target];
-            }
+            data.links = json.links.map(l => new Link(data.nodes[l.source], data.nodes[l.target], l.left, l.right));
+            // source and target of the link are now pointers to the nodes
+            // instead of just numbers
 
             this.hullg = svg.append("g");
             this.linkg = svg.append("g");
@@ -321,12 +369,8 @@ class ProductGraph {
             .attr("d", this.drawCluster)
             .style("fill", (d) => "blue")//.group))
             .on("click", (d) => {
-                // convert the hull to a ProductNode in the hull
-                let clicked = this.net.nodes.find(node =>
-                    (node instanceof ProductNode) && (node.group==d.group)
-                )
-
-                if (this.updateNetwork(clicked)) {
+                // simulate the click on a product node
+                if (this.updateNetwork(d.group.nodes[0])) {
                     this.updateGraph();
                 }
             });
@@ -369,6 +413,10 @@ class ProductGraph {
                 this.tooltip.html(d.createTooltip())
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
+                if (d instanceof ProductNode)
+                {
+                    document.getElementById("prodUrl").innerHTML = d.link()
+                }
             })
             .on("mouseout", (d) => {
                 this.tooltip.transition()
@@ -400,7 +448,7 @@ class Node{
     // represent a node to be drawn (can be either a cluster of products or a single product)
     // is an "interface" for ProductNode and ClusterNode (but there are no interfaces in ECMA5...)
     constructor(group){
-        // todo show could be only a parameter of a GroupNode
+        // todo show could be only a parameter of a ProductNode
         this.group = group;
         this.show = true; // you will remove some nodes from the graph (simply don't show them)
         // this.index;
@@ -441,6 +489,8 @@ class ProductNode extends Node{
         this.group = group
         this.component = component
         this.hashColor = hashColor
+
+        this.neighbours = []; // list of directly reachable nodes
         // this.group_data; set at runtime
     }
 
@@ -450,9 +500,8 @@ class ProductNode extends Node{
     }
 
     collapsible(){
-        // a ProductNode is collapsible in the GroupNode only if the latter contains
-        // at least two ProductNode
-        return this.group_data.nodes.length>1
+        // a ProductNode is collapsible only if belongs ot a GroupNode
+        return this.group_data != null
     }
 
     createTooltip() {
@@ -461,27 +510,35 @@ class ProductNode extends Node{
     }
 
     fill() {
-        // return "red"
-        return this.hashColor
+        return "red"
+        // return this.hashColor
     }
 
     toBeShown(){
-        // a ProductNode is shown if (this.group_data.expanded && this.show), i.e.
-        // -this.group_data.expanded: the relative group is expanded
-        // -this.show: you want effectively to show the node (maybe the user is not interested
-        // in seeing this product)
-        return this.group_data.expanded && this.show
+        if (this.group_data){
+            // show if it belongs to an expanded, not hidden group and this node is not
+            // hidden too
+            return this.group_data.show && this.group_data.expanded && this.show
+        }
+        else{
+            // otherwise show only if this node is not hidden
+            return this.show
+        }
     }
 
     id() {
         return this.group+"|"+this.name;
+    }
+
+    link(){
+        return "<a href='https://www.amazon.com/dp/"+ this.asin +"'> url </a>"
     }
 }
 
 class GroupNode extends Node{
     constructor(group){
         super(group);
-        this.link_count = 1;
+        // this.link_count = 1;
         this.nodes = [];
         this.expanded = false;
     }
@@ -506,7 +563,7 @@ class GroupNode extends Node{
     }
 
     toBeShown(){
-        // the group is shown only if not expanded
+        // the group is shown only if not expanded and not hidden
         return !this.expanded && this.show
     }
 
@@ -522,6 +579,17 @@ class Link {
         this.left = left;     // direction of the arrow (bool)
         this.right = right;   // direction of the arrow (bool), the arrow may point in both directions
         this.size = 0;
+
+        // add to each node the pointers to its out links (so that we can efficiently
+        // do a DFS on the graph composed only by ProductNodes)
+        if (this.source instanceof ProductNode && this.target instanceof ProductNode) {
+            if (this.right) {
+                this.source.neighbours.push(this.target)
+            }
+            if (this.left) {
+                this.target.neighbours.push(this.source)
+            }
+        }
     }
 
     toBeShown() {

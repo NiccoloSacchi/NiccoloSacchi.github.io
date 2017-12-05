@@ -55,14 +55,15 @@
     <!-- search box -->
     <section class="webdesigntuts-workshop" style="margin: 15px 15px">
         <div>
-            <input id="input_product" placeholder="What product are you looking for?">
-            <!--<button onclick="searchProduct()">Search</button>-->
-            <button onclick="">Search</button>
+            <input id="searchBox" placeholder="What product are you looking for?">
+            <button onclick="filterProducts(document.getElementById('searchBox').value)">Search</button>
+            <!--<button onclick="">Search</button>-->
         </div>
     </section>
 
     <!-- product graph -->
     <div>
         <svg id="product_graph" style="width: 50%"></svg>
+        <div id="prodUrl"> </div>
     </div>
 </body>
