@@ -37,7 +37,6 @@ function filterProducts(keywords){
 
     // mark a showable all the reachable nodes
     dfs_show(products)
-	find_paths(p.net.nodes)
 
     // // if a group contains at least one product to be shown then show also this group
     // p.net.nodes.forEach(n =>{
@@ -236,6 +235,8 @@ class ProductGraph {
                     this.net.cliques[clique] = cm[clique]
 
 
+            find_paths(p.net.nodes)
+
             this.hullg = svg.append("g");
             this.linkg = svg.append("g");
             this.nodeg = svg.append("g");
@@ -288,6 +289,8 @@ class ProductGraph {
         let link_selection = this.linkg
             .selectAll("line")
             .data(link_show)
+            .style('marker-start', (d) => d.left ? 'url(#start-arrow)' : '')
+            .style('marker-end', (d) => d.right ? 'url(#end-arrow)' : '')
         link_selection
             .enter()
             .append("line")
@@ -374,84 +377,6 @@ class ProductGraph {
             .attr("d", this.drawCluster)
             .style("fill", (d) => "blue")
         hull_selection.exit().remove()
-
-        // let link = this.linkg.selectAll("line.link").data(link_show, (l) => l.id())
-        // link.exit().remove();
-        // link.enter().append("line")
-        //     .attr("class", "link")
-        //     .style('marker-start', (d) => d.left ? 'url(#start-arrow)' : '')
-        //     .style('marker-end', (d) => d.right ? 'url(#end-arrow)' : '')
-        //     .attr("x1", (d) => d.source.x)
-        //     .attr("y1", (d) => d.source.y)
-        //     .attr("x2", (d) => d.target.x)
-        //     .attr("y2", (d) => d.target.y)
-        //     .style("stroke-width", (d) => (d.size && d.size == 3) ? 3 : (1 || d.size || 1))
-
-        // let node = this.nodeg.selectAll("circle.node")
-        //     .data(nodes_show, (n) => n.id())
-        // node.exit().remove();
-        // node.enter().append("circle")
-        //     .attr("class", (d) => "node" + (d instanceof GroupNode ? "" : " leaf"))
-        //     .attr("r", (d) =>  d instanceof GroupNode ? d.nodes.length + this.dr : this.dr + 1)
-        //     .attr("cx", (d) => d.x)
-        //     .attr("cy", (d) => d.y)
-        //     .style("fill",
-        //         (d) =>
-        //             d.fill())
-        //     // .style("fill", (d) => "#ef2d12")
-        //     .on("click", (d) => {
-        //         if (this.updateNetwork(d))
-        //         {
-        //             // it the network updated the update also the graph
-        //             this.updateGraph();
-        //         }
-        //     })
-        //     .on("mouseover", (d) => {
-        //         this.tooltip.transition()
-        //             .duration(200)
-        //             .style("opacity", .9);
-        //         this.tooltip.html(d.createTooltip())
-        //             .style("left", (d3.event.pageX) + "px")
-        //             .style("top", (d3.event.pageY - 28) + "px");
-        //         if (d instanceof ProductNode)
-        //         {
-        //             document.getElementById("prodUrl").innerHTML = d.link()
-        //         }
-			//
-			// 	// Show shortest path to best product
-			// 	let node = d
-			// 	while (node.pred != null) {
-			// 		node.links[node.pred.id()].size = 3
-			// 		node = node.pred
-			// 	}
-			//
-			// 	link.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
-        //     })
-        //     .on("mouseout", (d) => {
-        //         this.tooltip.transition()
-        //             .duration(500)
-        //             .style("opacity", 0);
-			//
-			// 	this.net.links.forEach(l => l.size = 0)
-			// 	link.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
-        //     });
-        //
-        // // node.call(this.simulation.drag);
-        //
-        // this.simulation.on("tick", () => {
-        //     if (!hull.empty()) {
-        //         hull.data(this.convexHulls())
-        //             .attr("d", this.drawCluster);
-        //     }
-        //
-        //     link.attr("x1", (d) => d.source.x)
-        //         .attr("y1", (d) => d.source.y)
-        //         .attr("x2", (d) => d.target.x)
-        //         .attr("y2", (d) => d.target.y)
-        //
-        //     node.attr("cx", (d) => d.x)
-        //         .attr("cy", (d) => d.y);
-        // });
     }
 }
 
