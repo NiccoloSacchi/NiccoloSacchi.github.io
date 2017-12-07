@@ -122,14 +122,13 @@ class ProductGraph {
     }
 
     convexHulls() {
-        // constructs the shadows for the "opened" clusters
-        let hulls = {};
-        let gm = {};
+        // update the hull of each clique
 
+        let hulls = {};
         for (let clique in this.net.cliques) {
-            hulls[clique] = hulls[clique] || [];
+            hulls[clique] = hulls[clique] || []
             for (let n of this.net.cliques[clique]){
-                if (n.show) {
+                if (n.toBeShown()) {
                     hulls[clique].push([n.x - this.off, n.y - this.off]);
                     hulls[clique].push([n.x - this.off, n.y + this.off]);
                     hulls[clique].push([n.x + this.off, n.y - this.off]);
@@ -142,13 +141,14 @@ class ProductGraph {
         let hullset = [];
         for (let clique in hulls) {
             // bind the hull to the respective group
-            hullset.push({clique: this.net.cliques[clique], path: d3.polygonHull(hulls[clique])});
+            if (hulls[clique].length > 1)
+                hullset.push({clique: this.net.cliques[clique], path: d3.polygonHull(hulls[clique])});
         }
-
-        return hullset;
+        return hullset
     }
 
     drawGraph(svgId, file){ // e.g. ("product_graph", "graph.json")
+        let that = this
         // select the svg
         let body = d3.select("body");
         let svg = body.select("#"+svgId)
@@ -235,48 +235,74 @@ class ProductGraph {
                 if (cm[clique].length > 1)
                     this.net.cliques[clique] = cm[clique]
 
+
             this.hullg = svg.append("g");
             this.linkg = svg.append("g");
             this.nodeg = svg.append("g");
 
+            this.simulation = d3.forceSimulation()
+                .force("link", d3.forceLink()
+//            .id((d) =>d.asin)
+                )
+                .force("charge", d3.forceManyBody())//.theta(1))
+                .force("center", d3.forceCenter(this.width / 2, this.height / 2))
+                // regulate the shape of the whole cluster
+                .force("x", d3.forceX().strength(.2))
+                .force("y", d3.forceY().strength(.1))
+                .force("repelForce", d3.forceManyBody().strength(-50))//.distanceMax(50).distanceMin(10));
+
+            that.simulation.on("tick", ticked);
+            function ticked() {
+                that.linkg
+                    .selectAll("line")
+                    .attr("x1", (d) => d.source.x)
+                    .attr("y1", (d) => d.source.y)
+                    .attr("x2", (d) => d.target.x)
+                    .attr("y2", (d) => d.target.y);
+
+                that.nodeg.selectAll("circle")
+                    .attr("cx", (d) => d.x)
+                    .attr("cy", (d) => d.y);
+
+                let hull = that.hullg.selectAll("path.hull")
+                if (hull && !hull.empty()) {
+                    hull.data(that.convexHulls())
+                        .attr("d", that.drawCluster);
+                }
+            }
             // this.computeNetwork(data);
             this.updateGraph();
         });
     }
 
     updateGraph() {
-        if (this.simulation) this.simulation.stop();
+        // if (this.simulation) this.simulation.stop();
 
-        let this_ = this
+        // store the context in a variable to access it in the functions
+        let that = this
 
         // get only the nodes and the links to be shown
         let nodes_show = this.net.nodes.filter(node => node.toBeShown());
         let link_show = this.net.links.filter(link => link.toBeShown());
 
-        this.simulation = d3.forceSimulation()
-            .force("link", d3.forceLink()
-//            .id((d) =>d.asin)
-            )
-            .force("charge", d3.forceManyBody())
-            .force("center", d3.forceCenter(this.width / 2, this.height / 2))
-            // regulate the shape of the whole cluster
-            .force("x", d3.forceX().strength(.2))
-            .force("y", d3.forceY().strength(.1))
-            .force("repelForce", d3.forceManyBody().strength(-50))//.distanceMax(50).distanceMin(10));
-
-        let link = this.linkg
+        let link_selection = this.linkg
             .selectAll("line")
             .data(link_show)
-            .enter().append("line")
+        link_selection
+            .enter()
+            .append("line")
             .attr("class", "link")
             .style('marker-start', (d) => d.left ? 'url(#start-arrow)' : '')
             .style('marker-end', (d) => d.right ? 'url(#end-arrow)' : '')
             // .attr("stroke-width", (d) => Math.sqrt(d.value));
+        link_selection.exit().remove()
 
-        let node = this.nodeg
+        let node_selection = this.nodeg
             .selectAll("circle")
             .data(nodes_show)
-            .enter().append("circle")
+        node_selection
+            .enter()
+            .append("circle")
             .attr("class", "node")
             .attr("r", 5)
             .attr("fill", (d) =>d.fill())
@@ -291,25 +317,28 @@ class ProductGraph {
                 let url = document.getElementById("prodUrl")
                 if (url)
                     url.innerHTML = d.link()
+
                 // Show shortest path to best product
+                let links = this.linkg.selectAll("line")
                 let node = d
                 while (node.pred != null) {
                     node.links[node.pred.id()].size = 3
                     node = node.pred
                 }
-                link.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
+                links.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
             })
             .on("mouseout", (d) => {
                 this.tooltip.transition()
                 .duration(500)
                 .style("opacity", 0);
 
+                let links = this.linkg.selectAll("line")
                 this.net.links.forEach(l => l.size = 0)
-                link.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
+                links.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
             })
             .call(d3.drag()
                 .on("start", (d) => {
-                    if (!d3.event.active) this_.simulation.alphaTarget(0.3).restart();
+                    if (!d3.event.active) that.simulation.alphaTarget(0.3).restart();
                     d.fx = d.x;
                     d.fy = d.y;
                 })
@@ -318,45 +347,33 @@ class ProductGraph {
                     d.fy = d3.event.y;
                 })
                 .on("end", (d) => {
-                    if (!d3.event.active) this_.simulation.alphaTarget(0);
+                    if (!d3.event.active) that.simulation.alphaTarget(0);
                     d.fx = null;
                     d.fy = null;
-                }));
-
-        node.append("title")
-            .text((d) => d.asin);
+                }))
+            .append("title")
+            .text((d) => d.asin)
+        node_selection.exit().remove()
 
         this.simulation
             .nodes(nodes_show)
-            .on("tick", ticked);
 
         this.simulation.force("link")
             .links(link_show);
 
-        this.hullg.selectAll("path.hull").remove();
-        let hull = this.hullg.selectAll("path.hull")
-            .data(this.convexHulls())
-            .enter().append("path")
+        // this.simulation.restart()
+        this.simulation.alphaTarget(0.3).restart()
+
+        let hull_data = this.convexHulls()
+        let hull_selection = this.hullg
+            .selectAll("path.hull")
+            .data(hull_data)
+        hull_selection.enter()
+            .append("path")
             .attr("class", "hull")
             .attr("d", this.drawCluster)
             .style("fill", (d) => "blue")
-
-        function ticked() {
-            link
-                .attr("x1", (d) => d.source.x)
-                .attr("y1", (d) => d.source.y)
-                .attr("x2", (d) => d.target.x)
-                .attr("y2", (d) => d.target.y);
-
-            node
-                .attr("cx", (d) => d.x)
-                .attr("cy", (d) => d.y);
-
-            if (!hull.empty()) {
-                hull.data(this_.convexHulls())
-                    .attr("d", this_.drawCluster);
-            }
-        }
+        hull_selection.exit().remove()
 
         // let link = this.linkg.selectAll("line.link").data(link_show, (l) => l.id())
         // link.exit().remove();
