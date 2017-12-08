@@ -27,28 +27,33 @@
   stroke-width: 1.5px;
 }
 
-/* clustproducter graph */
+/* style for the product graph */
 #product_graph circle.node {
     /*fill: lightsteelblue;*/
-    stroke: #555;
+    /*stroke: #555;*/
     stroke-width: 3px;
 }
 
-#product_graph circle.leaf {
-  /*stroke: #fff;*/
-    stroke: #555;
-    stroke-width: 2px;
-}
-
 #product_graph path.hull {
-    fill: lightsteelblue;
-    fill-opacity: 0.3;
+    /*fill: lightsteelblue;*/
+    stroke-opacity: 1;
+    fill-opacity: 0.6;
+    stroke: gray;
+    stroke-width: 2;
 }
 
 #product_graph line.link {
   stroke: #333;
   stroke-opacity: 0.5;
   pointer-events: none;
+}
+
+#product_graph path {
+    /* for the arrows */
+    stroke-opacity: 0.5;
+    stroke: black;
+    stroke-width: 3;
+    fill: none;
 }
 
 /* tooltip */

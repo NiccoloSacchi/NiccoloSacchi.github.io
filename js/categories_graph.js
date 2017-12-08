@@ -1,4 +1,6 @@
-function drawCategoryGraph() {
+// import * as d3 from './d3.v4.min.js'
+
+export function drawCategoryGraph() {
 
 // function convert_map(map){
 //     return Object.keys(map).map((name) => {
@@ -12,7 +14,7 @@ function drawCategoryGraph() {
 // }
 
 // attach the .equals method to Array's prototype to call it on any array
-    ArrayEquals = (array1, array2) => {
+    let ArrayEquals = (array1, array2) => {
         // if the other array is a falsy value, return
         if (!array1 || !array2)
             return false;
@@ -61,7 +63,9 @@ function drawCategoryGraph() {
     }
 
     let pubs;
-    d3.json("data/categories.json", function (data) {
+    d3.json("data/categories.json", function (error, data) {
+        if (error) throw error;
+
         // let pubs = {"names": [""], "children": convert_map(data), 'count': 1, 'isleaf': false};
         pubs = data; // store the data in a "global" variable
 
@@ -69,7 +73,7 @@ function drawCategoryGraph() {
 
         let height = 530;
         let width; // width will be computer after
-        let diameter = height;
+        // let diameter = height;
 
         let i = 0,
             duration = 350,
@@ -82,30 +86,26 @@ function drawCategoryGraph() {
             [node_diameter[0], node_diameter[1]] // codomain (diameter of the nodes)
         );
 
-        let degrees = 300;
-        let degrees_half = degrees / 2;
-        let tree = d3.layout.tree()
-            .size([degrees, diameter / 2 - 80])
-            .separation((a, b) => (a.parent == b.parent ? 1 : 10) / a.depth);
-
-        let diagonal = d3.svg.diagonal.radial()
-            .projection((d) => [d.y, d.x / 180 * Math.PI]);
-
         let svg = d3.select("body").select("#categories_graph")
             .attr("width", "100%")
             .attr("height", height)
             .append("g")
-            .attr("transform", () => {
-                width = document.getElementById("categories_graph").clientWidth;
-                return "translate(" + width / 2 + "," + (height / 2 - 60) + ")rotate(" + (360 - degrees) / 2 + ")"
-            });
+
+        width = document.getElementById("categories_graph").clientWidth;
+        svg.attr("transform", () => "translate(" + width / 2 + "," + (height / 2) + ")");
+
+        let degrees = 2*Math.PI;
+        let degrees_half = degrees / 2;
+        let treemap = d3.tree()
+            .size([degrees, width])
+            .separation((a, b) => (a.parent == b.parent ? 1 : 10) / a.depth);
 
         //create the tooltip that will be show on mouse over the nodes
         let tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
 
-        let curr_root = pubs;
+        let curr_root =  d3.hierarchy(pubs, (d) => d.children);
         roots.push(curr_root);
         curr_root.x0 = height / 2;
         curr_root.y0 = 0;
@@ -114,27 +114,28 @@ function drawCategoryGraph() {
         update(curr_root); // update the graph
         appendToList(curr_root); // update the list
 
-        d3.select(self.frameElement).style("height", "800px");
-
         function update(source) {
             let curr_root = roots[roots.length - 1];
 
+            // Assign the x and y position to the nodes
+            let root = treemap(curr_root);
+
             // Compute the new tree layout.
-            let nodes = tree.nodes(curr_root),
-                links = tree.links(nodes);
+            let nodes = root.descendants(),
+                links = root.links()
 
             // Normalize for fixed-depth.
-            nodes.forEach((d) => d.y = d.depth * 120);
+            nodes.forEach((d) => d.y = d == curr_root ? 0 : 100);
 
-            // Update the nodes…
-            let node = svg.selectAll("g.node")
+            // ****************** Nodes section ***************************
+            // Update the nodes...
+            let node = svg.selectAll('g.node')
                 .data(nodes, (d) => d.id || (d.id = ++i));
-
-            // Enter any new nodes at the parent's previous position.
-            let nodeEnter = node.enter().append("g")
-                .attr("class", "node")
-                //.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
-                .on("click", click)
+            let nodeEnter = node.enter().append('g')
+                .attr('cursor', 'pointer')
+                .attr('class', 'node')
+                .attr("transform", (d) => "translate(" + radialPoint(source.x0, source.y0) + ")")
+                .on('click', click)
                 // show the tooltip
                 .on("mouseover", (d) => {
                     tooltip
@@ -143,7 +144,7 @@ function drawCategoryGraph() {
                         .style("opacity", .9);
                     tooltip
                         .html(
-                            "<span><b>Number of products: </b>" + d.count.toLocaleString() + "</span>")
+                            "<span><b>Number of products: </b>" + d.data.count.toLocaleString() + "</span>")
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 })
@@ -154,56 +155,65 @@ function drawCategoryGraph() {
                         .style("opacity", 0);
                 });
 
+            // Add Circle for the nodes
             nodeEnter.append("circle")
+                .attr('r', 1e-6)
                 .style("stroke", (d) => stroke(d))
                 .style("fill", (d) => fill_category(d));
 
+            // Add labels for the nodes
             nodeEnter.append("text")
-                .attr("text-anchor", (d) => d.x < degrees_half ? "start" : "end")
-                // .attr("transform", (d) => { d.x < 180 ? "translate(0)" : "rotate(180)translate(-" + (d.name.length * 8.5)  + ")"})
-                .style("fill-opacity", 1e-6)
-                .html((d) =>
-                    d.names.map((name, i) =>
-                        "<tspan x='0' dy='" + ((i == 0) ? (-(d.names.length - 1) * 1.1 / 2 + 0.35) : 1.1) + "em'>" +
-                        name +
-                        "</tspan>")
-                        .join("")
+                .attr("dy", "0.31em")
+                .attr("x", (d) => d.x < degrees_half ? 6 : -6)
+                .html((d) => {
+                    let names = d.data.names
+                    return names.map((name, i) =>
+                            "<tspan x='0' dy='" + ((i == 0) ? (-(names.length - 1) * 1.1 / 2 + 0.35) : 1.1) + "em'>" +
+                            name +
+                            "</tspan>")
+                            .join("")
+                    }
                 );
 
-            // Transition nodes to their new position.
-            let nodeUpdate = node.transition()
-                .duration(duration)
-                .attr("transform", (d) => "rotate(" + (d.x - 90) + ")translate(" + d.y + ")");
+            // UPDATE
+            let nodeUpdate = nodeEnter.merge(node);
 
+            // Transition to the proper position for the node
+            nodeUpdate.transition()
+                .duration(duration)
+                .attr("transform", (d) => "translate(" + radialPoint(d.x, d.y) + ")");
+
+            // Update the node attributes and style
             nodeUpdate.select("circle")
-                .attr("r", (d) => diameterScale(Math.sqrt(d.count)))
+                .attr("r", (d) => diameterScale(Math.sqrt(d.data.count)))
                 .style("fill", (d) => fill_category(d))
                 // for the node in the middle show a "back" image
                 .filter((d) =>
-                    ArrayEquals(d.names, curr_root.names) && !ArrayEquals(d.names, ["Amazon"]))
+                    ArrayEquals(d.data.names, curr_root.data.names) && !ArrayEquals(d.data.names, ["Amazon"]))
                 .style("fill", "")
                 .attr("fill", "url(#image)");
 
+            // update the text on the new root node
             nodeUpdate.select("text")
-                .style("fill-opacity", 1)
+                .attr("text-anchor", (d) => d.x < degrees_half ? "start" : "end")
+                .attr("transform", (d) =>
+                    "rotate(" + (d.x < degrees_half ? d.x - degrees_half / 2 : d.x + degrees_half / 2) * 180 / degrees_half + ")" +
+                    "translate(" + (d.x < degrees_half ? 15 : -15) +")")
+                // .style("fill-opacity", 1)
                 .attr("class", "") // remove all previous classes (if it was a root before...)
-                .attr("text-anchor", (d) => (d.x < degrees_half) ? "start" : "end")
-                .attr("transform", (d) => {
-                    let trans = diameterScale(Math.sqrt(d.count)) + 5;
-                    return d.x < degrees_half ? "translate(0)translate(" + trans + ")" : "rotate(180)translate(" + -trans + ")"
-                })
                 .filter((d) =>
                     // the root note should be represented in the middle, bigger and not rotated
-                    ArrayEquals(d.names, curr_root.names)
+                    ArrayEquals(d.data.names, curr_root.data.names)
                 )
-                .attr("transform", (d) => "rotate(-90)translate(0," + (diameterScale(Math.sqrt(d.count)) + 10 * d.names.length) + ")")
+                .attr("transform", (d) => "rotate(0)translate(0," + (diameterScale(Math.sqrt(d.data.count)) + 10 * d.data.names.length) + ")") //todo?
                 .attr("text-anchor", "middle")
-                .attr("class", "root_node");
+                .attr("class", "root_node")
+                // .attr('cursor', 'pointer'); todo ?
 
-            // TODO: appropriate transform
+            // Remove any exiting nodes
             let nodeExit = node.exit().transition()
                 .duration(duration)
-                // .attr("transform", function(d) { return "diagonal(" + source.y + "," + source.x + ")"; })
+                .attr("transform", (d) => "translate(" + radialPoint(source.x, source.y) + ")")
                 .remove();
 
             nodeExit.select("circle")
@@ -212,30 +222,29 @@ function drawCategoryGraph() {
             nodeExit.select("text")
                 .style("fill-opacity", 1e-6);
 
+            // ****************** links section ***************************
+
             // Update the links…
             let link = svg.selectAll("path.link")
-                .data(links, (d) => d.target.id);
+                .data(links, (d) =>  d.id);
 
             // Enter any new links at the parent's previous position.
-            link.enter().insert("path", "g")
+            let linkEnter = link.enter().insert('path', "g")
                 .attr("class", "link")
-                .attr("d", (d) => {
-                    let o = {x: source.x0, y: source.y0};
-                    return diagonal({source: o, target: o});
-                });
+                .attr("d", d3.linkRadial().angle((d) => source.x0).radius((d) => source.y0))
 
-            // Transition links to their new position.
-            link.transition()
-                .duration(duration)
-                .attr("d", diagonal);
+            // UPDATE
+            let linkUpdate = linkEnter.merge(link)
 
-            // Transition exiting nodes to the parent's new position.
-            link.exit().transition()
+            // Transition back to the parent element position
+            linkUpdate.transition()
                 .duration(duration)
-                .attr("d", (d) => {
-                    let o = {x: source.x, y: source.y};
-                    return diagonal({source: o, target: o});
-                })
+                .attr("d", d3.linkRadial().angle((d) => d.x).radius((d) => d.y))
+
+            // Remove any exiting links
+            let linkExit = link.exit().transition()
+                .duration(duration)
+                .attr("d", d3.linkRadial().angle((d) => source.x0).radius((d) => source.y0))
                 .remove();
 
             // Stash the old positions for transition.
@@ -247,7 +256,7 @@ function drawCategoryGraph() {
 
         // Toggle children on click.
         function click(d) {
-            if (d.isleaf) {
+            if (d.data.isleaf) {
                 return
             }
 
@@ -295,7 +304,7 @@ function drawCategoryGraph() {
 
         function appendToList(d) {
             let parent = document.createElement("p");
-            let category_name = d.names.join(" & ")
+            let category_name = d.data.names.join(" & ")
             parent.appendChild(document.createTextNode(category_name));
             parent.addEventListener("click", () => {
                 // delete all the roots up to this one
@@ -311,6 +320,10 @@ function drawCategoryGraph() {
                 click(d)
             });
             document.getElementById("category_view").appendChild(parent)
+        }
+
+        function radialPoint(x, y) {
+            return [(y = +y) * Math.cos(x -= degrees_half / 2), y * Math.sin(x)];
         }
     });
 }

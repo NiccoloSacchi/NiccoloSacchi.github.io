@@ -5,9 +5,11 @@
 	<link rel="stylesheet" href="css/graph-style.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
-	<script src="https://d3js.org/d3.v3.min.js"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="js/categories_graph.js"></script>
 </head>
-<body>
+<body
+    onload="drawCategoryGraph()">
     <table class="categories_table">
         <tr>
             <th>List view</th>
@@ -25,7 +27,6 @@
                         </pattern>
                     </defs>
                 </svg>
-                <script src="js/categories_graph.js"></script>
             </td>
         </tr>
     </table>
