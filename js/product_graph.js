@@ -1,56 +1,19 @@
-// import * as d3v4 from './d3.v4.min.js'
-
-function find_paths(nodes) {
-    // Sort nodes by decreasing fan-in minus fan-out
-    let best = nodes
-        .filter(a => a instanceof ProductNode && a.show)
-        .sort((a, b) => (b.incoming.length - b.neighbours.length) - (a.incoming.length - a.neighbours.length))
-
-    nodes.forEach(n => [n.pred, n.dist, n.assigned] = [null, Infinity, false])
-
-    let queue = []
-    best.forEach(n => {
-        if (!n.assigned) {
-            queue.push(n)
-            n.dist = 0
-        }
-        while (queue.length > 0) {
-            let u = queue.shift()
-            u.assigned = true
-            u.incoming.forEach(v => {
-                if (n.dist + 1 < v.dist) {
-                    v.dist = n.dist + 1
-                    v.pred = u
-                    queue.push(v)
-                }
-            })
-        }
-    })
-}
-
 export class ProductGraph {
     constructor() {
-        // default initializations of the parameters (can be changed before calling the draw
-        // method)
+        // default initializations of the parameters (can be changed to modify the graph)
         this.width = "100%";     // svg width (computed afterwards)
-        this.height = 600;     // svg height
-        this.dr = 4;      // default point radius
+        this.height = "100%";     // svg height
         this.off = 10;    // cluster hull offset
         this.net = {"nodes":[], "links": [], "cliques": {}};  // all nodes (either products or groups) and links
-        // this.simulation; this.hullg; this.linkg; this.nodeg; these are set at runtime
-        this.start_opacity = 1;
-        this.choices;
+        this.choices = [];
 
+        // this.simulation; this.hullg; this.linkg; this.nodeg; these are set at runtime
         this.tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
 
-        this.curve = d3.line()
-            .curve(d3.curveCardinalClosed.tension(.85));
-
-        this.drawCluster = (d) => {
-            return this.curve(d.path); // 0.8
-        }
+        this.drawHull = (d) =>
+            d3.line().curve(d3.curveCardinalClosed.tension(.85))(d.path); // 0.8
     }
 
     convexHulls() {
@@ -78,14 +41,42 @@ export class ProductGraph {
         return hullset
     }
 
-    drawGraph(svgId, file){ // e.g. ("product_graph", "graph.json")
-        let that = this
-        // select the svg
-        let body = d3.select("body");
-        let svg = body.select("#"+svgId)
+    drawGraph(divId, file, searchbox){
+        // divId: id of the div in which to draw the search bar and the graph
+        // file: path to the file containing the graph
+        // searchbox: boolean to indicate whether draw a searchbox
 
-        // clear the svg content
-        svg.selectAll("*").remove();
+        // todo try directly with this
+        let that = this
+
+        // select the svg
+        let div = d3.select("#"+divId);
+        // clear the div content
+        div.selectAll("*").remove();
+
+        if(searchbox) {
+            // append the search box
+            // <!-- search box -->
+            // <section class="webdesigntuts-workshop" >
+            //     <div>
+            //         <input id="productSearchBox" placeholder="product">
+            //         <button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>
+            //     </div>
+            // </section>
+            let box = div.append("section")
+                .attr("class", "webdesigntuts-workshop")
+                .append("div")
+            let input = box.append("input")
+                .attr("id", "productSearchBox")
+                .attr("placeholder", "product")
+            box.append("button")
+                .on("click", () => this.filterProducts(input.node().value))
+                .text("search")
+        }
+
+        // append the svg to draw the graph
+        let svg = div.append("svg")
+            .attr("class", "product_graph")
 
         // set height and width, add zoom and drag
         svg.attr("width", this.width)
@@ -99,7 +90,9 @@ export class ProductGraph {
             );
 
         // update the width with the computed one
-        this.width = document.getElementById(svgId).clientWidth;
+        let rect = svg.node().getBoundingClientRect()
+        this.width = rect.width
+        this.height = rect.height
 
         // define arrow markers for graph links (directed edges)
         let defs = svg.append('defs');
@@ -112,7 +105,10 @@ export class ProductGraph {
             .attr('orient', 'auto')
             .append('svg:path')
             .attr('d', 'M0,-5L10,0L0,5')
-            .attr('fill', '#000');
+            .attr('stroke', 'black')
+            .attr('stroke-opacity', 0.5)
+            .attr('stroke-width', 3)
+            .attr('fill', 'none')
 
         defs.append('marker')
             .attr('id', 'start-arrow')
@@ -123,13 +119,16 @@ export class ProductGraph {
             .attr('orient', 'auto')
             .append('svg:path')
             .attr('d', 'M10,-5L0,0L10,5')
-            .attr('fill', '#000');
+            .attr('stroke', 'black')
+            .attr('stroke-opacity', 0.5)
+            .attr('stroke-width', 3)
+            .attr('fill', 'none')
 
         // when drawing make the graph appear "smoothly"
         svg.attr("opacity", 1e-6)
             .transition()
             .duration(1000)
-            .attr("opacity", this.start_opacity);
+            .attr("opacity", 1);
 
         d3.json("data/"+file, (error, json) => {
             if (error) throw error;
@@ -139,15 +138,7 @@ export class ProductGraph {
             //  "links":
             //      [{"source": nodeId, "target": nodeId, "right": false, "left": true, "value": 1}, ...]}
 
-            // give the autocompletion all the splitted names
-            this.choices = Array.from(
-                new Set(
-                    json.nodes
-                        .map(i => i.name.split(" "))
-                        .reduce((a, b) => a.concat(b)).map(i => i.toLowerCase())))
-
             // convert the nodes to ProductNode
-            // let idx = 0 // HACK
             this.net.nodes = json.nodes
                 .map(n => new ProductNode(n.asin, n.name, n.imUrl, n.price, n.numReviews, n.averageRating, n.helpfulFraction, n.brand, n.salesRankCategory, n.salesRank, n.group, n.component, n.hashColor));
             this.net.links = json.links
@@ -155,13 +146,12 @@ export class ProductGraph {
             // source and target of the link are now pointers to the nodes
             // instead of just numbers
 
-            // store the cliques
+            // detect and store the cliques
             let cm = {} // all cliques map
             this.net.nodes.forEach(n => {
                 cm[n.group] = (cm[n.group] || [])
                 cm[n.group].push(n)
             })
-
             let colId = 0
             for (let clique in cm){
                 // we consider as clique only the ones with more that 1 element
@@ -173,8 +163,7 @@ export class ProductGraph {
                 }
             }
 
-
-            find_paths(this.net.nodes)
+            this.find_paths(this.net.nodes)
 
             this.hullg = svg.append("g");
             this.linkg = svg.append("g");
@@ -206,11 +195,38 @@ export class ProductGraph {
                 let hull = that.hullg.selectAll("path.hull")
                 if (hull && !hull.empty()) {
                     hull.data(that.convexHulls())
-                        .attr("d", that.drawCluster);
+                        .attr("d", that.drawHull);
                 }
             }
             // this.computeNetwork(data);
             this.updateGraph();
+
+            if (searchbox) {
+                // give the autocompletion all the splitted names
+                that.choices = Array.from(
+                    new Set(
+                        this.net.nodes
+                            .map(i => i.name.split(" "))
+                            .reduce((a, b) => a.concat(b)).map(i => i.toLowerCase())))
+                new autoComplete({
+                    selector: '#productSearchBox',
+                    minChars: 1,
+                    source: function (term, suggest) {
+                        term = term.toLowerCase();
+                        let matches = [];
+                        for (let i = 0; i < that.choices.length; i++) {
+                            if (that.choices[i].toLowerCase().indexOf(term) >= 0) {
+                                matches.push(that.choices[i]);
+                            }
+                            if (matches.length >= 10) {
+                                break
+                            }
+                        }
+                        suggest(matches);
+                    }
+                });
+            }
+
         });
     }
 
@@ -223,6 +239,19 @@ export class ProductGraph {
         // get only the nodes and the links to be shown
         let nodes_show = this.net.nodes.filter(node => node.toBeShown());
         let link_show = this.net.links.filter(link => link.toBeShown());
+
+        this.linkg
+            .style("opacity", 0)
+            .transition().duration(500)
+            .style("opacity", 1)
+        this.nodeg
+            .style("opacity", 0)
+            .transition().duration(500)
+            .style("opacity", 1)
+        this.hullg
+            .style("opacity", 0)
+            .transition().duration(500)
+            .style("opacity", 1)
 
         let link_selection = this.linkg
             .selectAll("line")
@@ -293,12 +322,17 @@ export class ProductGraph {
                     d.fx = null;
                     d.fy = null;
                 }))
-            .append("title")
-            .text((d) => d.asin)
+
+        // node_enter
+        //     .style("opacity", 0)
+        //     .transition().duration(500)
+        //     .style("opacity", 1)
 
         let nodeUpdate = node_enter.merge(node_selection);
-        nodeUpdate.attr("fill", (d) =>d.fill())
+        nodeUpdate
+            .attr("fill", (d) =>d.fill())
             .attr("stroke", (d) => d.group in this.net.cliques ? "black" : "#555")
+
         node_selection.exit().remove()
 
         this.simulation
@@ -324,10 +358,69 @@ export class ProductGraph {
         hull_selection.enter()
             .append("path")
             .attr("class", "hull")
-            .attr("d", this.drawCluster)
+            .attr("d", this.drawHull)
             // .style("fill", (d) => "blue")
             .style("fill", (d) => d.clique.color)
         hull_selection.exit().remove()
+    }
+
+    find_paths(nodes) {
+        // finds all the paths from the nodes to the node with the higher fan-in
+
+        // Sort nodes by decreasing fan-in minus fan-out
+        let best = nodes
+            .filter(a => a instanceof ProductNode && a.show)
+            .sort((a, b) => (b.incoming.length - b.neighbours.length) - (a.incoming.length - a.neighbours.length))
+
+        nodes.forEach(n => [n.pred, n.dist, n.assigned] = [null, Infinity, false])
+
+        let queue = []
+        best.forEach(n => {
+            if (!n.assigned) {
+                queue.push(n)
+                n.dist = 0
+            }
+            while (queue.length > 0) {
+                let u = queue.shift()
+                u.assigned = true
+                u.incoming.forEach(v => {
+                    if (n.dist + 1 < v.dist) {
+                        v.dist = n.dist + 1
+                        v.pred = u
+                        queue.push(v)
+                    }
+                })
+            }
+        })
+    }
+
+    filterProducts(keywords){
+        function dfs_show(nodes) {
+            // the bfs is done considering only the product nodes
+
+            // (unique) list of non-explored neighbours
+            let neighbours = Array.from(
+                new Set(
+                    nodes
+                        .reduce((acc, n) => acc.concat(n.neighbours.filter(n => !n.show)), [])));
+            // set the neighbours as seen
+            neighbours.forEach(n => n.show = true)
+            if (neighbours.length > 0) {
+                dfs_show(neighbours)
+            }
+        }
+
+        // set show to true only the product nodes corresponding with the keyword
+        let products = this.net.nodes.filter(n => {
+                n.show = (n.name.toLowerCase().indexOf(keywords) >= 0)
+                return n.show
+            }
+        )
+
+        // mark a showable all the reachable nodes
+        dfs_show(products)
+
+        this.updateGraph()
     }
 }
 
@@ -351,8 +444,6 @@ class ProductNode {
         this.neighbours = []; // list of directly reachable nodes
 		this.incoming = []; // list of nodes that point towards this node
 		this.links = {};
-        // this.group_data; set at runtime
-
     }
 
     createTooltip() {

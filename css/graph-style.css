@@ -28,13 +28,17 @@
 }
 
 /* style for the product graph */
-#product_graph circle.node {
+.product_graph {
+    border: 1px solid #ccc;
+}
+
+.product_graph circle.node {
     /*fill: lightsteelblue;*/
     /*stroke: #555;*/
     stroke-width: 3px;
 }
 
-#product_graph path.hull {
+.product_graph path.hull {
     /*fill: lightsteelblue;*/
     stroke-opacity: 1;
     fill-opacity: 0.6;
@@ -42,18 +46,10 @@
     stroke-width: 2;
 }
 
-#product_graph line.link {
+.product_graph line.link {
   stroke: #333;
   stroke-opacity: 0.5;
   pointer-events: none;
-}
-
-#product_graph path {
-    /* for the arrows */
-    stroke-opacity: 0.5;
-    stroke: black;
-    stroke-width: 3;
-    fill: none;
 }
 
 /* tooltip */
@@ -69,8 +65,4 @@ div.tooltip {
     border-radius: 8px;
     pointer-events: none;
     z-index: 999;
-}
-
-svg#product_graph {
-  border: 1px solid #ccc;
 }
