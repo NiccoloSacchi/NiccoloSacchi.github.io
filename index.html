@@ -15,23 +15,18 @@
 	<link rel="stylesheet" href="css/main.css">
 	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
     <link rel="stylesheet" href="css/graph-style.css">
+    <link rel="stylesheet" href="css/auto-complete.css">
+    <link rel="stylesheet" href="css/search-tool.css">
 
-	<script src="https://d3js.org/d3.v3.min.js"></script>
-    <script src="js/categories_graph.js"></script>
-    <script src="js/product_graph.js"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="js/main_api.js" type="module"></script>
+    <script src="js/auto-complete.min.js"></script>
+    <!--<script src="js/product_graph.js" type="module"></script>-->
+    <!--<script src="js/categories_graph.js" type="module"></script>-->
 </head>
 <body
         style="text-align: justify"
-        onload="
-//            drawProductGraph('graph.json');
-            let p = new ProductGraph();
-            p.draw('product_graph', 'graph_2.json');
-            drawCategoryGraph();
-            setInterval(()=>{
-                p.net.nodes.forEach((node) => node.show = (Math.random()>0.5));
-                p.updateGraph();
-            }, 1000)
-">
+        onload="pageInit()">
 
 	<nav class="navbar navbar-default navbar-fixed-top navbar-custom">
 		<div class="container-fluid">
@@ -159,7 +154,7 @@
                             represent a cluster of competing products. The <i>arrows</i> point in the
                             direction of the preferred product.
                         </div>
-                        <svg id="product_graph" style="margin-top: 20px"></svg>
+                        <div id="product_graph" style="margin-top: 20px; height: 400px"></div>
                     </article>
                 </div>
             </div>

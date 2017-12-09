@@ -35,42 +35,11 @@
                 <button onclick="filterProducts(document.getElementById('categorySearchBox').value)">Search</button>
             </div>
         </section>
-
-        <!--&lt;!&ndash; search box &ndash;&gt;-->
-        <!--<section class="webdesigntuts-workshop" >-->
-            <!--<div>-->
-                <!--<input id="productSearchBox" placeholder="product">-->
-                <!--<button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>-->
-            <!--</div>-->
-        <!--</section>-->
     </div>
-
-    <hr>
 
     <!-- categories graph -->
     <div>
-        <!--<div id="category_graph">-->
-        <!--</div>-->
-        <table class="categories_table"> <!--categories_table_search-page-->
-            <tr>
-                <th>List view</th>
-                <th>Tree view</th>
-            </tr>
-            <tr>
-                <td id="category_view">
-                </td>
-                <td style="width: 700px;">
-                    <svg id="categories_graph" width="500px"> <!--fill="#efe">-->
-                        <defs>
-                            <pattern id="image" x="0%" y="0%" height="100%" width="100%"
-                                     viewBox="0 0 512 512">
-                                <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
-                            </pattern>
-                        </defs>
-                    </svg>
-                </td>
-            </tr>
-        </table>
+        <div id="categories_graph" style="width: 100%"></div>
     </div>
 
     <!-- product graph -->
@@ -79,7 +48,4 @@
         <div id="prodUrl"> </div>
     </div>
 
-
-    <svg id="d3v4_try"></svg>
-    <!--<script src="js/d3v3_try.js"></script>-->
 </body>

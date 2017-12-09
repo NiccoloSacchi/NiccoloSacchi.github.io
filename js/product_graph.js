@@ -1,7 +1,7 @@
 export class ProductGraph {
     constructor() {
         // default initializations of the parameters (can be changed to modify the graph)
-        this.width = "100%";     // svg width (computed afterwards)
+        this.width = "100%";     // svg width
         this.height = "100%";     // svg height
         this.off = 10;    // cluster hull offset
         this.net = {"nodes":[], "links": [], "cliques": {}};  // all nodes (either products or groups) and links
@@ -16,31 +16,6 @@ export class ProductGraph {
             d3.line().curve(d3.curveCardinalClosed.tension(.85))(d.path); // 0.8
     }
 
-    convexHulls() {
-        // update the hull of each clique
-        let hulls = {};
-        for (let clique in this.net.cliques) {
-            hulls[clique] = hulls[clique] || []
-            for (let n of this.net.cliques[clique].nodes){
-                if (n.toBeShown()) {
-                    hulls[clique].push([n.x - this.off, n.y - this.off]);
-                    hulls[clique].push([n.x - this.off, n.y + this.off]);
-                    hulls[clique].push([n.x + this.off, n.y - this.off]);
-                    hulls[clique].push([n.x + this.off, n.y + this.off]);
-                }
-            }
-        }
-
-        // create convex hulls
-        let hullset = [];
-        for (let clique in hulls) {
-            // bind the hull to the respective group
-            if (hulls[clique].length > 1)
-                hullset.push({"clique": this.net.cliques[clique], "path": d3.polygonHull(hulls[clique])});
-        }
-        return hullset
-    }
-
     drawGraph(divId, file, searchbox){
         // divId: id of the div in which to draw the search bar and the graph
         // file: path to the file containing the graph
@@ -49,7 +24,7 @@ export class ProductGraph {
         // todo try directly with this
         let that = this
 
-        // select the svg
+        // select the div
         let div = d3.select("#"+divId);
         // clear the div content
         div.selectAll("*").remove();
@@ -77,9 +52,8 @@ export class ProductGraph {
         // append the svg to draw the graph
         let svg = div.append("svg")
             .attr("class", "product_graph")
-
-        // set height and width, add zoom and drag
-        svg.attr("width", this.width)
+            // set height and width, add zoom and drag
+            .attr("width", this.width)
             .attr("height", this.height)
             .call(d3.zoom()
             //        .scaleExtent([1, 40])
@@ -364,6 +338,31 @@ export class ProductGraph {
         hull_selection.exit().remove()
     }
 
+    convexHulls() {
+        // update the hull of each clique
+        let hulls = {};
+        for (let clique in this.net.cliques) {
+            hulls[clique] = hulls[clique] || []
+            for (let n of this.net.cliques[clique].nodes){
+                if (n.toBeShown()) {
+                    hulls[clique].push([n.x - this.off, n.y - this.off]);
+                    hulls[clique].push([n.x - this.off, n.y + this.off]);
+                    hulls[clique].push([n.x + this.off, n.y - this.off]);
+                    hulls[clique].push([n.x + this.off, n.y + this.off]);
+                }
+            }
+        }
+
+        // create convex hulls
+        let hullset = [];
+        for (let clique in hulls) {
+            // bind the hull to the respective group
+            if (hulls[clique].length > 1)
+                hullset.push({"clique": this.net.cliques[clique], "path": d3.polygonHull(hulls[clique])});
+        }
+        return hullset
+    }
+
     find_paths(nodes) {
         // finds all the paths from the nodes to the node with the higher fan-in
 
@@ -477,7 +476,7 @@ class Link {
         this.size = 0;
 
         // add to each node the pointers to its out links (so that we can efficiently
-        // do a DFS on the graph composed only by ProductNodes)
+        // do a BFS on the graph)
         if (this.right) {
             this.source.links[this.target.id()] = this
             this.source.neighbours.push(this.target)

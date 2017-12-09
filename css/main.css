@@ -756,6 +756,7 @@ td.gutter {
   border: unset;
 }
 
+/* todo move these vvv */
 /* table for selecting the categories */
 .categories_table{
     margin: auto;
@@ -765,15 +766,16 @@ td.gutter {
 .categories_table tr th{
     background: inherit;
     text-align: center;
+}
+
+.categories_table tr:last-child td:first-child{
     min-width: 150px;
     width: 150px;
-}
-
-#category_view{
     vertical-align: text-top;
-}
-
-#category_view p{
     margin: 10px 0px;
     font-weight: 600;
+}
+
+.categories_table tr:last-child td:first-child p{
+    margin: 7px 0;
 }

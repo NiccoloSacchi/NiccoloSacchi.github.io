@@ -6,10 +6,10 @@ let p, c
 // functions to manage search and autocompletion
 export function pageInit() {
     c = new CategoryGraph();
-    c.drawGraph('category_graph', 'data/categories.json')
+    c.drawGraph('categories_graph', 'data/categories.json')
 
-    p = new ProductGraph();
-    p.drawGraph('product_graph', 'graph_1.json', true);
+    // p = new ProductGraph();
+    // p.drawGraph('product_graph', 'graph_1.json', true);
 }
 
 window.pageInit = pageInit

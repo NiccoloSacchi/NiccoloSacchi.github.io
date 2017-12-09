@@ -1,6 +1,6 @@
 // Dean Attali / Beautiful Jekyll 2016
 
-var main = {
+let main = {
 
   bigImgEl : null,
   numImgs : null,
@@ -25,7 +25,7 @@ var main = {
 	
     // On mobile, when clicking on a multi-level navbar menu, show the child links
     $('#main-navbar').on("click", ".navlinks-parent", function(e) {
-      var target = e.target;
+      let target = e.target;
       $.each($(".navlinks-parent"), function(key, value) {
         if (value == target) {
           $(value).parent().toggleClass("show-children");
@@ -36,22 +36,22 @@ var main = {
     });
     
     // Ensure nested navbar menus are not longer than the menu header
-    var menus = $(".navlinks-container");
+    let menus = $(".navlinks-container");
     if (menus.length > 0) {
-      var navbar = $("#main-navbar ul");
-      var fakeMenuHtml = "<li class='fake-menu' style='display:none;'><a></a></li>";
+      let navbar = $("#main-navbar ul");
+      let fakeMenuHtml = "<li class='fake-menu' style='display:none;'><a></a></li>";
       navbar.append(fakeMenuHtml);
-      var fakeMenu = $(".fake-menu");
+      let fakeMenu = $(".fake-menu");
 
       $.each(menus, function(i) {
-        var parent = $(menus[i]).find(".navlinks-parent");
-        var children = $(menus[i]).find(".navlinks-children a");
-        var words = [];
+        let parent = $(menus[i]).find(".navlinks-parent");
+        let children = $(menus[i]).find(".navlinks-children a");
+        let words = [];
         $.each(children, function(idx, el) { words = words.concat($(el).text().trim().split(/\s+/)); });
-        var maxwidth = 0;
+        let maxwidth = 0;
         $.each(words, function(id, word) {
           fakeMenu.html("<a>" + word + "</a>");
-          var width =  fakeMenu.width();
+          let width =  fakeMenu.width();
           if (width > maxwidth) {
             maxwidth = width;
           }
@@ -74,23 +74,23 @@ var main = {
 
           // 2fc73a3a967e97599c9763d05e564189
 	  // set an initial image
-	  var imgInfo = main.getImgInfo();
-	  var src = imgInfo.src;
-	  var desc = imgInfo.desc;
+	  let imgInfo = main.getImgInfo();
+	  let src = imgInfo.src;
+	  let desc = imgInfo.desc;
   	  main.setImg(src, desc);
   	
 	  // For better UX, prefetch the next image so that it will already be loaded when we want to show it
-  	  var getNextImg = function() {
-	    var imgInfo = main.getImgInfo();
-	    var src = imgInfo.src;
-	    var desc = imgInfo.desc;		  
+  	  let getNextImg = function() {
+	    let imgInfo = main.getImgInfo();
+	    let src = imgInfo.src;
+	    let desc = imgInfo.desc;
 	    
-		var prefetchImg = new Image();
+		let prefetchImg = new Image();
   		prefetchImg.src = src;
 		// if I want to do something once the image is ready: `prefetchImg.onload = function(){}`
 		
   		setTimeout(function(){
-                  var img = $("<div></div>").addClass("big-img-transition").css("background-image", 'url(' + src + ')');
+                  let img = $("<div></div>").addClass("big-img-transition").css("background-image", 'url(' + src + ')');
   		  $(".intro-header.big-img").prepend(img);
   		  setTimeout(function(){ img.css("opacity", "1"); }, 50);
 		  
@@ -113,9 +113,9 @@ var main = {
   },
   
   getImgInfo : function() {
-  	var randNum = Math.floor((Math.random() * main.numImgs) + 1);
-    var src = main.bigImgEl.attr("data-img-src-" + randNum);
-	var desc = main.bigImgEl.attr("data-img-desc-" + randNum);
+  	let randNum = Math.floor((Math.random() * main.numImgs) + 1);
+    let src = main.bigImgEl.attr("data-img-src-" + randNum);
+	let desc = main.bigImgEl.attr("data-img-desc-" + randNum);
 	
 	return {
 	  src : src,
