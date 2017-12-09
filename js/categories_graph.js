@@ -5,10 +5,12 @@ export class CategoryGraph {
         this.width = "100%";          // width will be computer after
         this.node_diameter = [2, 25]; // min and max diameter of the nodes
         this.duration = 350
-        this.degrees = 2*Math.PI;
+        this.degrees = 2*Math.PI
+        this.choices = []
     }
 
     drawGraph(divId, file){
+        let that = this
         // Load the data, draw the table and start the graph
         d3.json(file, (error, data) => {
             if (error) throw error;
@@ -19,6 +21,9 @@ export class CategoryGraph {
             this.i = 0
             this.roots = []
 
+            let curr_root =  d3.hierarchy(this.pubs, (d) => d.children);
+            this.roots.push(curr_root);
+
             let max_count = this.pubs["count"];
             this.diameterScale = d3.scaleLinear()
                 .domain([0, Math.sqrt(max_count)])
@@ -28,6 +33,67 @@ export class CategoryGraph {
             let div = d3.select("#"+divId);
             // clear the div content
             div.selectAll("*").remove();
+
+            // append the search box
+            // <!-- search box -->
+            // <section class="webdesigntuts-workshop" >
+            //     <div>
+            //         <input id="productSearchBox" placeholder="product">
+            //         <button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>
+            //     </div>
+            // </section>
+            let box = div.append("section")
+                .attr("class", "webdesigntuts-workshop")
+                .append("div")
+            let input = box.append("input")
+                .attr("id", "categorySearchBox")
+                .attr("placeholder", "category")
+            box.append("button")
+                .on("click", () => {
+                    // start over from the root Amazon
+                    that.roots = that.roots.slice(0, 1)
+                    let amazon = that.roots[0]
+                    amazon.children.forEach(collapse);
+                    this.list_view.selectAll("*").remove()
+                    this.update(amazon); // update the graph
+                    this.appendToList(amazon); // update the list
+
+                    // collect all the intermediate categories down to the selected one
+                    let node = that.choices[input.node().value]
+                    let roots_reversed = []
+                    while(node != amazon) {
+                        roots_reversed.push(node)
+                        node = node.parent
+                    }
+                    that.roots = that.roots.concat(roots_reversed.reverse())
+
+                    // simulate the click down the selected one
+                    for (let r of that.roots.slice(1)){
+                        that.click(r)
+                    }
+
+                })
+                .text("search")
+            // give the autocompletion all the splitted names
+            this.choices = categories_names(curr_root)
+            new autoComplete({
+                selector: '#categorySearchBox',
+                minChars: 1,
+                source: function (term, suggest) {
+                    term = term.toLowerCase();
+                    let matches = [];
+                    let names = Object.keys(that.choices)
+                    for (let i = 0; i < names.length; i++) {
+                        if (names[i].toLowerCase().indexOf(term) >= 0) {
+                            matches.push(names[i]);
+                        }
+                        if (matches.length >= 10) {
+                            break
+                        }
+                    }
+                    suggest(matches);
+                }
+            });
 
             // append a table to show all the visited categories and the the graph at the
             // same time
@@ -85,8 +151,6 @@ export class CategoryGraph {
                 .attr("class", "tooltip")
                 .style("opacity", 0);
 
-            let curr_root =  d3.hierarchy(this.pubs, (d) => d.children);
-            this.roots.push(curr_root);
             curr_root.x0 = this.height / 2;
             curr_root.y0 = 0;
 
@@ -266,7 +330,8 @@ export class CategoryGraph {
 
     // Toggle children on click.
     click(d) {
-        if (d.data.isleaf) {
+        if (!d._children && !d.children) {
+            // leaf
             return
         }
 
@@ -303,7 +368,8 @@ export class CategoryGraph {
     }
 
     fill_category(node) {
-        if (node.data.isleaf || (!node._children && !node.children)) {
+        if (!node._children && !node.children) {
+            // leaf
             return "LightGreen";
         }
 
@@ -331,6 +397,21 @@ export class CategoryGraph {
 //         }
 //     });
 // }
+}
+
+function categories_names(tree){
+    // build a map from the name to the respective node
+    function inner(tree, map) {
+        let name = [tree.data.names.join(" & ")]
+        map[name] = tree
+        if (tree.children)
+            tree.children.forEach(c => inner(c, map))
+    }
+    // note: the map is passed by reference
+    let map = {}
+    inner(tree, map)
+
+    return map
 }
 
 // Collapse nodes

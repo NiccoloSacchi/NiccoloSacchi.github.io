@@ -144,7 +144,7 @@ export class ProductGraph {
             this.nodeg = svg.append("g");
 
             this.simulation = d3.forceSimulation()
-                .force("link", d3.forceLink())
+                .force("link", d3.forceLink()) //.distance(() => 50)
                 .force("charge", d3.forceManyBody())
                 .force("center", d3.forceCenter(this.width / 2, this.height / 2))
                 .velocityDecay(0.85)
