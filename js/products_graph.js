@@ -130,7 +130,7 @@ export class ProductGraph {
             .duration(1000)
             .attr("opacity", 1);
 
-        d3.json("data/"+file, (error, json) => {
+        d3.json(file, (error, json) => {
             if (error) throw error;
             // json =
             // {"nodes":
