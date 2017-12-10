@@ -1,5 +1,5 @@
 import {CategoryGraph} from './categories_graph.js'
-import {ProductGraph} from './product_graph.js'
+import {ProductGraph} from './products_graph.js'
 
 let p, c
 
@@ -9,7 +9,7 @@ export function pageInit() {
     c.drawGraph('categories_graph', 'data/categories.json')
 
     p = new ProductGraph();
-    p.drawGraph('product_graph', 'graph_1.json', true);
+    p.drawGraph('product_graph', 'graph_1.json', true, true);
 }
 
 window.pageInit = pageInit

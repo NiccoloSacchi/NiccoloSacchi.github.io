@@ -8,20 +8,21 @@ export class ProductGraph {
         this.choices = [];
 
         // this.simulation; this.hullg; this.linkg; this.nodeg; these are set at runtime
-        this.tooltip = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
+        // this.tooltip = d3.select("body").append("div")
+        //     .attr("class", "tooltip")
+        //     .style("opacity", 0);
 
         this.drawHull = (d) =>
             d3.line().curve(d3.curveCardinalClosed.tension(.85))(d.path); // 0.8
     }
 
-    drawGraph(divId, file, searchbox){
+    drawGraph(divId, file, searchbox, productWindow){
         // divId: id of the div in which to draw the search bar and the graph
         // file: path to the file containing the graph
         // searchbox: boolean to indicate whether draw a searchbox
+        // productWindow: boolean to indicate whether reserve part of the div
+        //                the details of the mouse-overed product
 
-        // todo try directly with this
         let that = this
 
         // select the div
@@ -49,8 +50,30 @@ export class ProductGraph {
                 .text("search")
         }
 
+        let graph_view = div
+        if (productWindow){
+            // then create a table, on the left we show the graph
+            // on the right the details of the product
+            let row = div.append("table")
+                .attr("class", "product_table")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .append("tr")
+            graph_view = row.append("td").style("padding", 0)
+            let prodWindow = row.append("td").attr("width", 200)
+            this.productWindow = {
+                "title": prodWindow.append("h5"),
+                "image": prodWindow.append("img")
+                    .attr("width", "100%")
+                    .attr("heigth", 100),
+                "price": prodWindow.append("h6")
+                    .text("Price: ")
+                    .append("label")
+            }
+        }
+
         // append the svg to draw the graph
-        let svg = div.append("svg")
+        let svg = graph_view.append("svg")
             .attr("class", "product_graph")
             // set height and width, add zoom and drag
             .attr("width", this.width)
@@ -179,9 +202,9 @@ export class ProductGraph {
                 // give the autocompletion all the splitted names
                 that.choices = Array.from(
                     new Set(
-                        this.net.nodes
-                            .map(i => i.name.split(" "))
-                            .reduce((a, b) => a.concat(b)).map(i => i.toLowerCase())))
+                        this.net.nodes.reduce((acc, node) => acc.concat(node.keywords), [])
+                    )
+                )
                 new autoComplete({
                     selector: '#productSearchBox',
                     minChars: 1,
@@ -205,8 +228,6 @@ export class ProductGraph {
     }
 
     updateGraph() {
-        // if (this.simulation) this.simulation.stop();
-
         // store the context in a variable to access it in the functions
         let that = this
 
@@ -252,18 +273,15 @@ export class ProductGraph {
             .attr("fill", (d) =>d.fill())
             .attr("stroke", (d) => d.group in this.net.cliques ? "black" : "#555")
             .on("mouseover", (d) => {
-                this.tooltip.transition()
-                    .duration(200)
-                    .style("opacity", .9);
-                this.tooltip.html(d.createTooltip())
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+                // // 1. show the tooltip
+                // this.tooltip.transition()
+                //     .duration(200)
+                //     .style("opacity", .9);
+                // this.tooltip.html(d.createTooltip())
+                //     .style("left", (d3.event.pageX) + "px")
+                //     .style("top", (d3.event.pageY - 28) + "px");
 
-                let url = document.getElementById("prodUrl")
-                if (url)
-                    url.innerHTML = d.link()
-
-                // Show shortest path to best product
+                // 2. show shortest path to best product
                 let links = this.linkg.selectAll("line")
                 let node = d
                 while (node.pred != null) {
@@ -271,11 +289,20 @@ export class ProductGraph {
                     node = node.pred
                 }
                 links.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
+
+                // 3. show the details of the product
+                if (this.productWindow){
+                    this.productWindow["title"].text(d.name)
+                    this.productWindow["image"]
+                        .attr("src", d.imUrl)
+                        .attr("alt", "product image")
+                    this.productWindow["price"].text(d.price)
+                }
             })
             .on("mouseout", (d) => {
-                this.tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+                // this.tooltip.transition()
+                // .duration(500)
+                // .style("opacity", 0);
 
                 let links = this.linkg.selectAll("line")
                 this.net.links.forEach(l => l.size = 0)
@@ -336,6 +363,9 @@ export class ProductGraph {
             // .style("fill", (d) => "blue")
             .style("fill", (d) => d.clique.color)
         hull_selection.exit().remove()
+
+        // trigger a mouseover
+        this.nodeg.select("circle:first-child").dispatch("mouseover")
     }
 
     convexHulls() {
@@ -394,6 +424,7 @@ export class ProductGraph {
     }
 
     filterProducts(keywords){
+        // todo change (keywords will be an array)
         function dfs_show(nodes) {
             // the bfs is done considering only the product nodes
 
@@ -411,7 +442,8 @@ export class ProductGraph {
 
         // set show to true only the product nodes corresponding with the keyword
         let products = this.net.nodes.filter(n => {
-                n.show = (n.name.toLowerCase().indexOf(keywords) >= 0)
+            //todo change for keywords = array
+                n.show = n.keywords.includes(keywords)
                 return n.show
             }
         )
@@ -438,6 +470,12 @@ class ProductNode {
         this.salesRank = salesRank
         this.component = component
         this.hashColor = hashColor
+
+        this.keywords = this.name
+            .toLowerCase()
+            .split(" ")
+            // remove ; , ( ) from keywords
+            .map(s => s.replace(/;|,|\(|\)/g, ''))
 
         this.show = true
         this.neighbours = []; // list of directly reachable nodes

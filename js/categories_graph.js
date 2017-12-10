@@ -127,6 +127,7 @@ export class CategoryGraph {
             let row2 = table.append("tr")
             this.list_view = row2.append("td") // here we show the lis of visited categories
             let svg = row2.append("td").append("svg")
+                .attr("class", "categories_graph")
                 .attr("width", this.width)
                 .attr("height", this.height)
             svg.append("defs").append("pattern")

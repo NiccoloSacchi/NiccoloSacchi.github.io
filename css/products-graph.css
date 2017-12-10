@@ -1,0 +1,59 @@
+/* style for the product graph */
+.product_graph {
+    border: 1px solid #ccc;
+    margin: 0px;
+}
+
+.product_graph circle.node {
+    /*fill: lightsteelblue;*/
+    /*stroke: #555;*/
+    stroke-width: 3px;
+}
+
+.product_graph path.hull {
+    /*fill: lightsteelblue;*/
+    stroke-opacity: 1;
+    fill-opacity: 0.6;
+    stroke: gray;
+    stroke-width: 2;
+}
+
+.product_graph line.link {
+    stroke: #333;
+    stroke-opacity: 0.5;
+    pointer-events: none;
+}
+
+
+/*.product_table{*/
+    /*margin: auto;*/
+    /*!*margin: 20px 0px;*!*/
+/*}*/
+
+.product_table td{
+    vertical-align: text-top;
+    vertical-align: top;
+}
+
+/*!* table for selecting the categories *!*/
+/*.product_table{*/
+    /*margin: auto;*/
+    /*!*margin: 20px 0px;*!*/
+/*}*/
+
+/*.product_table tr th{*/
+    /*background: inherit;*/
+    /*text-align: center;*/
+/*}*/
+
+/*.product_table tr:last-child td:first-child{*/
+    /*min-width: 150px;*/
+    /*width: 150px;*/
+    /*vertical-align: text-top;*/
+    /*margin: 10px 0px;*/
+    /*font-weight: 600;*/
+/*}*/
+
+/*.product_table tr:last-child td:first-child p{*/
+    /*margin: 7px 0;*/
+/*}*/
