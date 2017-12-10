@@ -443,16 +443,21 @@ export class ProductGraph {
             }
         }
 
-        // set show to true only the product nodes corresponding with the keyword
-        let products = this.net.nodes.filter(n => {
-            //todo change for keywords = array
-                n.show = n.keywords.includes(keywords)
-                return n.show
-            }
-        )
+        if (keywords == ""){
+            this.net.nodes.forEach(n => n.show = true)
+        }
+        else {
+            // set show to true only the product nodes corresponding with the keyword
+            let products = this.net.nodes.filter(n => {
+                    //todo change for keywords = array
+                    n.show = n.keywords.includes(keywords)
+                    return n.show
+                }
+            )
 
-        // mark a showable all the reachable nodes
-        dfs_show(products)
+            // mark a showable all the reachable nodes
+            dfs_show(products)
+        }
 
         this.updateGraph()
     }
@@ -474,11 +479,16 @@ class ProductNode {
         this.component = component
         this.hashColor = hashColor
 
-        this.keywords = this.name
-            .toLowerCase()
-            .split(" ")
-            // remove ; , ( ) from keywords
-            .map(s => s.replace(/;|,|\(|\)/g, ''))
+        this.keywords = Array.from(
+            new Set(
+                this.name
+                // remove ; , ( ) from keywords
+                    .replace(/;|,|\(|\)/g, ' ')
+                    .toLowerCase()
+                    .split(" ")
+                    .filter(s => s != "")
+            )
+        )
 
         this.show = true
         this.neighbours = []; // list of directly reachable nodes
