@@ -60,7 +60,10 @@ export class ProductGraph {
                 .attr("height", "100%")
                 .append("tr")
             graph_view = row.append("td").style("padding", 0)
-            let prodWindow = row.append("td").attr("width", 200)
+
+            let prodWindow = row.append("td")
+                .attr("width", 200)
+                .style("overflow", "scroll")
             this.productWindow = {
                 "title": prodWindow.append("h5"),
                 "image": prodWindow.append("img")
@@ -295,7 +298,7 @@ export class ProductGraph {
                     this.productWindow["title"].text(d.name)
                     this.productWindow["image"]
                         .attr("src", d.imUrl)
-                        .attr("alt", "product image")
+                        .attr("alt", "product image not available")
                     this.productWindow["price"].text(d.price)
                 }
             })
