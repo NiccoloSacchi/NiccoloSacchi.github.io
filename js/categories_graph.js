@@ -65,10 +65,9 @@ export class CategoryGraph {
                         roots_reversed.push(node)
                         node = node.parent
                     }
-                    that.roots = that.roots.concat(roots_reversed.reverse())
 
                     // simulate the click down the selected one
-                    for (let r of that.roots.slice(1)){
+                    for (let r of roots_reversed.reverse()){
                         that.click(r)
                     }
 
