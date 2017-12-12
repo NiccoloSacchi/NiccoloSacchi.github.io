@@ -8,6 +8,7 @@ export class ProductGraph {
         this.choices = [];
 
         this.bestProducts = {"nodes": [], "view": null}
+        this.focusednode = d3.select("#asdjhasjdhg") // asin of the highlighted node
 
         // this.simulation; this.hullg; this.linkg; this.nodeg; these are set at runtime
         this.tooltip = d3.select("body").append("div")
@@ -176,27 +177,27 @@ export class ProductGraph {
 
         }
 
+        this.zoom = d3.zoom()
+        //        .scaleExtent([1, 40])
+        //        .translateExtent([[-100, -100], [width + 90, height + 100]])
+            .on("zoom", () => {
+                this.svg.selectAll("g").attr("transform", d3.event.transform);
+            })
         // append the svg to draw the graph
-        let svg = graph_view.append("svg")
+        this.svg = graph_view.append("svg")
             .attr("class", "product_graph")
             // set height and width, add zoom and drag
             .attr("width", this.width)
             .attr("height", this.height)
-            .call(d3.zoom()
-            //        .scaleExtent([1, 40])
-            //        .translateExtent([[-100, -100], [width + 90, height + 100]])
-                .on("zoom", () => {
-                    svg.selectAll("g").attr("transform", d3.event.transform);
-                })
-            );
+            .call(this.zoom);
 
         // update the width with the computed one
-        let rect = svg.node().getBoundingClientRect()
+        let rect = this.svg.node().getBoundingClientRect()
         this.width = rect.width
         this.height = rect.height
 
         // define arrow markers for graph links (directed edges)
-        let defs = svg.append('defs');
+        let defs = this.svg.append('defs');
         defs.append('marker')
             .attr('id', 'end-arrow')
             .attr('viewBox', '0 -5 10 10')
@@ -226,7 +227,7 @@ export class ProductGraph {
             .attr('fill', 'none')
 
         // when drawing make the graph appear "smoothly"
-        svg.attr("opacity", 1e-6)
+        this.svg.attr("opacity", 1e-6)
             .transition()
             .duration(1000)
             .attr("opacity", 1);
@@ -266,9 +267,9 @@ export class ProductGraph {
 
             this.find_paths(this.net.nodes)
 
-            this.hullg = svg.append("g");
-            this.linkg = svg.append("g");
-            this.nodeg = svg.append("g");
+            this.hullg = this.svg.append("g");
+            this.linkg = this.svg.append("g");
+            this.nodeg = this.svg.append("g");
 
             this.simulation = d3.forceSimulation()
                 .force("link", d3.forceLink()) //.distance(() => 50)
@@ -376,6 +377,7 @@ export class ProductGraph {
         let node_enter = node_selection
             .enter()
             .append("circle")
+            .attr("id", (d) => d.asin) // give each node the id of its product
             .attr("class", "node")
             .attr("r", 5)
             .attr("fill", (d) =>d.fill())
@@ -393,7 +395,7 @@ export class ProductGraph {
                 // 2. show the details of the product
                 if (this.productWindow){
                     this.productWindow.selectAll("*").remove()
-                    d.appendTo(this.productWindow, null, () => this.updateGraph.call(this, false))
+                    d.appendTo(this.productWindow, null, () => this.updateFocus.call(this, d))
                 }
                 else{
                     this.tooltip.transition()
@@ -403,6 +405,12 @@ export class ProductGraph {
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 }
+
+                // 3. Mark with yellow
+                // restore the color of the old focused one
+                this.focusednode.attr("fill", (d) => d.fill())
+                // focus on the new one
+                this.focusednode = d3.select("circle#" + d.asin).attr("fill", "yellow")
             })
             .on("mouseout", (d) => {
                 this.tooltip.transition()
@@ -436,6 +444,7 @@ export class ProductGraph {
 
         let nodeUpdate = node_enter.merge(node_selection);
         nodeUpdate
+            .attr("id", (d) => d.asin)
             .attr("fill", (d) =>d.fill())
             .attr("stroke", (d) => d.stroke(this.net))
 
@@ -471,15 +480,19 @@ export class ProductGraph {
 
 
         // update the list of best products
-        let i = 1
+        let rank = 1
+        let maxrank = 5
+        // clear the view
         this.bestProducts["view"].selectAll("*").remove()
+        // scan the best products and show only the ones that are represented
+        // in the graph
         this.bestProducts["nodes"].forEach(n => {
-            if (n.toBeShown() && i < 5){
-                if (i != 1){
+            if (n.toBeShown() && rank <= maxrank){
+                if (rank != 1){
                     this.bestProducts["view"].append("hr")
                 }
-                n.appendTo(this.bestProducts["view"], i, () => this.updateGraph.call(this, false))
-                i++
+                n.appendTo(this.bestProducts["view"], rank, () => this.updateFocus.call(this, n))
+                rank++
             }
         }
         )
@@ -581,6 +594,25 @@ export class ProductGraph {
 
         this.updateGraph(true)
     }
+
+    updateFocus(newNode){
+        // updates the focus: focus on newNode
+
+        // restore the color of the old focused one
+        this.focusednode.attr("fill", (d) => d.fill())
+        // focus on the new one
+        this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "yellow")
+
+        // zoom on the new node
+        this.svg
+            .transition()
+            // .delay(500)
+            .duration(2000)
+            .call(this.zoom.transform, d3.zoomIdentity
+                .translate(this.width / 2, this.height / 2)
+                .scale(2)
+                .translate(-newNode.x, -newNode.y));
+    }
 }
 
 class ProductNode {
@@ -648,18 +680,15 @@ class ProductNode {
         return "<a href='https://www.amazon.com/dp/"+ this.asin +"'> url </a>"
     }
 
-    appendTo(div, rank, update){
-        // given a div (d3 selector), appends to the info about
+    appendTo(div, rank, mouseenter){
+        // Given a div (d3 selector), appends to the info about
         // the product to it
+        // Call the passed mouseenter function when the cursor enters the div
+
         div = div.append("div")
-            .on("mouseenter", () => {
-                this.fill_color = "yellow"
-                update()
-                this.fill_color = "red"
-            })
 
         let rank_str = rank? rank + ". " : ""
-        div.append("h5")
+        div.append("h5").on("mouseenter", () => mouseenter())
             .append("a")
             .style("color", "inherit")
             .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
