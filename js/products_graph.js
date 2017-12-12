@@ -395,7 +395,7 @@ export class ProductGraph {
                 // 2. show the details of the product
                 if (this.productWindow){
                     this.productWindow.selectAll("*").remove()
-                    d.appendTo(this.productWindow, null, () => this.updateFocus.call(this, d))
+                    d.appendTo(this.productWindow, null, () => this.updateFocus.call(this, d, true))
                 }
                 else{
                     this.tooltip.transition()
@@ -406,11 +406,8 @@ export class ProductGraph {
                         .style("top", (d3.event.pageY - 28) + "px");
                 }
 
-                // 3. Mark with yellow
-                // restore the color of the old focused one
-                this.focusednode.attr("fill", (d) => d.fill())
-                // focus on the new one
-                this.focusednode = d3.select("circle#" + d.asin).attr("fill", "yellow")
+                // 3. focus on the node
+                this.updateFocus(d, false)
             })
             .on("mouseout", (d) => {
                 this.tooltip.transition()
@@ -491,7 +488,7 @@ export class ProductGraph {
                 if (rank != 1){
                     this.bestProducts["view"].append("hr")
                 }
-                n.appendTo(this.bestProducts["view"], rank, () => this.updateFocus.call(this, n))
+                n.appendTo(this.bestProducts["view"], rank, () => this.updateFocus.call(this, n, true))
                 rank++
             }
         }
@@ -595,23 +592,27 @@ export class ProductGraph {
         this.updateGraph(true)
     }
 
-    updateFocus(newNode){
+    updateFocus(newNode, zoom){
         // updates the focus: focus on newNode
+        // newNode: node to focus on
+        // zoom: boolean which indicates whether to zoom on that node
 
         // restore the color of the old focused one
         this.focusednode.attr("fill", (d) => d.fill())
         // focus on the new one
         this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "yellow")
 
-        // zoom on the new node
-        this.svg
-            .transition()
-            // .delay(500)
-            .duration(2000)
-            .call(this.zoom.transform, d3.zoomIdentity
-                .translate(this.width / 2, this.height / 2)
-                .scale(2)
-                .translate(-newNode.x, -newNode.y));
+        if (zoom) {
+            // zoom on the new node
+            this.svg
+                .transition()
+                // .delay(500)
+                .duration(2000)
+                .call(this.zoom.transform, d3.zoomIdentity
+                    .translate(this.width / 2, this.height / 2)
+                    .scale(2)
+                    .translate(-newNode.x, -newNode.y));
+        }
     }
 }
 
@@ -686,9 +687,10 @@ class ProductNode {
         // Call the passed mouseenter function when the cursor enters the div
 
         div = div.append("div")
+            .on("click", () => mouseenter())
 
         let rank_str = rank? rank + ". " : ""
-        div.append("h5").on("mouseenter", () => mouseenter())
+        div.append("h5")
             .append("a")
             .style("color", "inherit")
             .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
