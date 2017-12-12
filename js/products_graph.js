@@ -687,6 +687,7 @@ class ProductNode {
         // Call the passed mouseenter function when the cursor enters the div
 
         div = div.append("div")
+            .style('cursor', 'pointer')
             .on("click", () => mouseenter())
 
         let rank_str = rank? rank + ". " : ""
