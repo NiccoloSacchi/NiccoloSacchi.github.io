@@ -9,7 +9,7 @@ export function pageInit() {
     c.drawGraph('categories_graph', 'data/categories.json')
 
     p = new ProductGraph();
-    p.drawGraph('product_graph', 'data/graph_4.json', true, true);
+    p.drawGraph('product_graph', 'data/graph_4.json', true, true, true, true);
 }
 
 window.pageInit = pageInit

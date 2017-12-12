@@ -2,26 +2,32 @@ export class ProductGraph {
     constructor() {
         // default initializations of the parameters (can be changed to modify the graph)
         this.width = "100%";     // svg width
-        this.height = "100%";     // svg height
+        this.height = 500;     // svg height
         this.off = 10;    // cluster hull offset
         this.net = {"nodes":[], "links": [], "cliques": {}};  // all nodes (either products or groups) and links
         this.choices = [];
 
+        this.bestProducts = {"nodes": [], "view": null}
+
         // this.simulation; this.hullg; this.linkg; this.nodeg; these are set at runtime
-        // this.tooltip = d3.select("body").append("div")
-        //     .attr("class", "tooltip")
-        //     .style("opacity", 0);
+        this.tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
 
         this.drawHull = (d) =>
             d3.line().curve(d3.curveCardinalClosed.tension(.85))(d.path); // 0.8
     }
 
-    drawGraph(divId, file, searchbox, productWindow){
+    drawGraph(divId, file, searchbox, productWindow, priceBrush, bestProducts){
         // divId: id of the div in which to draw the search bar and the graph
         // file: path to the file containing the graph
         // searchbox: boolean to indicate whether draw a searchbox
         // productWindow: boolean to indicate whether reserve part of the div
         //                the details of the mouse-overed product
+        // priceBrush: boolean to indicate whether draw a brush to select an
+        //             interval of prices
+        // bestProducts: boolean to indicate whether show the best products
+        //             of the showed graph
 
         let that = this
 
@@ -50,29 +56,124 @@ export class ProductGraph {
                 .text("search")
         }
 
-        let graph_view = div
+        let table = div.append("table")
+            .attr("class", "product_table")
+            .attr("width", "100%")
+            .attr("height", "100%")
+
+        let row1 = table.append("tr")
+        let ncolumns = 1 + bestProducts + productWindow
+        if (bestProducts){
+            // in this.bestProducts["view"] we will show the first 10 shown nodes
+            // of this.bestProducts["nodes"]
+            let column = row1.append("td")
+                .attr("width", (100/ncolumns) + "%")
+                .style("padding", 3+"px")
+                .style("height", this.height+"px")
+            column.append("h4")
+                .text("Best products")
+                .style("height", "7%")
+                .style("margin", 0+"px")
+            this.bestProducts["view"] =
+                column
+                    .append("div")
+                    .style("width", "100%")
+                    .style("height", "93%")
+                    .style("overflow-y", "scroll")
+                    .style("margin", 0+"px")
+                    // .attr("class", "bestProducts")
+        }
+
+        let graph_view = row1.append("td")
+            .style("padding", 0)
+            .attr("height", this.height);
+
         if (productWindow){
             // then create a table, on the left we show the graph
             // on the right the details of the product
-            let row = div.append("table")
-                .attr("class", "product_table")
-                .attr("width", "100%")
-                .attr("height", "100%")
-                .append("tr")
-            graph_view = row.append("td").style("padding", 0)
+            let column = row1.append("td")
+                .attr("width", (100/ncolumns) + "%")
+                .style("padding", 3+"px")
+            column.append("h4")
+                .text("Selected product")
+                .style("height", "7%")
+                .style("margin", 0+"px")
+            this.productWindow =
+                // .style("height", this.height+"px")
+                 column.append("div")
+                     .style("width", "100%")
+                     .style("height", "93%")
+                     .style("overflow-y", "scroll")
+                     .style("margin", 0+"px")
+        }
 
-            let prodWindow = row.append("td")
-                .attr("width", 200)
-                .style("overflow", "scroll")
-            this.productWindow = {
-                "title": prodWindow.append("h5"),
-                "image": prodWindow.append("img")
-                    .attr("width", "100%")
-                    .attr("heigth", 100),
-                "price": prodWindow.append("h6")
-                    .text("Price: ")
-                    .append("label")
+        if (priceBrush){
+            // let margin = {top: 0, right: 5, bottom: 0, left: 5}
+            let brushHeight = 30
+            let row2 = table
+                .append("tr")
+                .style("height", brushHeight+"px")
+                .style("padding", 0)
+
+            let priceBrush = row2
+                .append("td").attr("colspan", 100).style("padding", 0)
+                .append("svg").attr("class", "priceBrush").attr("height", brushHeight)
+                .append("g")
+                // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            let brushWidth = row2.node().getBoundingClientRect().width //- //margin.left - margin.right
+
+            let maxPrice = 1000
+            let scale = d3.scaleLinear()
+                .domain([0, maxPrice]) // min max price
+                .rangeRound([0, brushWidth]);
+
+            // add small ticks to x axis
+            priceBrush.append("g")
+                .attr("class", "axis axis--grid")
+                .attr("transform", "translate(0," + brushHeight + ")")
+                .call(d3.axisBottom(scale)
+                    .ticks(100)//(brushWidth, 12)
+                    .tickSize(-brushHeight)
+                    .tickFormat(() => null))
+                .selectAll(".tick")
+                .classed("tick--minor", (d) => {
+                    return d//d.getHours()
+                });
+
+            // // add wider ticks with label to x axis
+            // priceBrush.append("g")
+            //     .attr("class", "axis axis--x")
+            //     .attr("transform", "translate(0," + brushHeight + ")")
+            //     .call(d3.axisBottom(scale)
+            //         .ticks(10)//(brushWidth, 6)
+            //         .tickPadding(0))
+            //     .attr("text-anchor", null)
+            //     .selectAll("text")
+            //     .attr("x", 6);
+
+            // add the rectangle to brush
+            priceBrush.append("g")
+                .attr("class", "brush")
+                .call(d3.brushX()
+                    .extent([[0, 0], [brushWidth, brushHeight]])
+                    .on("end", brushended));
+
+            function brushended() {
+                // if (!d3.event.sourceEvent) return; // Only transition after input.
+                // if (!d3.event.selection) return; // Ignore empty selections.
+                // let d0 = d3.event.selection.map(scale.invert),
+                //     d1 = d0.map(d3.timeDay.round);
+                //
+                // // If empty when rounded, use floor & ceil instead.
+                // if (d1[0] >= d1[1]) {
+                //     d1[0] = d3.timeDay.floor(d0[0]);
+                //     d1[1] = d3.timeDay.offset(d1[0]);
+                // }
+                //
+                // d3.select(this).transition().call(d3.event.target.move, d1.map(scale));
             }
+
         }
 
         // append the svg to draw the graph
@@ -99,28 +200,28 @@ export class ProductGraph {
         defs.append('marker')
             .attr('id', 'end-arrow')
             .attr('viewBox', '0 -5 10 10')
-            .attr('refX', 18)
+            .attr('refX', 23)
             .attr('markerWidth', 5)
             .attr('markerHeight', 5)
             .attr('orient', 'auto')
             .append('svg:path')
             .attr('d', 'M0,-5L10,0L0,5')
             .attr('stroke', 'black')
-            .attr('stroke-opacity', 0.5)
+            .attr('stroke-opacity', 0.7)
             .attr('stroke-width', 3)
             .attr('fill', 'none')
 
         defs.append('marker')
             .attr('id', 'start-arrow')
             .attr('viewBox', '0 -5 10 10')
-            .attr('refX', -14)
+            .attr('refX', -13)
             .attr('markerWidth', 5)
             .attr('markerHeight', 5)
             .attr('orient', 'auto')
             .append('svg:path')
             .attr('d', 'M10,-5L0,0L10,5')
             .attr('stroke', 'black')
-            .attr('stroke-opacity', 0.5)
+            .attr('stroke-opacity', 0.7)
             .attr('stroke-width', 3)
             .attr('fill', 'none')
 
@@ -177,7 +278,7 @@ export class ProductGraph {
                 // regulate the shape of the whole cluster
                 .force("x", d3.forceX().strength(.2))
                 .force("y", d3.forceY().strength(.2))
-                .force("repelForce", d3.forceManyBody().strength(-50))//.distanceMax(50).distanceMin(10));
+                .force("repelForce", d3.forceManyBody().strength(-100))//.distanceMax(50).distanceMin(10));
 
             that.simulation.on("tick", ticked);
             function ticked() {
@@ -274,17 +375,9 @@ export class ProductGraph {
             .attr("class", "node")
             .attr("r", 5)
             .attr("fill", (d) =>d.fill())
-            .attr("stroke", (d) => d.group in this.net.cliques ? "black" : "#555")
+            .attr("stroke", (d) => d.stroke(this.net))
             .on("mouseover", (d) => {
-                // // 1. show the tooltip
-                // this.tooltip.transition()
-                //     .duration(200)
-                //     .style("opacity", .9);
-                // this.tooltip.html(d.createTooltip())
-                //     .style("left", (d3.event.pageX) + "px")
-                //     .style("top", (d3.event.pageY - 28) + "px");
-
-                // 2. show shortest path to best product
+                // 1. show shortest path to best product
                 let links = this.linkg.selectAll("line")
                 let node = d
                 while (node.pred != null) {
@@ -293,19 +386,24 @@ export class ProductGraph {
                 }
                 links.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
 
-                // 3. show the details of the product
+                // 2. show the details of the product
                 if (this.productWindow){
-                    this.productWindow["title"].text(d.name)
-                    this.productWindow["image"]
-                        .attr("src", d.imUrl)
-                        .attr("alt", "product image not available")
-                    this.productWindow["price"].text(d.price)
+                    this.productWindow.selectAll("*").remove()
+                    d.appendTo(this.productWindow)
+                }
+                else{
+                    this.tooltip.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    this.tooltip.html(d.createTooltip())
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
                 }
             })
             .on("mouseout", (d) => {
-                // this.tooltip.transition()
-                // .duration(500)
-                // .style("opacity", 0);
+                this.tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
 
                 let links = this.linkg.selectAll("line")
                 this.net.links.forEach(l => l.size = 0)
@@ -335,7 +433,7 @@ export class ProductGraph {
         let nodeUpdate = node_enter.merge(node_selection);
         nodeUpdate
             .attr("fill", (d) =>d.fill())
-            .attr("stroke", (d) => d.group in this.net.cliques ? "black" : "#555")
+            .attr("stroke", (d) => d.stroke(this.net))
 
         node_selection.exit().remove()
 
@@ -369,15 +467,31 @@ export class ProductGraph {
 
         // trigger a mouseover
         this.nodeg.select("circle:first-child").dispatch("mouseover")
+
+        // update the list of best products
+        let i = 1
+        this.bestProducts["view"].selectAll("*").remove()
+        this.bestProducts["nodes"].forEach(n => {
+            if (n.toBeShown() && i < 5){
+                if (i != 1){
+                    this.bestProducts["view"].append("hr")
+                }
+                this.bestProducts["view"].append("h5").text(i)
+                n.appendTo(this.bestProducts["view"])
+                i++
+            }
+        }
+        )
+
     }
 
     convexHulls() {
         // update the hull of each clique
         let hulls = {};
         for (let clique in this.net.cliques) {
-            hulls[clique] = hulls[clique] || []
-            for (let n of this.net.cliques[clique].nodes){
-                if (n.toBeShown()) {
+            if (this.net.cliques[clique].nodes.every(n => n.toBeShown())) { // only if we show all the graph
+                hulls[clique] = hulls[clique] || []
+                for (let n of this.net.cliques[clique].nodes) {
                     hulls[clique].push([n.x - this.off, n.y - this.off]);
                     hulls[clique].push([n.x - this.off, n.y + this.off]);
                     hulls[clique].push([n.x + this.off, n.y - this.off]);
@@ -411,6 +525,7 @@ export class ProductGraph {
             if (!n.assigned) {
                 queue.push(n)
                 n.dist = 0
+                this.bestProducts["nodes"].push(n)
             }
             while (queue.length > 0) {
                 let u = queue.shift()
@@ -457,6 +572,10 @@ export class ProductGraph {
 
             // mark a showable all the reachable nodes
             dfs_show(products)
+
+            // show also the direct "parents"
+            this.net.nodes.filter(n => n.show)
+                .forEach(n => n.incoming.forEach(n => n.show=true))
         }
 
         this.updateGraph()
@@ -505,6 +624,15 @@ class ProductNode {
         return "red"
     }
 
+    stroke(net){
+        // change the stroke color if this node belongs to a clique and all the clique
+        // is being shown
+        // if (this.group in net.cliques && this.name.indexOf("RH2C")>=0)
+        if (this.group in net.cliques && net.cliques[this.group].nodes.every(n => n.toBeShown()))
+            return "black"
+        return "#555"
+    }
+
     toBeShown(){
         return this.show
     }
@@ -515,6 +643,20 @@ class ProductNode {
 
     link(){
         return "<a href='https://www.amazon.com/dp/"+ this.asin +"'> url </a>"
+    }
+
+    appendTo(div){
+        // given a div (d3 selector), appends to the info about
+        // the product to it
+        div = div.append("div")
+        div.append("h5")
+            .text(this.name)
+        div.append("img")
+            .attr("src", this.imUrl)
+            .attr("alt", "product image not available")
+        div.append("h6")
+            .text("Price: ")
+            .append("label").text(this.price)
     }
 }
 
