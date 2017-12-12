@@ -58,8 +58,6 @@ export class ProductGraph {
 
         let table = div.append("table")
             .attr("class", "product_table")
-            .attr("width", "100%")
-            .attr("height", "100%")
 
         let row1 = table.append("tr")
         let ncolumns = 1 + bestProducts + productWindow
@@ -67,7 +65,7 @@ export class ProductGraph {
             // in this.bestProducts["view"] we will show the first 10 shown nodes
             // of this.bestProducts["nodes"]
             let column = row1.append("td")
-                .attr("width", (100/ncolumns) + "%")
+                .style("width", (100/ncolumns) + "%")
                 .style("padding", 3+"px")
                 .style("height", this.height+"px")
             column.append("h4")
@@ -86,14 +84,16 @@ export class ProductGraph {
 
         let graph_view = row1.append("td")
             .style("padding", 0)
-            .attr("height", this.height);
+            .style("width", (100/ncolumns) + "%")
+            .style("height", this.height+"px")
 
         if (productWindow){
             // then create a table, on the left we show the graph
             // on the right the details of the product
             let column = row1.append("td")
-                .attr("width", (100/ncolumns) + "%")
+                .style("width", (100/ncolumns) + "%")
                 .style("padding", 3+"px")
+                .style("height", this.height+"px")
             column.append("h4")
                 .text("Selected product")
                 .style("height", "7%")
@@ -300,7 +300,9 @@ export class ProductGraph {
                 }
             }
             // this.computeNetwork(data);
-            this.updateGraph();
+            this.updateGraph(true);
+            // trigger a mouseover
+            this.nodeg.select("circle:first-child").dispatch("mouseover")
 
             if (searchbox) {
                 // give the autocompletion all the splitted names
@@ -331,7 +333,7 @@ export class ProductGraph {
         });
     }
 
-    updateGraph() {
+    updateGraph(show_opacity_change) {
         // store the context in a variable to access it in the functions
         let that = this
 
@@ -339,18 +341,20 @@ export class ProductGraph {
         let nodes_show = this.net.nodes.filter(node => node.toBeShown());
         let link_show = this.net.links.filter(link => link.toBeShown());
 
-        this.linkg
-            .style("opacity", 0)
-            .transition().duration(500)
-            .style("opacity", 1)
-        this.nodeg
-            .style("opacity", 0)
-            .transition().duration(500)
-            .style("opacity", 1)
-        this.hullg
-            .style("opacity", 0)
-            .transition().duration(500)
-            .style("opacity", 1)
+        if (show_opacity_change) {
+            this.linkg
+                .style("opacity", 0)
+                .transition().duration(500)
+                .style("opacity", 1)
+            this.nodeg
+                .style("opacity", 0)
+                .transition().duration(500)
+                .style("opacity", 1)
+            this.hullg
+                .style("opacity", 0)
+                .transition().duration(500)
+                .style("opacity", 1)
+        }
 
         let link_selection = this.linkg
             .selectAll("line")
@@ -389,7 +393,7 @@ export class ProductGraph {
                 // 2. show the details of the product
                 if (this.productWindow){
                     this.productWindow.selectAll("*").remove()
-                    d.appendTo(this.productWindow)
+                    d.appendTo(this.productWindow, null, () => this.updateGraph.call(this, false))
                 }
                 else{
                     this.tooltip.transition()
@@ -465,8 +469,6 @@ export class ProductGraph {
             .style("fill", (d) => d.clique.color)
         hull_selection.exit().remove()
 
-        // trigger a mouseover
-        this.nodeg.select("circle:first-child").dispatch("mouseover")
 
         // update the list of best products
         let i = 1
@@ -476,8 +478,7 @@ export class ProductGraph {
                 if (i != 1){
                     this.bestProducts["view"].append("hr")
                 }
-                this.bestProducts["view"].append("h5").text(i)
-                n.appendTo(this.bestProducts["view"])
+                n.appendTo(this.bestProducts["view"], i, () => this.updateGraph.call(this, false))
                 i++
             }
         }
@@ -578,7 +579,7 @@ export class ProductGraph {
                 .forEach(n => n.incoming.forEach(n => n.show=true))
         }
 
-        this.updateGraph()
+        this.updateGraph(true)
     }
 }
 
@@ -613,6 +614,8 @@ class ProductNode {
         this.neighbours = []; // list of directly reachable nodes
 		this.incoming = []; // list of nodes that point towards this node
 		this.links = {};
+
+		this.fill_color = "red"
     }
 
     createTooltip() {
@@ -621,7 +624,7 @@ class ProductNode {
     }
 
     fill() {
-        return "red"
+        return this.fill_color
     }
 
     stroke(net){
@@ -645,12 +648,22 @@ class ProductNode {
         return "<a href='https://www.amazon.com/dp/"+ this.asin +"'> url </a>"
     }
 
-    appendTo(div){
+    appendTo(div, rank, update){
         // given a div (d3 selector), appends to the info about
         // the product to it
         div = div.append("div")
+            .on("mouseenter", () => {
+                this.fill_color = "yellow"
+                update()
+                this.fill_color = "red"
+            })
+
+        let rank_str = rank? rank + ". " : ""
         div.append("h5")
-            .text(this.name)
+            .append("a")
+            .style("color", "inherit")
+            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+            .text(rank_str + this.name)
         div.append("img")
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")

@@ -24,6 +24,10 @@
     pointer-events: none;
 }
 
+.product_table{
+    width: 100%;
+}
+
 .product_table td{
     vertical-align: text-top;
     vertical-align: top;
