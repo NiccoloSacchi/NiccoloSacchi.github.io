@@ -7,6 +7,8 @@
 
 	<title>Amazon - product graph</title>
 
+<link rel="shortcut icon" href="favicon.ico">
+
 	<link rel="alternate" type="application/rss+xml" title="Amazon - A virtual proof that name is awesome!" href="/feed.xml">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
@@ -24,8 +26,9 @@
     <!--<script src="js/categories_graph.js" type="module"></script>-->
 </head>
 <body
-        style="text-align: justify"
-        onload="pageInit()">
+        style="text-align: justify; /* overflow-x: hidden; */"
+        onload="pageInit()"
+>
 
 	<nav class="navbar navbar-default navbar-fixed-top navbar-custom">
 		<div class="container-fluid">
@@ -136,7 +139,8 @@
                         </div>
                         <!--<div id="product_graph" style="margin-top: 20px; width: 800px"></div>-->
                     </article>
-                    <div id="product_graph" style="width: 800px; margin: auto"></div>
+                    <!-- setting the margin so to go beyond the width of the parent -->
+                    <div id="product_graph" style="width: 120%; margin-left: -10%;"></div>
 
                     <article class="post-preview">
                         <h2 class="post-title">Part 3</h2>
@@ -148,6 +152,7 @@
                         </div>
                     </article>
                 </div>
+
             </div>
         </div>
     </div>

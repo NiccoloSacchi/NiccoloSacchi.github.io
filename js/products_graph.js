@@ -1,8 +1,9 @@
 export class ProductGraph {
     constructor() {
         // default initializations of the parameters (can be changed to modify the graph)
-        this.width = "100%";     // svg width
-        this.height = 500;     // svg height
+        // height and width of the whole div
+        this.width = d3.select("body").node().getBoundingClientRect().width;
+        this.height = 450
         this.off = 10;    // cluster hull offset
         this.net = {"nodes":[], "links": [], "cliques": {}};  // all nodes (either products or groups) and links
         this.choices = [];
@@ -10,6 +11,7 @@ export class ProductGraph {
         this.bestProducts = {"nodes": [], "view": null}
         this.focusednode = d3.select("#asdjhasjdhg") // asin of the highlighted node
 
+        this.brushHeight = 25
         // this.simulation; this.hullg; this.linkg; this.nodeg; these are set at runtime
         this.tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
@@ -33,7 +35,9 @@ export class ProductGraph {
         let that = this
 
         // select the div
-        let div = d3.select("#"+divId);
+        let div = d3.select("#"+divId)
+            .style("width", this.width)
+            .style("height", this.height)
         // clear the div content
         div.selectAll("*").remove();
 
@@ -110,71 +114,20 @@ export class ProductGraph {
 
         if (priceBrush){
             // let margin = {top: 0, right: 5, bottom: 0, left: 5}
-            let brushHeight = 30
-            let row2 = table
+            let div = table
                 .append("tr")
-                .style("height", brushHeight+"px")
-                .style("padding", 0)
-
-            let priceBrush = row2
                 .append("td").attr("colspan", 100).style("padding", 0)
-                .append("svg").attr("class", "priceBrush").attr("height", brushHeight)
-                .append("g")
-                // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                .append("div").style("margin", "0px 15px")
 
-            let brushWidth = row2.node().getBoundingClientRect().width //- //margin.left - margin.right
+            div.append("h6").text("Select a price interval")
+                // .style("margin", "auto")
+                .style("text-align", "center").style("margin", "0px")
 
-            let maxPrice = 1000
-            let scale = d3.scaleLinear()
-                .domain([0, maxPrice]) // min max price
-                .rangeRound([0, brushWidth]);
-
-            // add small ticks to x axis
-            priceBrush.append("g")
-                .attr("class", "axis axis--grid")
-                .attr("transform", "translate(0," + brushHeight + ")")
-                .call(d3.axisBottom(scale)
-                    .ticks(100)//(brushWidth, 12)
-                    .tickSize(-brushHeight)
-                    .tickFormat(() => null))
-                .selectAll(".tick")
-                .classed("tick--minor", (d) => {
-                    return d//d.getHours()
-                });
-
-            // // add wider ticks with label to x axis
-            // priceBrush.append("g")
-            //     .attr("class", "axis axis--x")
-            //     .attr("transform", "translate(0," + brushHeight + ")")
-            //     .call(d3.axisBottom(scale)
-            //         .ticks(10)//(brushWidth, 6)
-            //         .tickPadding(0))
-            //     .attr("text-anchor", null)
-            //     .selectAll("text")
-            //     .attr("x", 6);
-
-            // add the rectangle to brush
-            priceBrush.append("g")
-                .attr("class", "brush")
-                .call(d3.brushX()
-                    .extent([[0, 0], [brushWidth, brushHeight]])
-                    .on("end", brushended));
-
-            function brushended() {
-                // if (!d3.event.sourceEvent) return; // Only transition after input.
-                // if (!d3.event.selection) return; // Ignore empty selections.
-                // let d0 = d3.event.selection.map(scale.invert),
-                //     d1 = d0.map(d3.timeDay.round);
-                //
-                // // If empty when rounded, use floor & ceil instead.
-                // if (d1[0] >= d1[1]) {
-                //     d1[0] = d3.timeDay.floor(d0[0]);
-                //     d1[1] = d3.timeDay.offset(d1[0]);
-                // }
-                //
-                // d3.select(this).transition().call(d3.event.target.move, d1.map(scale));
-            }
-
+            this.priceBrush = div
+                .append("svg").style("overflow", "visible")
+                .attr("class", "priceBrush")
+                .attr("height", this.brushHeight)
+                .attr('transform', 'translate(0, 2)')
         }
 
         this.zoom = d3.zoom()
@@ -187,14 +140,9 @@ export class ProductGraph {
         this.svg = graph_view.append("svg")
             .attr("class", "product_graph")
             // set height and width, add zoom and drag
-            .attr("width", this.width)
-            .attr("height", this.height)
+            .attr("width", "100%")
+            .attr("height", "100%")
             .call(this.zoom);
-
-        // update the width with the computed one
-        let rect = this.svg.node().getBoundingClientRect()
-        this.width = rect.width
-        this.height = rect.height
 
         // define arrow markers for graph links (directed edges)
         let defs = this.svg.append('defs');
@@ -271,10 +219,11 @@ export class ProductGraph {
             this.linkg = this.svg.append("g");
             this.nodeg = this.svg.append("g");
 
+            let svgsize = this.svg.node().getBoundingClientRect()
             this.simulation = d3.forceSimulation()
                 .force("link", d3.forceLink()) //.distance(() => 50)
                 .force("charge", d3.forceManyBody())
-                .force("center", d3.forceCenter(this.width / 2, this.height / 2))
+                .force("center", d3.forceCenter(svgsize.width / 2, svgsize.height / 2))
                 .velocityDecay(0.85)
                 // regulate the shape of the whole cluster
                 .force("x", d3.forceX().strength(.2))
@@ -302,6 +251,8 @@ export class ProductGraph {
             }
             // this.computeNetwork(data);
             this.updateGraph(true);
+            this.updatePriceBrush();
+
             // trigger a mouseover
             this.nodeg.select("circle:first-child").dispatch("mouseover")
 
@@ -475,7 +426,6 @@ export class ProductGraph {
             .style("fill", (d) => d.clique.color)
         hull_selection.exit().remove()
 
-
         // update the list of best products
         let rank = 1
         let maxrank = 5
@@ -526,7 +476,7 @@ export class ProductGraph {
 
         // Sort nodes by decreasing fan-in minus fan-out
         let best = nodes
-            .filter(a => a instanceof ProductNode && a.show)
+            .filter(n => n instanceof ProductNode && n.toBeShown())
             .sort((a, b) => (b.incoming.length - b.neighbours.length) - (a.incoming.length - a.neighbours.length))
 
         nodes.forEach(n => [n.pred, n.dist, n.assigned] = [null, Infinity, false])
@@ -554,42 +504,43 @@ export class ProductGraph {
 
     filterProducts(keywords){
         // todo change (keywords will be an array)
-        function dfs_show(nodes) {
+        function bfs_show(nodes) {
             // the bfs is done considering only the product nodes
 
             // (unique) list of non-explored neighbours
             let neighbours = Array.from(
                 new Set(
                     nodes
-                        .reduce((acc, n) => acc.concat(n.neighbours.filter(n => !n.show)), [])));
+                        .reduce((acc, n) => acc.concat(n.neighbours.filter(n => !n.reachable)), [])));
             // set the neighbours as seen
-            neighbours.forEach(n => n.show = true)
+            neighbours.forEach(n => n.reachable = true)
             if (neighbours.length > 0) {
-                dfs_show(neighbours)
+                bfs_show(neighbours)
             }
         }
 
         if (keywords == ""){
-            this.net.nodes.forEach(n => n.show = true)
+            this.net.nodes.forEach(n => n.reachable = true)
         }
         else {
             // set show to true only the product nodes corresponding with the keyword
             let products = this.net.nodes.filter(n => {
                     //todo change for keywords = array
-                    n.show = n.keywords.includes(keywords)
-                    return n.show
+                    n.reachable = n.keywords.includes(keywords)
+                    return n.reachable
                 }
             )
 
             // mark a showable all the reachable nodes
-            dfs_show(products)
+            bfs_show(products)
 
             // show also the direct "parents"
-            this.net.nodes.filter(n => n.show)
-                .forEach(n => n.incoming.forEach(n => n.show=true))
+            this.net.nodes.filter(n => n.reachable)
+                .forEach(n => n.incoming.forEach(n => n.reachable=true))
         }
 
         this.updateGraph(true)
+        this.updatePriceBrush()
     }
 
     updateFocus(newNode, zoom){
@@ -603,16 +554,102 @@ export class ProductGraph {
         this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "yellow")
 
         if (zoom) {
+            let svgsize = this.svg.node().getBoundingClientRect()
             // zoom on the new node
             this.svg
                 .transition()
                 // .delay(500)
                 .duration(2000)
                 .call(this.zoom.transform, d3.zoomIdentity
-                    .translate(this.width / 2, this.height / 2)
+                    .translate(svgsize.width / 2, svgsize.height / 2)
                     .scale(2)
                     .translate(-newNode.x, -newNode.y));
         }
+    }
+
+    updatePriceBrush(){
+        let nodes = this.net.nodes.filter(node => node.reachable);
+
+        let brushWidth = this.priceBrush.node().getBoundingClientRect().width
+        let brushHeight = this.priceBrush.node().getBoundingClientRect().height
+        let prices = nodes.map(n => n.price)
+        let maxPrice = Math.max.apply(null, prices)
+        maxPrice = Math.ceil(maxPrice/100)*100 // round to next multiple of 100
+
+        let priceScale = d3.scaleLinear()
+            .domain([0, maxPrice]) // min max price
+            .rangeRound([0, brushWidth]);
+
+        this.priceBrush.selectAll("g").remove()
+
+        this.priceBrush.append("g").attr("id", "productPrices") // here we will show circles representing the prices
+
+        // add small ticks to x axis
+        this.priceBrush.append("g")
+            .attr("opacity", 0.5)
+            .attr("class", "axis axis--grid")
+            .attr("transform", "translate(0," + this.brushHeight + ")")
+            .call(d3.axisBottom(priceScale)
+                .ticks(100)//(brushWidth, 12)
+                .tickSize(-this.brushHeight)
+                .tickFormat(() => null))
+            .selectAll(".tick")
+            .classed("tick--minor", (d) =>  d);
+
+        // add wider ticks with label to x axis
+        this.priceBrush.append("g")
+            .attr("class", "axis axis--x")
+            .call(d3.axisBottom(priceScale)
+                    .ticks(10)//(brushWidth, 6)
+                    .tickPadding(0)
+                // .tickSize(10)
+            )
+            .attr("text-anchor", "middle")
+            .selectAll("text")
+            .attr("y", this.brushHeight/2)
+
+        // add the rectangle to brush
+        this.priceBrush.append("g")
+            .attr("class", "brush")
+            .attr("opacity", 0.5)
+            .call(d3.brushX()
+                .extent([[0, 0], [brushWidth, this.brushHeight]])
+                .on("end", () => brushended()));
+
+        let that = this
+        function brushended() {
+            if (!d3.event.sourceEvent) return; // Only transition after input.
+            if (!d3.event.selection) return; // Ignore empty selections.
+            let price_interval = d3.event.selection.map(priceScale.invert) // map pixels to prices
+                // d1 = price_interval.map(p => round p?); // don't round
+
+            that.net.nodes.forEach(n => n.in_price_interval = (price_interval[0]<n.price && price_interval[1]>n.price))
+
+            that.updateGraph()
+            // // If empty when rounded, use floor & ceil instead.
+            // if (d0[0] >= d0[1]) {
+            //     d0[0] = d3.timeDay.floor(d0[0]);
+            //     d0[1] = d3.timeDay.offset(d1[0]);
+            // }
+
+        }
+
+        let price_selection = this.priceBrush.select("g#productPrices")
+            .selectAll("circle")
+            .data(prices)
+        let price_enter = price_selection
+            .enter()
+            .append("circle")
+            .attr("r", 2)
+            .attr("fill", "red")
+            .attr("opacity", "0.7")
+            .attr("cx", (d) => priceScale(d))
+            .attr("cy", (d) => gaussianRandom(0, brushHeight))
+        let price_update = price_enter.merge(price_selection);
+        price_update
+            .attr("cx", (d) => priceScale(d))
+            .attr("cy", (d) => gaussianRandom(0, brushHeight))
+        price_selection.exit().remove()
     }
 }
 
@@ -643,7 +680,10 @@ class ProductNode {
             )
         )
 
-        this.show = true
+        // reachable and in_price_interval are the two conditions that need to be satisfied in order to show the product
+        this.reachable = true
+        this.in_price_interval = true
+
         this.neighbours = []; // list of directly reachable nodes
 		this.incoming = []; // list of nodes that point towards this node
 		this.links = {};
@@ -670,7 +710,7 @@ class ProductNode {
     }
 
     toBeShown(){
-        return this.show
+        return this.reachable && this.in_price_interval
     }
 
     id() {
@@ -690,7 +730,7 @@ class ProductNode {
             .style('cursor', 'pointer')
             .on("click", () => mouseenter())
 
-        let rank_str = rank? rank + ". " : ""
+        let rank_str = rank? rank + ". " : "" // if no rank is passed then append nothing
         div.append("h5")
             .append("a")
             .style("color", "inherit")
@@ -737,4 +777,16 @@ class Link {
             v = this.target.id();
         return u + "|" + v;
     }
+}
+
+
+function gaussianRand() {
+    let rand = 0;
+    for (let i = 0; i < 6; i += 1) {
+        rand += Math.random();
+    }
+    return rand / 6;
+}
+function gaussianRandom(start, end) {
+    return Math.floor(start + gaussianRand() * (end - start + 1));
 }
