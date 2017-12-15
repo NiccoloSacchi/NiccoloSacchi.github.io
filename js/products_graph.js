@@ -434,6 +434,7 @@ export class ProductGraph {
             .attr("id", (d) => d.asin)
             .attr("fill", (d) =>d.fill())
             .attr("stroke", (d) => d.stroke(that.net))
+            .attr("r", (d) => d.range())
             .style("opacity", 1)
 
         node_selection.exit().remove()
