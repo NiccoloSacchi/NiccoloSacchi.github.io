@@ -177,63 +177,97 @@ export class ProductGraph {
             .attr("height", "100%")
             .call(this.zoom);
 
-        // define arrow markers for graph links (directed edges)
+        // define arrows markers for graph links (directed edges)
         let defs = this.svg.append('defs');
-        defs.append('marker')
-            .attr('id', 'end-arrow')
-            .attr('viewBox', '0 -5 10 10')
-            .attr('refX', 23)
-            .attr('markerWidth', 5)
-            .attr('markerHeight', 5)
-            .attr('orient', 'auto')
-            .append('svg:path')
-            .attr('d', 'M0,-5L10,0L0,5')
-            .attr('stroke', 'black')
-            .attr('stroke-opacity', 0.7)
-            .attr('stroke-width', 3)
-            .attr('fill', 'none')
+        let refX_map = {'red': [23, -13], 'black': [33, -23]}
+        let opacities = [0.2, 0.7]
+        for (let color of ['red', 'black']){
+            for (let o=0; o<opacities.length; o++){
+                // let a = 'end-arrow-' + color + "-" + opacity
+                defs.append('marker')
+                    .attr('id', 'end-arrow-' + color + "-opacity" + o)
+                    .attr('viewBox', '0 -5 10 10')
+                    .attr('refX', refX_map[color][0])
+                    .attr('markerWidth', 5)
+                    .attr('markerHeight', 5)
+                    .attr('orient', 'auto')
+                    .append('svg:path')
+                    .attr('d', 'M0,-5L10,0L0,5')
+                    .attr('stroke', color)
+                    .attr('stroke-opacity', opacities[o])
+                    .attr('stroke-width', 3)
+                    .attr('fill', 'none')
 
-        defs.append('marker')
-            .attr('id', 'start-arrow')
-            .attr('viewBox', '0 -5 10 10')
-            .attr('refX', -13)
-            .attr('markerWidth', 5)
-            .attr('markerHeight', 5)
-            .attr('orient', 'auto')
-            .append('svg:path')
-            .attr('d', 'M10,-5L0,0L10,5')
-            .attr('stroke', 'black')
-            .attr('stroke-opacity', 0.7)
-            .attr('stroke-width', 3)
-            .attr('fill', 'none')
-
-        defs.append('marker')
-            .attr('id', 'end-arrow_red')
-            .attr('viewBox', '0 -5 10 10')
-            .attr('refX', 23)
-            .attr('markerWidth', 5)
-            .attr('markerHeight', 5)
-            .attr('orient', 'auto')
-            .append('svg:path')
-            .attr('d', 'M0,-5L10,0L0,5')
-            .attr('stroke', 'red')
-            .attr('stroke-opacity', 0.7)
-            .attr('stroke-width', 3)
-            .attr('fill', 'none')
-
-        defs.append('marker')
-            .attr('id', 'start-arrow_red')
-            .attr('viewBox', '0 -5 10 10')
-            .attr('refX', -13)
-            .attr('markerWidth', 5)
-            .attr('markerHeight', 5)
-            .attr('orient', 'auto')
-            .append('svg:path')
-            .attr('d', 'M10,-5L0,0L10,5')
-            .attr('stroke', 'red')
-            .attr('stroke-opacity', 0.7)
-            .attr('stroke-width', 3)
-            .attr('fill', 'none')
+                defs.append('marker')
+                    .attr('id', 'start-arrow-' + color + "-opacity" + o)
+                    .attr('viewBox', '0 -5 10 10')
+                    .attr('refX', refX_map[color][1])
+                    .attr('markerWidth', 5)
+                    .attr('markerHeight', 5)
+                    .attr('orient', 'auto')
+                    .append('svg:path')
+                    .attr('d', 'M10,-5L0,0L10,5')
+                    .attr('stroke', color)
+                    .attr('stroke-opacity', opacities[o])
+                    .attr('stroke-width', 3)
+                    .attr('fill', 'none')
+            }
+        }
+        // defs.append('marker')
+        //     .attr('id', 'end-arrow')
+        //     .attr('viewBox', '0 -5 10 10')
+        //     .attr('refX', 33)
+        //     .attr('markerWidth', 5)
+        //     .attr('markerHeight', 5)
+        //     .attr('orient', 'auto')
+        //     .append('svg:path')
+        //     .attr('d', 'M0,-5L10,0L0,5')
+        //     .attr('stroke', 'black')
+        //     .attr('stroke-opacity', 0.7)
+        //     .attr('stroke-width', 3)
+        //     .attr('fill', 'none')
+        //
+        // defs.append('marker')
+        //     .attr('id', 'start-arrow')
+        //     .attr('viewBox', '0 -5 10 10')
+        //     .attr('refX', -23)
+        //     .attr('markerWidth', 5)
+        //     .attr('markerHeight', 5)
+        //     .attr('orient', 'auto')
+        //     .append('svg:path')
+        //     .attr('d', 'M10,-5L0,0L10,5')
+        //     .attr('stroke', 'black')
+        //     .attr('stroke-opacity', 0.7)
+        //     .attr('stroke-width', 3)
+        //     .attr('fill', 'none')
+        //
+        // defs.append('marker')
+        //     .attr('id', 'end-arrow_red')
+        //     .attr('viewBox', '0 -5 10 10')
+        //     .attr('refX', 23)
+        //     .attr('markerWidth', 5)
+        //     .attr('markerHeight', 5)
+        //     .attr('orient', 'auto')
+        //     .append('svg:path')
+        //     .attr('d', 'M0,-5L10,0L0,5')
+        //     .attr('stroke', 'red')
+        //     .attr('stroke-opacity', 0.7)
+        //     .attr('stroke-width', 3)
+        //     .attr('fill', 'none')
+        //
+        // defs.append('marker')
+        //     .attr('id', 'start-arrow_red')
+        //     .attr('viewBox', '0 -5 10 10')
+        //     .attr('refX', -13)
+        //     .attr('markerWidth', 5)
+        //     .attr('markerHeight', 5)
+        //     .attr('orient', 'auto')
+        //     .append('svg:path')
+        //     .attr('d', 'M10,-5L0,0L10,5')
+        //     .attr('stroke', 'red')
+        //     .attr('stroke-opacity', 0.7)
+        //     .attr('stroke-width', 3)
+        //     .attr('fill', 'none')
 
         // when drawing make the graph appear "smoothly"
         this.svg.attr("opacity", 1e-6)
@@ -383,56 +417,32 @@ export class ProductGraph {
         let link_selection = this.linkg
             .selectAll("line")
             .data(link_show)
-            .style('marker-start', (d) => d.left ? 'url(#start-arrow)' : '')
-            .style('marker-end', (d) => d.right ? 'url(#end-arrow)' : '')
+            .style('marker-start', (d) => d.startArrow())
+            .style('marker-end', (d) => d.endArrow())
+            .style("stroke-opacity", (d) => d.opacity())
         link_selection
             .enter()
             .append("line")
             .attr("class", "link")
-            .style('marker-start', (d) => d.left ? 'url(#start-arrow)' : '')
-            .style('marker-end', (d) => d.right ? 'url(#end-arrow)' : '')
+            .style('marker-start', (d) => d.startArrow())
+            .style('marker-end', (d) => d.endArrow())
+            .style("stroke-opacity", (d) => d.opacity())
         link_selection.exit().remove()
 
         let node_selection = this.nodeg
             .selectAll("circle")
             .data(nodes_show)
-
         let node_enter = node_selection
             .enter()
             .append("circle")
             .attr("id", (d) => d.asin) // give each node the id of its product
             .attr("class", "node")
             .attr("r", 5)
+            .style("opacity", 1)
             .attr("fill", (d) =>d.fill())
             .attr("stroke", (d) => d.stroke(this.net))
             .on("mouseover", (d) => {
-                // 1. show shortest path to best product (after hiding the previous one)
-                // hide old
-                let links = this.linkg.selectAll("line")
-                this.net.links.forEach(l => l.size = 0)
-
-                // show new
-                let node = d
-                while (node.pred != null) {
-                    node.links[node.pred.id()].size = 3
-                    node = node.pred
-                }
-                links.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
-                    .style("stroke-width", (d) => (d.size && d.size == 3) ? '2px' : '1px')
-                    .style('marker-start', (d) => {
-                        if (d.left){
-                            return (d.size && d.size == 3) ? 'url(#start-arrow_red)' : 'url(#start-arrow)'
-                        }
-                        return ''
-                    })
-                    .style('marker-end', (d) => {
-                        if (d.right){
-                            return (d.size && d.size == 3) ? 'url(#end-arrow_red)' : 'url(#end-arrow)'
-                        }
-                        return ''
-                    })
-
-                // 1. show the details of the product
+                // 1. show the details of the product (either in the selected product window or with the popup)
                 if (this.productWindow){
                     this.productWindow.selectAll("*").remove()
                     d.appendTo(this.productWindow, null, () => this.updateFocus.call(this, d, true))
@@ -469,17 +479,12 @@ export class ProductGraph {
                     d.fx = null;
                     d.fy = null;
                 }))
-
-        // node_enter
-        //     .style("opacity", 0)
-        //     .transition().duration(500)
-        //     .style("opacity", 1)
-
         let nodeUpdate = node_enter.merge(node_selection);
         nodeUpdate
             .attr("id", (d) => d.asin)
             .attr("fill", (d) =>d.fill())
             .attr("stroke", (d) => d.stroke(this.net))
+            .style("opacity", 1)
 
         node_selection.exit().remove()
 
@@ -513,13 +518,13 @@ export class ProductGraph {
 
         // update the list of best products
         let rank = 1
-        let maxrank = 5
+        // let maxrank = 5 show any rank
         // clear the view
         this.bestProducts["view"].selectAll("*").remove()
         // scan the best products and show only the ones that are represented
         // in the graph
         this.bestProducts["nodes"].forEach(n => {
-            if (n.toBeShown() && rank <= maxrank){
+            if (n.toBeShown()){ // && rank <= maxrank){
                 if (rank != 1){
                     this.bestProducts["view"].append("hr")
                 }
@@ -632,15 +637,38 @@ export class ProductGraph {
     }
 
     updateFocus(newNode, zoom){
-        // updates the focus: focus on newNode
+        // updates the focus (focus on newNode)
         // newNode: node to focus on
         // zoom: boolean which indicates whether to zoom on that node
 
+        // 1. show shortest path to best product (after hiding the previous one)
+        let links = this.linkg.selectAll("line")
+        this.net.links.forEach(l => l.path = false)
+        let node = newNode
+        while (node.pred != null) {
+            node.links[node.pred.id()].path = true
+            node = node.pred
+        }
+        links.style("stroke", (d) => (d.path) ? 'red' : '')
+            .style("stroke-width", (d) => (d.path) ? '2px' : '1px')
+            .style('marker-start', (d) => d.startArrow())
+            .style('marker-end', (d) => d.endArrow())
+            .style("stroke-opacity", (d) => d.opacity())
+            // .style('marker-start', (d) => d.startArrow())
+            // .style('marker-end', (d) => {
+            //     if (d.right){
+            //         return (d.path) ? 'url(#end-arrow-red-opacity1)' : 'url(#end-arrow-black-opacity1)'
+            //     }
+            //     return ''
+            // })
+
+        // 2. show which is the focused node (fll it with another color)
         // restore the color of the old focused one
         this.focusednode.attr("fill", (d) => d.fill())
         // focus on the new one
         this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "white")
 
+        // 3. possibly zoom on that node
         if (zoom) {
             let svgsize = this.svg.node().getBoundingClientRect()
             // zoom on the new node
@@ -731,13 +759,23 @@ export class ProductGraph {
 
             that.net.nodes.forEach(n => n.in_price_interval = (price_interval[0]<n.price && price_interval[1]>n.price))
 
-            that.updateGraph()
+            // that.updateGraph()
+
             // // If empty when rounded, use floor & ceil instead.
             // if (d0[0] >= d0[1]) {
             //     d0[0] = d3.timeDay.floor(d0[0]);
             //     d0[1] = d3.timeDay.offset(d1[0]);
             // }
 
+            // obfuscate the nodes based on a price interval
+            let minopacity = 0.2
+            that.nodeg.selectAll("circle")
+                .style("opacity", (n) => n.in_price_interval + minopacity)
+            that.linkg.selectAll("line")
+                .style('marker-start', (d) => d.startArrow())
+                .style('marker-end', (d) => d.endArrow())
+                .style("stroke-opacity", (d) => d.opacity())
+                // .style("stroke-opacity", (l) => (l.source.in_price_interval && l.target.in_price_interval) + minopacity)
         }
     }
 }
@@ -799,7 +837,7 @@ class ProductNode {
     }
 
     toBeShown(){
-        return this.reachable && this.in_price_interval
+        return this.reachable //&& this.in_price_interval
     }
 
     id() {
@@ -840,7 +878,7 @@ class Link {
         this.target = target; // target node
         this.left = left;     // direction of the arrow (bool)
         this.right = right;   // direction of the arrow (bool), the arrow may point in both directions
-        this.size = 0;
+        this.path = false; // belong to the path to the best product
 
         // add to each node the pointers to its out links (so that we can efficiently
         // do a BFS on the graph)
@@ -854,6 +892,30 @@ class Link {
             this.target.neighbours.push(this.source)
             this.source.incoming.push(this.target)
         }
+    }
+
+    startArrow(){
+        if (this.left){ // there is an arrow
+            if (this.source.in_price_interval && this.target.in_price_interval){ // the opacity is high
+                return (this.path) ? 'url(#start-arrow-red-opacity1)' : 'url(#start-arrow-black-opacity1)'
+            }
+            return (this.path) ? 'url(#start-arrow-red-opacity0)' : 'url(#start-arrow-black-opacity0)' // the opacity is low
+        }
+        return ''
+    }
+
+    endArrow(){
+        if (this.right){ // there is an arrow
+            if (this.source.in_price_interval && this.target.in_price_interval){ // the opacity is high
+                return (this.path) ? 'url(#end-arrow-red-opacity1)' : 'url(#end-arrow-black-opacity1)'
+            }
+            return (this.path) ? 'url(#end-arrow-red-opacity0)' : 'url(#end-arrow-black-opacity0)' // the opacity is low
+        }
+        return ''
+    }
+
+    opacity(){
+        return (this.source.in_price_interval && this.target.in_price_interval)? 0.7 : 0.2
     }
 
     toBeShown() {
