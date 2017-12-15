@@ -213,61 +213,11 @@ export class ProductGraph {
                     .attr('fill', 'none')
             }
         }
-        // defs.append('marker')
-        //     .attr('id', 'end-arrow')
-        //     .attr('viewBox', '0 -5 10 10')
-        //     .attr('refX', 33)
-        //     .attr('markerWidth', 5)
-        //     .attr('markerHeight', 5)
-        //     .attr('orient', 'auto')
-        //     .append('svg:path')
-        //     .attr('d', 'M0,-5L10,0L0,5')
-        //     .attr('stroke', 'black')
-        //     .attr('stroke-opacity', 0.7)
-        //     .attr('stroke-width', 3)
-        //     .attr('fill', 'none')
-        //
-        // defs.append('marker')
-        //     .attr('id', 'start-arrow')
-        //     .attr('viewBox', '0 -5 10 10')
-        //     .attr('refX', -23)
-        //     .attr('markerWidth', 5)
-        //     .attr('markerHeight', 5)
-        //     .attr('orient', 'auto')
-        //     .append('svg:path')
-        //     .attr('d', 'M10,-5L0,0L10,5')
-        //     .attr('stroke', 'black')
-        //     .attr('stroke-opacity', 0.7)
-        //     .attr('stroke-width', 3)
-        //     .attr('fill', 'none')
-        //
-        // defs.append('marker')
-        //     .attr('id', 'end-arrow_red')
-        //     .attr('viewBox', '0 -5 10 10')
-        //     .attr('refX', 23)
-        //     .attr('markerWidth', 5)
-        //     .attr('markerHeight', 5)
-        //     .attr('orient', 'auto')
-        //     .append('svg:path')
-        //     .attr('d', 'M0,-5L10,0L0,5')
-        //     .attr('stroke', 'red')
-        //     .attr('stroke-opacity', 0.7)
-        //     .attr('stroke-width', 3)
-        //     .attr('fill', 'none')
-        //
-        // defs.append('marker')
-        //     .attr('id', 'start-arrow_red')
-        //     .attr('viewBox', '0 -5 10 10')
-        //     .attr('refX', -13)
-        //     .attr('markerWidth', 5)
-        //     .attr('markerHeight', 5)
-        //     .attr('orient', 'auto')
-        //     .append('svg:path')
-        //     .attr('d', 'M10,-5L0,0L10,5')
-        //     .attr('stroke', 'red')
-        //     .attr('stroke-opacity', 0.7)
-        //     .attr('stroke-width', 3)
-        //     .attr('fill', 'none')
+
+        defs.append("pattern")
+            .attr("id", "star")
+            .attr("x", "0%").attr("y", "0%").attr("height", "100%").attr("width", "100%").attr("viewBox", "0 0 512 512")
+            .append("image").attr("x", "0%").attr("y", "0%").attr("height", "512").attr("width", "512").attr("href", "img/star.svg")
 
         // when drawing make the graph appear "smoothly"
         this.svg.attr("opacity", 1e-6)
@@ -437,10 +387,10 @@ export class ProductGraph {
             .append("circle")
             .attr("id", (d) => d.asin) // give each node the id of its product
             .attr("class", "node")
-            .attr("r", 5)
+            .attr("r", (d) => d.range())
             .style("opacity", 1)
             .attr("fill", (d) =>d.fill())
-            .attr("stroke", (d) => d.stroke(this.net))
+            .attr("stroke", (d) => d.stroke(that.net))
             .on("mouseover", (d) => {
                 // 1. show the details of the product (either in the selected product window or with the popup)
                 if (this.productWindow){
@@ -483,7 +433,7 @@ export class ProductGraph {
         nodeUpdate
             .attr("id", (d) => d.asin)
             .attr("fill", (d) =>d.fill())
-            .attr("stroke", (d) => d.stroke(this.net))
+            .attr("stroke", (d) => d.stroke(that.net))
             .style("opacity", 1)
 
         node_selection.exit().remove()
@@ -577,6 +527,7 @@ export class ProductGraph {
                 queue.push(n)
                 n.dist = 0
                 this.bestProducts["nodes"].push(n)
+                n.best = true;
             }
             while (queue.length > 0) {
                 let u = queue.shift()
@@ -654,19 +605,17 @@ export class ProductGraph {
             .style('marker-start', (d) => d.startArrow())
             .style('marker-end', (d) => d.endArrow())
             .style("stroke-opacity", (d) => d.opacity())
-            // .style('marker-start', (d) => d.startArrow())
-            // .style('marker-end', (d) => {
-            //     if (d.right){
-            //         return (d.path) ? 'url(#end-arrow-red-opacity1)' : 'url(#end-arrow-black-opacity1)'
-            //     }
-            //     return ''
-            // })
 
-        // 2. show which is the focused node (fll it with another color)
+        // 2. show which is the focused node (flll it with another color)
         // restore the color of the old focused one
         this.focusednode.attr("fill", (d) => d.fill())
+        this.focusednode.attr("stroke", (d) => d.stroke(this.net))
         // focus on the new one
-        this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "white")
+        let asins = this.bestProducts["nodes"].map(n=>n.asin)
+        if (asins.includes(newNode.asin) )
+            this.focusednode = d3.select("circle#" + newNode.asin).attr("stroke", "black")
+        else
+            this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "white")
 
         // 3. possibly zoom on that node
         if (zoom) {
@@ -815,6 +764,8 @@ class ProductNode {
 		this.incoming = []; // list of nodes that point towards this node
 		this.links = {};
 
+		this.best = false; // is one of the best product
+
 		this.fill_color = "yellow"; // set from outside depending on which quantile this the price of this product belongs
     }
 
@@ -824,6 +775,8 @@ class ProductNode {
     }
 
     fill() {
+        if (this.best)
+            return "url(#star)"
         return this.fill_color
     }
 
@@ -831,9 +784,17 @@ class ProductNode {
         // change the stroke color if this node belongs to a clique and all the clique
         // is being shown
         // if (this.group in net.cliques && this.name.indexOf("RH2C")>=0)
+        if (this.best)
+            return ""
         if (this.group in net.cliques && net.cliques[this.group].nodes.every(n => n.toBeShown()))
             return "black"
         return "#555"
+    }
+
+    range(){
+        if (this.best)
+            return 8
+        return 4
     }
 
     toBeShown(){
@@ -929,7 +890,6 @@ class Link {
         return u + "|" + v;
     }
 }
-
 
 function gaussianRand() {
     let rand = 0;
