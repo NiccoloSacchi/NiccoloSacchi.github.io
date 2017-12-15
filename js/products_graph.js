@@ -19,6 +19,39 @@ export class ProductGraph {
 
         this.drawHull = (d) =>
             d3.line().curve(d3.curveCardinalClosed.tension(.85))(d.path); // 0.8
+
+        this.redToGreen = [
+            "#FF0000",
+            "#FF1100",
+            "#FF2300",
+            "#FF3400",
+            "#FF4600",
+            "#FF5700",
+            "#FF6900",
+            "#FF7B00",
+            "#FF8C00",
+            "#FF9E00",
+            "#FFAF00",
+            "#FFC100",
+            "#FFD300",
+            "#FFE400",
+            "#FFF600",
+            "#F7FF00",
+            "#E5FF00",
+            "#D4FF00",
+            "#C2FF00",
+            "#B0FF00",
+            "#9FFF00",
+            "#8DFF00",
+            "#7CFF00",
+            "#6AFF00",
+            "#58FF00",
+            "#47FF00",
+            "#35FF00",
+            "#24FF00",
+            "#12FF00",
+            "#00FF00"
+        ]
     }
 
     drawGraph(divId, file, searchbox, productWindow, priceBrush, bestProducts){
@@ -249,7 +282,18 @@ export class ProductGraph {
                         .attr("d", that.drawHull);
                 }
             }
-            // this.computeNetwork(data);
+
+            // set the color of each node (done only one time, computed splitting the price in quantiles)
+            // sort descending prices
+            let sorted = this.net.nodes.sort((a, b) => b.price - a.price)
+            let quantile_size = Math.ceil(sorted.length/this.redToGreen.length)
+            for (let curr_quantile = 0; curr_quantile < this.redToGreen.length; curr_quantile++){
+                // assign each color to a quantile
+                for (let i = curr_quantile*quantile_size; i<(curr_quantile+1)*quantile_size && i < sorted.length; i++){
+                    sorted[i].fill_color = this.redToGreen[curr_quantile]
+                }
+            }
+
             this.updateGraph(true);
             this.updatePriceBrush();
 
@@ -539,6 +583,9 @@ export class ProductGraph {
                 .forEach(n => n.incoming.forEach(n => n.reachable=true))
         }
 
+        // restore price inteval
+        this.net.nodes.forEach(n => n.in_price_interval=true)
+
         this.updateGraph(true)
         this.updatePriceBrush()
     }
@@ -551,7 +598,7 @@ export class ProductGraph {
         // restore the color of the old focused one
         this.focusednode.attr("fill", (d) => d.fill())
         // focus on the new one
-        this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "yellow")
+        this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "white")
 
         if (zoom) {
             let svgsize = this.svg.node().getBoundingClientRect()
@@ -568,6 +615,7 @@ export class ProductGraph {
     }
 
     updatePriceBrush(){
+        // take only the reachable nodes
         let nodes = this.net.nodes.filter(node => node.reachable);
 
         let brushWidth = this.priceBrush.node().getBoundingClientRect().width
@@ -616,12 +664,29 @@ export class ProductGraph {
                 .extent([[0, 0], [brushWidth, this.brushHeight]])
                 .on("end", () => brushended()));
 
+        let price_selection = this.priceBrush.select("g#productPrices")
+            .selectAll("circle")
+            .data(nodes)
+        let price_enter = price_selection
+            .enter()
+            .append("circle")
+            .attr("r", 2)
+            .attr("fill", n => n.fill())
+            .attr("opacity", "0.7")
+            .attr("cx", (d) => priceScale(d.price))
+            .attr("cy", (d) => gaussianRandom(0, brushHeight))
+        let price_update = price_enter.merge(price_selection);
+        price_update
+            .attr("cx", (d) => priceScale(d.price))
+            .attr("cy", (d) => gaussianRandom(0, brushHeight))
+        price_selection.exit().remove()
+
         let that = this
         function brushended() {
             if (!d3.event.sourceEvent) return; // Only transition after input.
             if (!d3.event.selection) return; // Ignore empty selections.
             let price_interval = d3.event.selection.map(priceScale.invert) // map pixels to prices
-                // d1 = price_interval.map(p => round p?); // don't round
+            // d1 = price_interval.map(p => round p?); // don't round
 
             that.net.nodes.forEach(n => n.in_price_interval = (price_interval[0]<n.price && price_interval[1]>n.price))
 
@@ -633,23 +698,6 @@ export class ProductGraph {
             // }
 
         }
-
-        let price_selection = this.priceBrush.select("g#productPrices")
-            .selectAll("circle")
-            .data(prices)
-        let price_enter = price_selection
-            .enter()
-            .append("circle")
-            .attr("r", 2)
-            .attr("fill", "red")
-            .attr("opacity", "0.7")
-            .attr("cx", (d) => priceScale(d))
-            .attr("cy", (d) => gaussianRandom(0, brushHeight))
-        let price_update = price_enter.merge(price_selection);
-        price_update
-            .attr("cx", (d) => priceScale(d))
-            .attr("cy", (d) => gaussianRandom(0, brushHeight))
-        price_selection.exit().remove()
     }
 }
 
@@ -688,7 +736,7 @@ class ProductNode {
 		this.incoming = []; // list of nodes that point towards this node
 		this.links = {};
 
-		this.fill_color = "red"
+		this.fill_color = "yellow"; // set from outside depending on which quantile this the price of this product belongs
     }
 
     createTooltip() {
