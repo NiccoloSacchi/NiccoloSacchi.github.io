@@ -207,6 +207,34 @@ export class ProductGraph {
             .attr('stroke-width', 3)
             .attr('fill', 'none')
 
+        defs.append('marker')
+            .attr('id', 'end-arrow_red')
+            .attr('viewBox', '0 -5 10 10')
+            .attr('refX', 23)
+            .attr('markerWidth', 5)
+            .attr('markerHeight', 5)
+            .attr('orient', 'auto')
+            .append('svg:path')
+            .attr('d', 'M0,-5L10,0L0,5')
+            .attr('stroke', 'red')
+            .attr('stroke-opacity', 0.7)
+            .attr('stroke-width', 3)
+            .attr('fill', 'none')
+
+        defs.append('marker')
+            .attr('id', 'start-arrow_red')
+            .attr('viewBox', '0 -5 10 10')
+            .attr('refX', -13)
+            .attr('markerWidth', 5)
+            .attr('markerHeight', 5)
+            .attr('orient', 'auto')
+            .append('svg:path')
+            .attr('d', 'M10,-5L0,0L10,5')
+            .attr('stroke', 'red')
+            .attr('stroke-opacity', 0.7)
+            .attr('stroke-width', 3)
+            .attr('fill', 'none')
+
         // when drawing make the graph appear "smoothly"
         this.svg.attr("opacity", 1e-6)
             .transition()
@@ -378,16 +406,33 @@ export class ProductGraph {
             .attr("fill", (d) =>d.fill())
             .attr("stroke", (d) => d.stroke(this.net))
             .on("mouseover", (d) => {
-                // 1. show shortest path to best product
+                // 1. show shortest path to best product (after hiding the previous one)
+                // hide old
                 let links = this.linkg.selectAll("line")
+                this.net.links.forEach(l => l.size = 0)
+
+                // show new
                 let node = d
                 while (node.pred != null) {
                     node.links[node.pred.id()].size = 3
                     node = node.pred
                 }
                 links.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
+                    .style("stroke-width", (d) => (d.size && d.size == 3) ? '2px' : '1px')
+                    .style('marker-start', (d) => {
+                        if (d.left){
+                            return (d.size && d.size == 3) ? 'url(#start-arrow_red)' : 'url(#start-arrow)'
+                        }
+                        return ''
+                    })
+                    .style('marker-end', (d) => {
+                        if (d.right){
+                            return (d.size && d.size == 3) ? 'url(#end-arrow_red)' : 'url(#end-arrow)'
+                        }
+                        return ''
+                    })
 
-                // 2. show the details of the product
+                // 1. show the details of the product
                 if (this.productWindow){
                     this.productWindow.selectAll("*").remove()
                     d.appendTo(this.productWindow, null, () => this.updateFocus.call(this, d, true))
@@ -401,17 +446,13 @@ export class ProductGraph {
                         .style("top", (d3.event.pageY - 28) + "px");
                 }
 
-                // 3. focus on the node
+                // 2. focus on the node
                 this.updateFocus(d, false)
             })
             .on("mouseout", (d) => {
                 this.tooltip.transition()
                 .duration(500)
                 .style("opacity", 0);
-
-                let links = this.linkg.selectAll("line")
-                this.net.links.forEach(l => l.size = 0)
-                links.style("stroke", (d) => (d.size && d.size == 3) ? 'red' : '')
             })
             .call(d3.drag()
                 .on("start", (d) => {
