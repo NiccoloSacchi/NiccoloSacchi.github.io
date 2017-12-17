@@ -859,7 +859,7 @@ class ProductNode {
                     if (i>10)
                         clearInterval(int)
                     let h = main.node().getBoundingClientRect().height
-                    if (h_start > h) {
+                    if (h_start < h) {
                         clique_view.style("height", h + "px")
                         clearInterval(int)
                     }
