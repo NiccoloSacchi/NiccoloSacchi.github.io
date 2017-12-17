@@ -841,7 +841,7 @@ class ProductNode {
 
         // show also the competing products
         if (clique){
-            let h = main.node().getBoundingClientRect().height
+            let h_start = main.node().getBoundingClientRect().height
 
             main.style("width", "70%")
 
@@ -859,10 +859,11 @@ class ProductNode {
                     if (i>10)
                         clearInterval(int)
                     let h = main.node().getBoundingClientRect().height
-                    clique_view.style("height", h+"px")
+                    if (h_start+50 < h)
+                        clique_view.style("height", h+"px")
                 }, 200
             )
-            clique_view.style("height", h+"px")
+            clique_view.style("height", h_start+"px")
             clique_view.append("h5").text("Competing products")
                 .style("text-align", "center")
                 .style("margin", "5px 0px")
