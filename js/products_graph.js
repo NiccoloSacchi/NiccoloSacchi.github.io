@@ -116,6 +116,7 @@ export class ProductGraph {
                     .style("width", "100%")
                     .style("height", "93%")
                     .style("overflow-y", "scroll")
+                    .attr("class", "nice_scrollbar")
                     .style("margin", 0+"px")
                     // .attr("class", "bestProducts")
         }
@@ -142,6 +143,7 @@ export class ProductGraph {
                      .style("width", "100%")
                      .style("height", "93%")
                      .style("overflow-y", "scroll")
+                     .attr("class", "nice_scrollbar")
                      .style("margin", 0+"px")
         }
 
@@ -395,7 +397,7 @@ export class ProductGraph {
                 // 1. show the details of the product (either in the selected product window or with the popup)
                 if (this.productWindow){
                     this.productWindow.selectAll("*").remove()
-                    d.appendTo(this.productWindow, null, () => this.updateFocus.call(this, d, true))
+                    d.appendTo(this.productWindow, null, this.net.cliques[d.group], (n) => this.updateFocus.call(this, n, true))
                 }
                 else{
                     this.tooltip.transition()
@@ -479,7 +481,7 @@ export class ProductGraph {
                 if (rank != 1){
                     this.bestProducts["view"].append("hr")
                 }
-                n.appendTo(this.bestProducts["view"], rank, () => this.updateFocus.call(this, n, true))
+                n.appendTo(this.bestProducts["view"], rank, this.net.cliques[n.group], (n) => this.updateFocus.call(this, n, true))
                 rank++
             }
         }
@@ -810,27 +812,67 @@ class ProductNode {
         return "<a href='https://www.amazon.com/dp/"+ this.asin +"'> url </a>"
     }
 
-    appendTo(div, rank, mouseenter){
-        // Given a div (d3 selector), appends to the info about
-        // the product to it
-        // Call the passed mouseenter function when the cursor enters the div
+    appendTo(div, rank, clique, click){
+        // Given a div (d3 selector), appends to the info about the product to it
+        // click: function when the user clicks on the div
+        // clique: clique to which the product belongs
 
         div = div.append("div")
-            .style('cursor', 'pointer')
-            .on("click", () => mouseenter())
 
-        let rank_str = rank? rank + ". " : "" // if no rank is passed then append nothing
-        div.append("h5")
+        let rank_str = rank? rank + ". " : "" // if no rank is passed then don't specify it
+        let row = div.append("table")
+            .style("width", "100%")
+            .append("tr")
+            .style("width", "100%")
+        let main = row.append("td").style("width", "100%")
+        main.style('cursor', 'pointer')
+            .on("click", () => click(this))
+        main.append("h5")
             .append("a")
             .style("color", "inherit")
             .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(rank_str + this.name)
-        div.append("img")
+        main.append("img")
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")
-        div.append("h6")
+        main.append("h6")
             .text("Price: ")
             .append("label").text(this.price)
+
+        // show also the competing products
+        if (clique){
+            let h = main.node().getBoundingClientRect().height
+
+            main.style("width", "70%")
+
+            let clique_view = row.append("td")
+                .style("padding", "2px")
+                .style("width", "30%")
+                .append("div")
+                .style("overflow-y", "scroll")
+                .attr("class", "nice_scrollbar")
+            // a little hack to set the height properly
+            let i = 0
+            let int = setInterval(() =>
+                {
+                    i++
+                    if (i>10)
+                        clearInterval(int)
+                    let h = main.node().getBoundingClientRect().height
+                    clique_view.style("height", h+"px")
+                }, 200
+            )
+            clique_view.style("height", h+"px")
+            clique_view.append("h5").text("Competing products")
+                .style("text-align", "center")
+                .style("margin", "5px 0px")
+            div = clique_view.append("div")
+
+            for (let node of clique.nodes){
+                if (node != this)
+                    node.appendTo(div, null, null, click)
+            }
+        }
     }
 }
 
