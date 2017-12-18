@@ -128,10 +128,18 @@ In summary, the visualization guides the user from their idea of product to the 
 		\caption{Example of products filtered according to keyword.}
 		\label{fig:wireless}
 	\end{figure}
+	\item The user can query a few keywords and set a price range, which will cause the graph to highlight only relevant parts and collapse the rest. At this point, the user can inspect the paths between products, as well as the \emph{attractors}. 
+	\begin{figure}[H]
+	\centering{}
+	\includegraphics[width=\textwidth]{img/best.png}
+	\caption{Best products are directly shown to users, but they are also highlighted on the graph.}
+	\label{fig:best}
+	\end{figure}
+	The visualization provides some recommendations, showing their title, picture and a brief summary of their characteristics. Such recommendations are \textit{attractors}, that is, nodes with the highest incoming edges. Therefore, they are considered the most popular products in category.
 \end{enumerate}
 \todo{insert additional view with products on the side}
 \section{Process}
-The graph must show to users the most relevant products in an intuitive manner. Indeed, users should find the information of interest "at first glance", without need to interpret the graph.
+The graph must show to users the most relevant products in an intuitive manner. As a crucial requirement, users should find the information of interest "at first glance", without need to interpret the graph.
 \begin{enumerate}
 	\item We opted for \href{http://bl.ocks.org/GerHobbelt/3071239}{this} collapsible graph which would allow to "hide" all the competing products in one node and expand it only if the user is really interested in analazying them. 
 	\item Once we display all the products of a category the next step is to choose an intuitive and easy way to select only the parts of the graph in which the user is interested. A simple search box and more advanced visualization (e.g. highlight the path to the bests products, show a list of computed best products, photos and links to the products) will accomplish the task.
