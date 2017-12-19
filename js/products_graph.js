@@ -3,7 +3,7 @@ export class ProductGraph {
         // default initializations of the parameters (can be changed to modify the graph)
         // height and width of the whole div
         this.width = d3.select("body").node().getBoundingClientRect().width;
-        this.height = 450
+        this.height = "100%"
         this.off = 10;    // cluster hull offset
         this.net = {"nodes":[], "links": [], "cliques": {}};  // all nodes (either products or groups) and links
         this.choices = [];
@@ -65,6 +65,9 @@ export class ProductGraph {
         // bestProducts: boolean to indicate whether show the best products
         //             of the showed graph
 
+        if (this.height == "100%")
+            this.height = d3.select("body").node().getBoundingClientRect().height -120
+
         let that = this
 
         // select the div
@@ -73,6 +76,45 @@ export class ProductGraph {
             .style("height", this.height)
         // clear the div content
         div.selectAll("*").remove();
+
+        if (bestProducts){
+            // append a div with the best products that will be show only when the button will be clicked
+            // <div id="sideNavigation" class="sidenav">
+            //     <a class="closebtn" onclick="closeNav()" style="cursor: pointer;">&times;</a>
+            // </div>
+        // <a class="closebtn" style="cursor: pointer;">&amp;times;</a>
+            // in this.bestProducts["view"] we will show the first 10 shown nodes
+            // of this.bestProducts["nodes"]
+
+            // let column = row1.append("td")
+            //     .style("width", (100/ncolumns) + "%")
+            //     .style("padding", 3+"px")
+            //     .style("height", this.height+"px")
+            let bestProductDiv = div.append("div")
+                .attr("id", "sideNavigation")
+                .attr("class","sidenav")
+            bestProductDiv.append("a")
+                .html("&times;")
+                .style("cursor", "pointer")
+                .attr("class", "closebtn")
+                .on("click", closeNav)
+            let title = bestProductDiv.append("h4")
+                .text("Best products")
+                .style("height", "7%")
+                .style("margin", 0+"px")
+                .style("text-align",  "center")
+                .style("vertical-align", "middle")
+            title.style("line-height", title.node().getBoundingClientRect().height+"px")
+            this.bestProducts["view"] =
+                bestProductDiv
+                    .append("div")
+                    .style("width", "100%")
+                    .style("height", "93%")
+                    .style("overflow-y", "scroll")
+                    .attr("class", "nice_scrollbar")
+                    .style("margin", 0+"px")
+            // .attr("class", "bestProducts")
+        }
 
         if(searchbox_callback) {
             // append the search box
@@ -89,6 +131,10 @@ export class ProductGraph {
                 .append("div").attr("class", "topnav")
             box.append("a").text("Categories").on("click", searchbox_callback)
                 .style("cursor", "pointer")
+
+            box.append("a").text("Best products").on("click", openNav) // todo delete
+                .style("cursor", "pointer")
+
             box = box.append("div").attr("class", "search-container")//.append("form")
             let input = box.append("input")
                 .attr("id", "productSearchBox")
@@ -123,42 +169,18 @@ export class ProductGraph {
             .attr("class", "product_table")
 
         let row1 = table.append("tr")
-        let ncolumns = 1 + bestProducts + productWindow
-        if (bestProducts){
-            // in this.bestProducts["view"] we will show the first 10 shown nodes
-            // of this.bestProducts["nodes"]
-            let column = row1.append("td")
-                .style("width", (100/ncolumns) + "%")
-                .style("padding", 3+"px")
-                .style("height", this.height+"px")
-            let title = column.append("h4")
-                .text("Best products")
-                .style("height", "7%")
-                .style("margin", 0+"px")
-                .style("text-align",  "center")
-                .style("vertical-align", "middle")
-            title.style("line-height", title.node().getBoundingClientRect().height+"px")
-            this.bestProducts["view"] =
-                column
-                    .append("div")
-                    .style("width", "100%")
-                    .style("height", "93%")
-                    .style("overflow-y", "scroll")
-                    .attr("class", "nice_scrollbar")
-                    .style("margin", 0+"px")
-                    // .attr("class", "bestProducts")
-        }
+        // let ncolumns = 1 + productWindow
 
         let graph_view = row1.append("td")
             .style("padding", 0)
-            .style("width", (100/ncolumns) + "%")
+            .style("width", productWindow? "70%":"100%")//(100/ncolumns) + "%")
             .style("height", this.height+"px")
 
         if (productWindow){
             // then create a table, on the left we show the graph
             // on the right the details of the product
             let column = row1.append("td")
-                .style("width", (100/ncolumns) + "%")
+                .style("width", "30%")//(100/ncolumns) + "%")
                 .style("padding", 3+"px")
                 .style("height", this.height+"px")
             let title = column.append("h4")
@@ -986,4 +1008,14 @@ function gaussianRand() {
 }
 function gaussianRandom(start, end) {
     return Math.floor(start + gaussianRand() * (end - start + 1));
+}
+
+function openNav() {
+    document.getElementById("sideNavigation").style.width = "400px";
+    // document.getElementById("main").style.marginLeft = "400px";
+}
+
+function closeNav() {
+    document.getElementById("sideNavigation").style.width = "0";
+    // document.getElementById("main").style.marginLeft = "0";
 }
