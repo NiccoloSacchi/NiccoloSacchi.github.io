@@ -76,25 +76,47 @@ export class ProductGraph {
 
         if(searchbox_callback) {
             // append the search box
-            // <!-- search box -->
-            // <section class="webdesigntuts-workshop" >
-            //     <div>
-            //         <input id="productSearchBox" placeholder="product">
-            //         <button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>
+            // <div class="topnav">
+            //     <a href="#about">Categories</a>
+            //     <div class="search-container">
+            //         <form action="/action_page.php">
+            //             <input type="text" placeholder="Search.." name="search">
+            //             <button type="submit"><i class="fa fa-search"></i></button>
+            //         </form>
             //     </div>
-            // </section>
-            let box = div.append("section")
-                .attr("class", "webdesigntuts-workshop")
-                .append("div")
-            let input = box.append("input").style("width", "60%")
+            // </div>
+            let box = div
+                .append("div").attr("class", "topnav")
+            box.append("a").text("Categories").on("click", searchbox_callback)
+                .style("cursor", "pointer")
+            box = box.append("div").attr("class", "search-container")//.append("form")
+            let input = box.append("input")
                 .attr("id", "productSearchBox")
-                .attr("placeholder", "product")
-            box.append("button")
-                .on("click", () => this.filterProducts(input.node().value))
-                .text("search")
-            box.append("button")
-                .on("click", () => searchbox_callback())
-                .text("back")
+                .attr("type", "text")
+                .attr("placeholder", "product keyword")
+                .attr("name", "search")
+            box.append("button").on("click", () => this.filterProducts(input.node().value))
+                .append("i").attr("class", "fa fa-search")
+
+            // // <!-- search box -->
+            // // <section class="webdesigntuts-workshop" >
+            // //     <div>
+            // //         <input id="productSearchBox" placeholder="product">
+            // //         <button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>
+            // //     </div>
+            // // </section>
+            // let box = div.append("section")
+            //     .attr("class", "webdesigntuts-workshop")
+            //     .append("div")
+            // let input = box.append("input").style("width", "60%")
+            //     .attr("id", "productSearchBox")
+            //     .attr("placeholder", "product")
+            // box.append("button")
+            //     .on("click", () => this.filterProducts(input.node().value))
+            //     .text("search")
+            // box.append("button")
+            //     .on("click", () => searchbox_callback())
+            //     .text("back")
         }
 
         let table = div.append("table")
@@ -109,10 +131,13 @@ export class ProductGraph {
                 .style("width", (100/ncolumns) + "%")
                 .style("padding", 3+"px")
                 .style("height", this.height+"px")
-            column.append("h4")
+            let title = column.append("h4")
                 .text("Best products")
                 .style("height", "7%")
                 .style("margin", 0+"px")
+                .style("text-align",  "center")
+                .style("vertical-align", "middle")
+            title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.bestProducts["view"] =
                 column
                     .append("div")
@@ -136,10 +161,13 @@ export class ProductGraph {
                 .style("width", (100/ncolumns) + "%")
                 .style("padding", 3+"px")
                 .style("height", this.height+"px")
-            column.append("h4")
+            let title = column.append("h4")
                 .text("Selected product")
                 .style("height", "7%")
-                .style("margin", 0+"px")
+                .style("margin", "0px")
+                .style("text-align",  "center")
+                .style("vertical-align", "middle")
+            title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.productWindow =
                 // .style("height", this.height+"px")
                  column.append("div")
@@ -844,6 +872,7 @@ class ProductNode {
             .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(rank_str + this.name)
         main.append("img")
+            .style("border", "#999999 2px outset")
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")
         main.append("h6")

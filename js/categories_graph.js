@@ -42,21 +42,18 @@ export class CategoryGraph {
             div.selectAll("*").remove();
 
             // append the search box
-            // <!-- search box -->
-            // <section class="webdesigntuts-workshop" >
-            //     <div>
-            //         <input id="productSearchBox" placeholder="product">
-            //         <button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>
-            //     </div>
-            // </section>
-            let box = div.append("section")
-                .attr("class", "webdesigntuts-workshop")
-                .append("div")
+            let box = div
+                .append("div").attr("class", "topnav")
+            // box.append("a").text("a")
+            box = box.append("div").attr("class", "search-container")//.append("form")
             let input = box.append("input")
+                .style("text-overflow", "ellipsis")
+                .style("width", "1000px")
                 .attr("id", "categorySearchBox")
+                .attr("type", "text")
                 .attr("placeholder", "category")
-            box.append("button")
-                .on("click", () => {
+                .attr("name", "search")
+            box.append("button").on("click", () => {
                     // start over from the root Amazon
                     that.roots = that.roots.slice(0, 1)
                     let amazon = that.roots[0]
@@ -77,9 +74,49 @@ export class CategoryGraph {
                     for (let r of roots_reversed.reverse()){
                         that.click(r)
                     }
-
                 })
-                .text("search")
+                .append("i").attr("class", "fa fa-search")
+
+            // // <!-- search box -->
+            // // <section class="webdesigntuts-workshop" >
+            // //     <div>
+            // //         <input id="productSearchBox" placeholder="product">
+            // //         <button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>
+            // //     </div>
+            // // </section>
+            // let box = div.append("section")
+            //     .attr("class", "webdesigntuts-workshop")
+            //     .append("div")
+            // let input = box.append("input")
+            //     .attr("id", "categorySearchBox")
+            //     .attr("placeholder", "category")
+            // box.append("button")
+            //     .on("click", () => {
+            //         // start over from the root Amazon
+            //         that.roots = that.roots.slice(0, 1)
+            //         let amazon = that.roots[0]
+            //         amazon.children.forEach(collapse);
+            //         this.list_view.selectAll("*").remove()
+            //         this.update(amazon); // update the graph
+            //         this.appendToList(amazon); // update the list
+            //
+            //         // collect all the intermediate categories down to the selected one
+            //         let node = that.choices[input.node().value]
+            //         let roots_reversed = []
+            //         while(node != amazon) {
+            //             roots_reversed.push(node)
+            //             node = node.parent
+            //         }
+            //
+            //         // simulate the click down the selected one
+            //         for (let r of roots_reversed.reverse()){
+            //             that.click(r)
+            //         }
+            //
+            //     })
+            //     .text("search")
+
+
             // give the autocompletion all the splitted names
             this.choices = categories_names(curr_root)
             new autoComplete({
@@ -101,6 +138,8 @@ export class CategoryGraph {
                 }
             });
 
+            // let longest = Object.keys(that.choices).sort((a, b)=> b.length - a.length)[0];
+            // input.node().value =longest
             // append a table to show all the visited categories and the the graph at the
             // same time
             // <table class="categories_table"> <!--categories_table_search-page-->
@@ -335,11 +374,13 @@ export class CategoryGraph {
     click(d) {
         if (!d._children && !d.children) {
             // leaf
-            this.callback() // pass also the name of the file of the product graph
-            this.tooltip
-                .transition()
-                .duration(500)
-                .style("opacity", 0);
+            if (this.callback) {
+                this.callback() // pass also the name of the file of the product graph
+                this.tooltip
+                    .transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            }
             return
         }
 
@@ -408,16 +449,20 @@ export class CategoryGraph {
 }
 
 function categories_names(tree){
-    // build a map from the name to the respective node
-    function inner(tree, map) {
-        let name = [tree.data.names.join(" & ")]
-        map[name] = tree
-        if (tree.children)
-            tree.children.forEach(c => inner(c, map))
-    }
     // note: the map is passed by reference
     let map = {}
-    inner(tree, map)
+
+    // build a map from the name to the respective node
+    function inner(tree, path) {
+        let name = tree.data.names.join(" & ")
+        name = path ? path + " -> " + name: name // append the path
+        map[name] = tree
+        if (tree.children)
+            tree.children.forEach(c => inner(c, name))
+    }
+
+    tree.children.forEach(c => inner(c, ""))
+    // inner(tree, null)
 
     return map
 }

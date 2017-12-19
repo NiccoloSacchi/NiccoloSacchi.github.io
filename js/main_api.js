@@ -17,7 +17,6 @@ c = new CategoryGraph()
 
 // functions to manage search and autocompletion
 export function pageInit() {
-    c = new CategoryGraph();
     c.drawGraph('search-tool', 'data/categories.json', category_callback)
     setTimeout(()=>category_callback(), 500)
 }
@@ -30,4 +29,9 @@ function product_callback(){
     c.drawGraph('search-tool', 'data/categories.json', category_callback)
 }
 
+export function drawCategoryGraph(divId){
+    c.drawGraph(divId, 'data/categories.json', null)
+}
+
 window.pageInit = pageInit
+window.drawCategoryGraph = drawCategoryGraph

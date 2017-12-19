@@ -2,32 +2,18 @@
 <html lang="en">
 <head>
     <title> Categories graph </title>
-	<link rel="stylesheet" href="css/graph-style.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/categories-graph.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
 	<script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="js/categories_graph.js"></script>
+
+    <script src="js/auto-complete.min.js"></script>
+    <script src="js/main_api.js" type="module"></script>
+    <link rel="stylesheet" href="css/search-tool.css">
 </head>
 <body
-    onload="drawCategoryGraph()">
-    <table class="categories_table">
-        <tr>
-            <th>List view</th>
-            <th>Tree view</th>
-        </tr>
-        <tr>
-            <td id="category_view">
-            </td>
-            <td style="width: 100%;">
-                <svg id="categories_graph" width="100%">
-                    <defs>
-                        <pattern id="image" x="0%" y="0%" height="100%" width="100%"
-                                 viewBox="0 0 512 512">
-                            <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
-                        </pattern>
-                    </defs>
-                </svg>
-            </td>
-        </tr>
-    </table>
+    onload="drawCategoryGraph('categoryGraph')">
+    <div id="categoryGraph" style="width: 100%">
+    </div>
 </body>
