@@ -11,7 +11,7 @@ export class ProductGraph {
         this.bestProducts = {"nodes": [], "view": null}
         this.focusednode = d3.select("#asdjhasjdhg") // asin of the highlighted node
 
-        this.brushHeight = 25
+        this.brushHeight = 50
         // this.simulation; this.hullg; this.linkg; this.nodeg; these are set at runtime
         this.tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
@@ -54,10 +54,10 @@ export class ProductGraph {
         ]
     }
 
-    drawGraph(divId, file, searchbox, productWindow, priceBrush, bestProducts){
+    drawGraph(divId, file, searchbox_callback, productWindow, priceBrush, bestProducts){
         // divId: id of the div in which to draw the search bar and the graph
         // file: path to the file containing the graph
-        // searchbox: boolean to indicate whether draw a searchbox
+        // searchbox_callback: if passed a searchbox will be drawn. searchbox is a function that will be called when "back is pressed"
         // productWindow: boolean to indicate whether reserve part of the div
         //                the details of the mouse-overed product
         // priceBrush: boolean to indicate whether draw a brush to select an
@@ -74,7 +74,7 @@ export class ProductGraph {
         // clear the div content
         div.selectAll("*").remove();
 
-        if(searchbox) {
+        if(searchbox_callback) {
             // append the search box
             // <!-- search box -->
             // <section class="webdesigntuts-workshop" >
@@ -86,12 +86,15 @@ export class ProductGraph {
             let box = div.append("section")
                 .attr("class", "webdesigntuts-workshop")
                 .append("div")
-            let input = box.append("input")
+            let input = box.append("input").style("width", "60%")
                 .attr("id", "productSearchBox")
                 .attr("placeholder", "product")
             box.append("button")
                 .on("click", () => this.filterProducts(input.node().value))
                 .text("search")
+            box.append("button")
+                .on("click", () => searchbox_callback())
+                .text("back")
         }
 
         let table = div.append("table")
@@ -314,7 +317,7 @@ export class ProductGraph {
             // trigger a mouseover
             this.nodeg.select("circle:first-child").dispatch("mouseover")
 
-            if (searchbox) {
+            if (searchbox_callback) {
                 // give the autocompletion all the splitted names
                 that.choices = Array.from(
                     new Set(
@@ -691,33 +694,41 @@ export class ProductGraph {
         let price_enter = price_selection
             .enter()
             .append("circle")
-            .attr("r", 2)
+            .attr("r", (d) => d.best? 6 : 3)
             .attr("fill", n => n.fill())
-            .attr("opacity", "0.7")
+            .attr("opacity", (d) => d.best? "1":"0.7")
             .attr("cx", (d) => priceScale(d.price))
-            .attr("cy", (d) => gaussianRandom(0, brushHeight))
+            .attr("cy", (d) => gaussianRandom(y_start(d), y_end(d)))
         let price_update = price_enter.merge(price_selection);
         price_update
             .attr("cx", (d) => priceScale(d.price))
-            .attr("cy", (d) => gaussianRandom(0, brushHeight))
+            .attr("cy", (d) => gaussianRandom(y_start(d), y_end(d)))
         price_selection.exit().remove()
+
+        function y_start(d) {
+            return (d.best? brushHeight*0.7: 5)
+        }
+        function y_end(d){
+            return (d.best? brushHeight-5: brushHeight*0.7)
+        }
+
+        this.priceBrush.select("g#productPrices")
+            .selectAll("circle").sort((x, y) => {
+                return x.best > y.best;
+            })
 
         let that = this
         function brushended() {
             if (!d3.event.sourceEvent) return; // Only transition after input.
-            if (!d3.event.selection) return; // Ignore empty selections.
-            let price_interval = d3.event.selection.map(priceScale.invert) // map pixels to prices
-            // d1 = price_interval.map(p => round p?); // don't round
-
-            that.net.nodes.forEach(n => n.in_price_interval = (price_interval[0]<n.price && price_interval[1]>n.price))
-
-            // that.updateGraph()
-
-            // // If empty when rounded, use floor & ceil instead.
-            // if (d0[0] >= d0[1]) {
-            //     d0[0] = d3.timeDay.floor(d0[0]);
-            //     d0[1] = d3.timeDay.offset(d1[0]);
-            // }
+            if (!d3.event.selection) {
+                //empty selections.
+                that.net.nodes.forEach(n => n.in_price_interval = true)
+            }
+            else{
+                let price_interval = d3.event.selection.map(priceScale.invert) // map pixels to prices
+                // d1 = price_interval.map(p => round p?); // don't round
+                that.net.nodes.forEach(n => n.in_price_interval = (price_interval[0] < n.price && price_interval[1] > n.price))
+            }
 
             // obfuscate the nodes based on a price interval
             let minopacity = 0.2

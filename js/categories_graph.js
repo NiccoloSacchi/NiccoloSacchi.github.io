@@ -7,9 +7,16 @@ export class CategoryGraph {
         this.duration = 350
         this.degrees = 2*Math.PI
         this.choices = []
+
+        //create the tooltip that will be show on mouse over the nodes
+        this.tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
     }
 
-    drawGraph(divId, file){
+    drawGraph(divId, file, callback){
+        // callback: function that is called when an leaf category has been selected
+        this.callback = callback
         let that = this
         // Load the data, draw the table and start the graph
         d3.json(file, (error, data) => {
@@ -146,11 +153,6 @@ export class CategoryGraph {
             this.treemap = d3.tree()
                 .size([this.degrees, this.width])
                 .separation((a, b) => (a.parent == b.parent ? 1 : 10) / a.depth);
-
-            //create the tooltip that will be show on mouse over the nodes
-            this.tooltip = d3.select("body").append("div")
-                .attr("class", "tooltip")
-                .style("opacity", 0);
 
             curr_root.x0 = this.height / 2;
             curr_root.y0 = 0;
@@ -333,6 +335,11 @@ export class CategoryGraph {
     click(d) {
         if (!d._children && !d.children) {
             // leaf
+            this.callback() // pass also the name of the file of the product graph
+            this.tooltip
+                .transition()
+                .duration(500)
+                .style("opacity", 0);
             return
         }
 
