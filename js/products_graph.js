@@ -893,7 +893,7 @@ class ProductNode {
 
         div = div.append("div")
             .attr("class", "productCard")
-        let size = div.append("div").node().getBoundingClientRect()
+        // let size = div.append("div").node().getBoundingClientRect()
         let rank_str = rank? rank + ". " : "" // if no rank is passed then don't specify it
         let row = div.append("table")
             .attr("class", "productTable")
