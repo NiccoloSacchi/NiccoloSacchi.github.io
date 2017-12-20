@@ -66,7 +66,7 @@ export class ProductGraph {
         //             of the showed graph
 
         if (this.height == "100%")
-            this.height = d3.select("body").node().getBoundingClientRect().height -120
+            this.height = d3.select("body").node().getBoundingClientRect().height - 70
 
         let that = this
 
@@ -98,12 +98,10 @@ export class ProductGraph {
                 .style("cursor", "pointer")
                 .attr("class", "closebtn")
                 .on("click", closeNav)
-            let title = bestProductDiv.append("h4")
-                .text("Best products")
-                .style("height", "7%")
-                .style("margin", 0+"px")
-                .style("text-align",  "center")
-                .style("vertical-align", "middle")
+            let title = bestProductDiv.append("p")
+                .text("RECOMMENDATIONS")
+                .attr("class", "productSectionTitle")
+                .style("height", "46px")
             title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.bestProducts["view"] =
                 bestProductDiv
@@ -129,10 +127,10 @@ export class ProductGraph {
             // </div>
             let box = div
                 .append("div").attr("class", "topnav")
-            box.append("a").text("Categories").on("click", searchbox_callback)
+            box.append("a").text("CATEGORIES").on("click", searchbox_callback)
                 .style("cursor", "pointer")
 
-            box.append("a").text("Best products").on("click", openNav) // todo delete
+            box.append("a").text("RECOMMENDATIONS").on("click", openNav) // todo delete
                 .style("cursor", "pointer")
 
             box = box.append("div").attr("class", "search-container")//.append("form")
@@ -166,13 +164,17 @@ export class ProductGraph {
         }
 
         let table = div.append("table")
-            .attr("class", "product_table")
+            .style("padding", "0px")
+            // .style("font-family", "\"Roboto\",sans-serif")
+            .style("height", "100%")
+            .style("width", "100%")
+            .style("border", "none")
 
         let row1 = table.append("tr")
         // let ncolumns = 1 + productWindow
 
         let graph_view = row1.append("td")
-            .style("padding", 0)
+            .style("padding", "0px")
             .style("width", productWindow? "70%":"100%")//(100/ncolumns) + "%")
             .style("height", this.height+"px")
 
@@ -181,14 +183,11 @@ export class ProductGraph {
             // on the right the details of the product
             let column = row1.append("td")
                 .style("width", "30%")//(100/ncolumns) + "%")
-                .style("padding", 3+"px")
+                .style("padding", "0px")
                 .style("height", this.height+"px")
-            let title = column.append("h4")
-                .text("Selected product")
-                .style("height", "7%")
-                .style("margin", "0px")
-                .style("text-align",  "center")
-                .style("vertical-align", "middle")
+            let title = column.append("p")
+                .text("SELECTED PRODUCT")
+                .attr("class", "productSectionTitle")
             title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.productWindow =
                 // .style("height", this.height+"px")
@@ -203,19 +202,22 @@ export class ProductGraph {
         if (priceBrush){
             // let margin = {top: 0, right: 5, bottom: 0, left: 5}
             let div = table
-                .append("tr")
-                .append("td").attr("colspan", 100).style("padding", 0)
+                .append("tr").attr("class", "priceBrushDiv")
+                .append("td").attr("colspan", 100).style("padding", "0px")
                 .append("div").style("margin", "0px 15px")
 
-            div.append("h6").text("Select a price interval")
+            div.append("p").text("SELECT A PRICE INTERVAL")
                 // .style("margin", "auto")
-                .style("text-align", "center").style("margin", "0px")
+                .style("text-align", "center")
+                .style("margin", "0px")
+                .style("margin-top", "4px")
+                .style("font-size", "13px")
 
             this.priceBrush = div
                 .append("svg").style("overflow", "visible")
                 .attr("class", "priceBrush")
                 .attr("height", this.brushHeight)
-                .attr('transform', 'translate(0, 2)')
+                .attr('transform', 'translate(-3, 2)')
         }
 
         this.zoom = d3.zoom()
@@ -225,11 +227,13 @@ export class ProductGraph {
                 this.svg.selectAll("g").attr("transform", d3.event.transform);
             })
         // append the svg to draw the graph
-        this.svg = graph_view.append("svg")
+
+        this.svg = graph_view.append("div").style("width", "100%")
+            .style("height", "100%").append("svg")
             .attr("class", "product_graph")
             // set height and width, add zoom and drag
-            .attr("width", "100%")
-            .attr("height", "100%")
+            .style("width", "100%")
+            .style("height", "100%")
             .call(this.zoom);
 
         // define arrows markers for graph links (directed edges)
@@ -290,7 +294,7 @@ export class ProductGraph {
 
             // convert the nodes to ProductNode
             this.net.nodes = json.nodes
-                .map(n => new ProductNode(n.asin, n.name, n.imUrl, n.price, n.numReviews, n.averageRating, n.helpfulFraction, n.brand, n.salesRankCategory, n.salesRank, n.group, n.component, n.hashColor));
+                .map(n => new ProductNode(n.asin, n.name, n.imUrl, n.price, n.numReviews, n.averageRating, n.helpfulFraction, n.brand, n.salesRankCategory, n.salesRank, n.groups, n.component, n.hashColor));
             this.net.links = json.links
                 .map(l => new Link(this.net.nodes[l.source], this.net.nodes[l.target], l.left, l.right));
             // source and target of the link are now pointers to the nodes
@@ -299,8 +303,10 @@ export class ProductGraph {
             // detect and store the cliques
             let cm = {} // all cliques map
             this.net.nodes.forEach(n => {
-                cm[n.group] = (cm[n.group] || [])
-                cm[n.group].push(n)
+                n.groups.forEach(g => {
+                    cm[g] = (cm[g] || [])
+                    cm[g].push(n)
+                })
             })
             let colId = 0
             for (let clique in cm){
@@ -326,7 +332,7 @@ export class ProductGraph {
                 .force("center", d3.forceCenter(svgsize.width / 2, svgsize.height / 2))
                 .velocityDecay(0.85)
                 // regulate the shape of the whole cluster
-                .force("x", d3.forceX().strength(.2))
+                .force("x", d3.forceX().strength(.1))
                 .force("y", d3.forceY().strength(.2))
                 .force("repelForce", d3.forceManyBody().strength(-100))//.distanceMax(50).distanceMin(10));
 
@@ -450,7 +456,11 @@ export class ProductGraph {
                 // 1. show the details of the product (either in the selected product window or with the popup)
                 if (this.productWindow){
                     this.productWindow.selectAll("*").remove()
-                    d.appendTo(this.productWindow, null, this.net.cliques[d.group], (n) => this.updateFocus.call(this, n, true))
+                    d.appendTo(
+                        this.productWindow,
+                        null,
+                        d.groups.reduce((acc, group) => this.net.cliques[group]? acc.concat(this.net.cliques[group].nodes):acc, []).filter(n => n!=undefined),
+                        (n) => this.updateFocus.call(this, n, true))
                 }
                 else{
                     this.tooltip.transition()
@@ -503,9 +513,8 @@ export class ProductGraph {
         // increase the strength on the links between nodes belonging to the same cluster
         let str = 1
         this.simulation.force("linkForce",
-                d3.forceLink(link_show.filter((l) => l.source.group == l.target.group))
+                d3.forceLink(link_show.filter((l) => l.source.groups.some(g => g in l.target.groups)))
                     .strength(str))
-
 
         // this.simulation.restart()
         this.simulation.alphaTarget(0.3).restart()
@@ -534,7 +543,11 @@ export class ProductGraph {
                 if (rank != 1){
                     this.bestProducts["view"].append("hr")
                 }
-                n.appendTo(this.bestProducts["view"], rank, this.net.cliques[n.group], (n) => this.updateFocus.call(this, n, true))
+                n.appendTo(
+                    this.bestProducts["view"],
+                    rank,
+                    n.groups.reduce((acc, group) => this.net.cliques[group]? acc.concat(this.net.cliques[group].nodes):acc, []).filter(n => n!=undefined),
+                    (n) => this.updateFocus.call(this, n, true))
                 rank++
             }
         }
@@ -708,7 +721,6 @@ export class ProductGraph {
 
         // add small ticks to x axis
         this.priceBrush.append("g")
-            .attr("opacity", 0.5)
             .attr("class", "axis axis--grid")
             .attr("transform", "translate(0," + this.brushHeight + ")")
             .call(d3.axisBottom(priceScale)
@@ -794,10 +806,10 @@ export class ProductGraph {
 }
 
 class ProductNode {
-    constructor(asin, name, imUrl, price, numReviews, averageRating, helpfulFraction, brand, salesRankCategory, salesRank, group, component, hashColor){
+    constructor(asin, name, imUrl, price, numReviews, averageRating, helpfulFraction, brand, salesRankCategory, salesRank, groups, component, hashColor){
         this.asin = asin
         this.name = name
-        this.group = group
+        this.groups = groups
         this.imUrl = imUrl
         this.price = price
         this.numReviews = numReviews
@@ -850,7 +862,8 @@ class ProductNode {
         // if (this.group in net.cliques && this.name.indexOf("RH2C")>=0)
         if (this.best)
             return ""
-        if (this.group in net.cliques && net.cliques[this.group].nodes.every(n => n.toBeShown()))
+        let cliques_id = this.groups.filter(g => g in net.cliques)
+        if (cliques_id.length > 0 && cliques_id.some(c_id => net.cliques[c_id].nodes.every(n => n.toBeShown())))
             return "black"
         return "#555"
     }
@@ -866,7 +879,7 @@ class ProductNode {
     }
 
     id() {
-        return this.group+"|"+this.name;
+        return this.groups+"|"+this.name;
     }
 
     link(){
@@ -879,9 +892,11 @@ class ProductNode {
         // clique: clique to which the product belongs
 
         div = div.append("div")
-
+            .attr("class", "productCard")
+        let size = div.append("div").node().getBoundingClientRect()
         let rank_str = rank? rank + ". " : "" // if no rank is passed then don't specify it
         let row = div.append("table")
+            .attr("class", "productTable")
             .style("width", "100%")
             .append("tr")
             .style("width", "100%")
@@ -891,6 +906,7 @@ class ProductNode {
         main.append("h5")
             .append("a")
             .style("color", "inherit")
+            .style("font-family", "\"Roboto\",sans-serif")
             .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(rank_str + this.name)
         main.append("img")
@@ -902,13 +918,13 @@ class ProductNode {
             .append("label").text(this.price)
 
         // show also the competing products
-        if (clique){
+        if (clique && clique.length > 0){
             let h_start = main.node().getBoundingClientRect().height
 
             main.style("width", "70%")
 
             let clique_view = row.append("td")
-                .style("padding", "2px")
+                .style("padding", "0px")
                 .style("width", "30%")
                 .append("div")
                 .style("overflow-y", "scroll")
@@ -933,7 +949,7 @@ class ProductNode {
                 .style("margin", "5px 0px")
             div = clique_view.append("div")
 
-            for (let node of clique.nodes){
+            for (let node of clique){
                 if (node != this)
                     node.appendTo(div, null, null, click)
             }

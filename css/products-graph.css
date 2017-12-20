@@ -1,8 +1,11 @@
 /* style for the product graph */
 .product_graph {
-    border: 1px solid #ccc;
+    /*border: 1px solid #ccc;*/
     margin: 0px;
-    background: url("../img/gray_background2.jpg");
+    background: #ADA996;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #EAEAEA, #e7e7e7, #F2F2F2, #ccc8b0);  /* Chrome 10-25, Safari 5.1-6 */
+    /*background: radial-gradient(circle at center, #EAEAEA, #F2F2F2, #e7e7e7, #dbd7bd); !* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ *!*/
+    background: radial-gradient(circle at center, #ede9ce, #d3c193)
     /*background-color: #e9e9e9;*/
 }
 
@@ -25,14 +28,22 @@
     pointer-events: none;
 }
 
-.product_table{
-    height: 100%;
-    width: 100%;
+/*  */
+.productCard{
+    padding: 6px 13px;
 }
 
-.product_table td{
-    vertical-align: text-top;
-    vertical-align: top;
+.productSectionTitle{
+    height: 7%;
+    margin: 0px;
+    text-align: center;
+    vertical-align: middle;
+    font-family: "Roboto",sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    /*background: #b0aac2;*/
+    background: #935347;
+    color: #ede9ce;
 }
 
 /* List of best Products */
@@ -41,6 +52,16 @@
 /*}*/
 
 /* Price brush */
+.priceBrushDiv{
+    font-family: "Roboto",sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0px;
+    background: #935347;
+    color: #ede9ce;
+}
+
 .priceBrush,
 .priceBrush g {
     width: 100%;
@@ -54,24 +75,35 @@
 
 .priceBrush .axis--grid .domain {
     fill: #ddd;
-    stroke: none;
+    /*stroke: none;*/
+    stroke: #c7ad88;
+    opacity: 0.1;
 }
 
 .priceBrush .axis--x .domain,
 .priceBrush .axis--grid .tick line {
-    stroke: #fff;
+    /*stroke: #64706c;*/
+    stroke: #c7ad88;
 }
 
 .priceBrush .axis--x .tick line{
-    stroke: #5a5a5a;
+    stroke: #ffdfae;
+    stroke-width: 2px;
 }
 
 .priceBrush .axis--x .tick text{
-    fill: #444444;
+    /*fill: #444444;*/
+    fill: #ffddae;
+    font-size: 13px;
 }
 
 .priceBrush .axis--grid .tick--minor line {
     stroke-opacity: .5;
+}
+
+.brush .selection{
+    fill: #c7ad88;
+    fill-opacity: 0.7;
 }
 
 .nice_scrollbar::-webkit-scrollbar-track
@@ -113,11 +145,12 @@
 .sidenav .closebtn {
     text-decoration: none;
     position: absolute;
-    top: 0;
-    right: 25px;
+    top: -3px;
+    right: 18px;
     font-size: 36px;
     margin-left: 50px;
-    color: #757575;
+    /*color: #757575;*/
+    color: black;
 }
 
 /* When you mouse over the navigation links, change their color */

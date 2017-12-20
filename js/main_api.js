@@ -22,7 +22,7 @@ export function pageInit() {
 }
 
 function category_callback(){
-    p.drawGraph('search-tool', 'data/graph_4.json', product_callback, true, true, true);
+    p.drawGraph('search-tool', 'data/electronics-accessories-supplies-audio-video-accessories-headphones.json', product_callback, true, true, true);
 }
 
 function product_callback(){
