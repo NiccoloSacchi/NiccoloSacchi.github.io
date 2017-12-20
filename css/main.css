@@ -755,18 +755,3 @@ td.gutter {
 .gist, .gist-file table tr td {
   border: unset;
 }
-
-/* tooltip */
-div.tooltip {
-    position: absolute;
-    text-align: center;
-    width: auto;
-    height: auto;
-    padding: 5px 15px;
-    font: 14px sans-serif;
-    background: #a8de9c;
-    border: 0px;
-    border-radius: 8px;
-    pointer-events: none;
-    z-index: 999;
-}

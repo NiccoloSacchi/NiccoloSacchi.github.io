@@ -86,7 +86,7 @@ export class ProductGraph {
             // in this.bestProducts["view"] we will show the first 10 shown nodes
             // of this.bestProducts["nodes"]
 
-            // let column = row1.append("td")
+            // let column = row1.append("div")!!!
             //     .style("width", (100/ncolumns) + "%")
             //     .style("padding", 3+"px")
             //     .style("height", this.height+"px")
@@ -109,7 +109,7 @@ export class ProductGraph {
                     .style("width", "100%")
                     .style("height", "93%")
                     .style("overflow-y", "scroll")
-                    .attr("class", "nice_scrollbar")
+                    // .attr("class", "nice_scrollbar")
                     .style("margin", 0+"px")
             // .attr("class", "bestProducts")
         }
@@ -163,17 +163,21 @@ export class ProductGraph {
             //     .text("back")
         }
 
-        let table = div.append("table")
+        let table = div.append("div").attr("class", "table")
+        let row1 = table.append("div")
+            .attr("class", "row")
             .style("padding", "0px")
             // .style("font-family", "\"Roboto\",sans-serif")
             .style("height", "100%")
             .style("width", "100%")
             .style("border", "none")
 
-        let row1 = table.append("tr")
+        // let row1 = table.append("div")
+        //     .attr("class", "row")
         // let ncolumns = 1 + productWindow
 
-        let graph_view = row1.append("td")
+        let graph_view = row1.append("div")
+            .attr("class", "column")
             .style("padding", "0px")
             .style("width", productWindow? "70%":"100%")//(100/ncolumns) + "%")
             .style("height", this.height+"px")
@@ -181,7 +185,8 @@ export class ProductGraph {
         if (productWindow){
             // then create a table, on the left we show the graph
             // on the right the details of the product
-            let column = row1.append("td")
+            let column = row1.append("div")
+                .attr("class", "column")
                 .style("width", "30%")//(100/ncolumns) + "%")
                 .style("padding", "0px")
                 .style("height", this.height+"px")
@@ -195,25 +200,25 @@ export class ProductGraph {
                      .style("width", "100%")
                      .style("height", "93%")
                      .style("overflow-y", "scroll")
-                     .attr("class", "nice_scrollbar")
+                     // .attr("class", "nice_scrollbar")
                      .style("margin", 0+"px")
         }
 
         if (priceBrush){
             // let margin = {top: 0, right: 5, bottom: 0, left: 5}
-            let div = table
-                .append("tr").attr("class", "priceBrushDiv")
-                .append("td").attr("colspan", 100).style("padding", "0px")
+            let row2 = table
+                .append("div").attr("class", "row priceBrushDiv")
+                .append("div").style("padding", "0px")
                 .append("div").style("margin", "0px 15px")
 
-            div.append("p").text("SELECT A PRICE INTERVAL")
+            row2.append("p").text("SELECT A PRICE INTERVAL")
                 // .style("margin", "auto")
                 .style("text-align", "center")
                 .style("margin", "0px")
                 .style("margin-top", "4px")
                 .style("font-size", "13px")
 
-            this.priceBrush = div
+            this.priceBrush = row2
                 .append("svg").style("overflow", "visible")
                 .attr("class", "priceBrush")
                 .attr("height", this.brushHeight)
@@ -292,6 +297,9 @@ export class ProductGraph {
             //  "links":
             //      [{"source": nodeId, "target": nodeId, "right": false, "left": true, "value": 1}, ...]}
 
+            // let i =0
+            // alert(json.nodes.length)
+            // json.nodes.forEach(n=> n.groups=[i++])
             // convert the nodes to ProductNode
             this.net.nodes = json.nodes
                 .map(n => new ProductNode(n.asin, n.name, n.imUrl, n.price, n.numReviews, n.averageRating, n.helpfulFraction, n.brand, n.salesRankCategory, n.salesRank, n.groups, n.component, n.hashColor));
@@ -552,6 +560,8 @@ export class ProductGraph {
             }
         }
         )
+
+        // alert(this.nodeg.selectAll("circle").size())
 
     }
 
@@ -892,15 +902,13 @@ class ProductNode {
         // clique: clique to which the product belongs
 
         div = div.append("div")
-            .attr("class", "productCard")
+            .attr("class", "productCard table")
         // let size = div.append("div").node().getBoundingClientRect()
         let rank_str = rank? rank + ". " : "" // if no rank is passed then don't specify it
-        let row = div.append("table")
-            .attr("class", "productTable")
+        let row = div.append("div")
+            .attr("class", "row")
+        let main = row.append("div").attr("class", "column")
             .style("width", "100%")
-            .append("tr")
-            .style("width", "100%")
-        let main = row.append("td").style("width", "100%")
         main.style('cursor', 'pointer')
             .on("click", () => click(this))
         main.append("h5")
@@ -909,8 +917,12 @@ class ProductNode {
             .style("font-family", "\"Roboto\",sans-serif")
             .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(rank_str + this.name)
-        main.append("img")
+        main.append("div")
+            .attr("class", "productImg")
+            .append("img")
             .style("border", "#999999 2px outset")
+            .style("max-width", "100%")
+            .style("max-height", "100%")
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")
         main.append("h6")
@@ -923,12 +935,13 @@ class ProductNode {
 
             main.style("width", "70%")
 
-            let clique_view = row.append("td")
+            let clique_view = row.append("div").attr("class", "column")
                 .style("padding", "0px")
                 .style("width", "30%")
                 .append("div")
                 .style("overflow-y", "scroll")
-                .attr("class", "nice_scrollbar")
+                .style("overflow-x", "hidden")
+                // .attr("class", "nice_scrollbar")
             // a little hack to set the height properly
             let i = 0
             let int = setInterval(() =>

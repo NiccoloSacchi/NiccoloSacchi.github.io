@@ -256,7 +256,7 @@ export class CategoryGraph {
             .attr("dy", "0.31em")
             .attr("x", (d) => d.x < degrees_half ? 6 : -6)
             .html((d) => {
-                    let names = d.data.names
+                    let names = d.data.names.split("&")
                     return names.map((name, i) =>
                         "<tspan x='0' dy='" + ((i == 0) ? (-(names.length - 1) * 1.1 / 2 + 0.35) : 1.1) + "em'>" +
                         name +
@@ -278,8 +278,7 @@ export class CategoryGraph {
             .attr("r", (d) => this.diameterScale(Math.sqrt(d.data.count)))
             .style("fill", (d) => that.fill_category(d))
             // for the node in the middle show a "back" image
-            .filter((d) =>
-                ArrayEquals(d.data.names, curr_root.data.names) && !ArrayEquals(d.data.names, ["Amazon"]))
+            .filter((d) => d.data.names == curr_root.data.names && d.data.names != "Amazon")
             .style("fill", "")
             .attr("fill", "url(#back_image)");
 
@@ -293,9 +292,9 @@ export class CategoryGraph {
             .attr("class", "") // remove all previous classes (if it was a root before...)
             .filter((d) =>
                 // the root note should be represented in the middle, bigger and not rotated
-                ArrayEquals(d.data.names, curr_root.data.names)
+                d.data.names == curr_root.data.names
             )
-            .attr("transform", (d) => "rotate(0)translate(0," + (this.diameterScale(Math.sqrt(d.data.count)) + 10 * d.data.names.length) + ")") //todo?
+            .attr("transform", (d) => "rotate(0)translate(0," + (this.diameterScale(Math.sqrt(d.data.count)) + 10 * d.data.names.split("&").length) + ")") //todo?
             .attr("text-anchor", "middle")
             .attr("class", "root_node")
         // .attr('cursor', 'pointer'); todo ?
@@ -351,17 +350,16 @@ export class CategoryGraph {
 
     appendToList(d) {
         let that = this
-        let category_name = d.data.names.join(" & ")
 
         this.list_view.append("p")
             .style("cursor", "pointer")
-            .text(category_name)
+            .text(d.data.names)
             .on("click", () => {
                 // delete all the roots up to this one
                 that.roots = that.roots.slice(0, that.roots.indexOf(d))
                 collapse(d);
 
-                while (that.list_view.select("p:last-child").text() != category_name) {
+                while (that.list_view.select("p:last-child").text() != d.data.names) {
                     that.list_view.select("p:last-child").remove()
                 }
                 that.list_view.select("p:last-child").remove()
@@ -375,7 +373,7 @@ export class CategoryGraph {
         if (!d._children && !d.children) {
             // leaf
             if (this.callback) {
-                this.callback() // pass also the name of the file of the product graph
+                this.callback(d.data.url) // pass also the name of the file of the product graph
                 this.tooltip
                     .transition()
                     .duration(500)
@@ -454,7 +452,7 @@ function categories_names(tree){
 
     // build a map from the name to the respective node
     function inner(tree, path) {
-        let name = tree.data.names.join(" & ")
+        let name = tree.data.names
         name = path ? path + " -> " + name: name // append the path
         map[name] = tree
         if (tree.children)

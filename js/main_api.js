@@ -18,16 +18,20 @@ c = new CategoryGraph()
 // functions to manage search and autocompletion
 export function pageInit() {
     c.drawGraph('search-tool', 'data/categories.json', category_callback)
-    setTimeout(()=>category_callback(), 500)
+    setTimeout(()=>category_callback("tools-home-improvement--building-supplies--heating-cooling--ducting.json"), 500)
 }
 
-function category_callback(){
-    p.drawGraph('search-tool', 'data/electronics-accessories-supplies-audio-video-accessories-headphones.json', product_callback, true, true, true);
+function category_callback(url){
+    p.drawGraph('search-tool', 'data/graphs/'+url, product_callback, true, true, true);
 }
 
 function product_callback(){
     c.drawGraph('search-tool', 'data/categories.json', category_callback)
 }
+
+
+
+
 
 export function drawCategoryGraph(divId){
     c.drawGraph(divId, 'data/categories.json', null)
