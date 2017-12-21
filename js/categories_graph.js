@@ -7,7 +7,6 @@ export class CategoryGraph {
         this.duration = 350
         this.degrees = 2*Math.PI
         this.choices = []
-
         //create the tooltip that will be show on mouse over the nodes
         this.tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
@@ -41,7 +40,7 @@ export class CategoryGraph {
             // clear the div content
             div.selectAll("*").remove();
 
-            let table = div.append("div").style("overflow", "hidden")
+            let table = div.append("div")//.style("overflow", "visible")
                 .style("font-size", "13px")
                 .attr("class", "categories_table table")
                 .attr("width", "100%")

@@ -128,8 +128,9 @@ export class ProductGraph {
             //     </div>
             // </div>
             let box = table
-                .append("div").attr("class", "row topnav")
+                .append("div").attr("class", "topnav row")
                 .style("height", "45px")
+
             box.append("a").text("CATEGORIES").on("click", searchbox_callback)
                 .style("cursor", "pointer")
 

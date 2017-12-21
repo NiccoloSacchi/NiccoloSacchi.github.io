@@ -1,4 +1,4 @@
 - only graph (were are the products?) => best products + selected product (where is the graph?) => best products show with hamburger menu so to leave more space for the graph.
 - choose category and show product on the same window.
-- colors are assigned to bins 
+- colors are assigned to bins (however outliers are still badly recognizable (100€ => red, 1000€ => red))
 - to implement the search bar with autocompletion we used a library (https://goodies.pixabay.com/javascript/auto-complete/demo.html) 
