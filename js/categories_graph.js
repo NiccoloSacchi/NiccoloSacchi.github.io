@@ -1,8 +1,9 @@
 export class CategoryGraph {
     constructor(){
         // default initializations of the parameters (can be changed to modify the graph)
-        this.height = 530;
-        this.width = "100%";          // width will be computer after
+        //this.height = 530;
+		this.height = 650;
+        this.width = 650      // width will be computer after
         this.node_diameter = [2, 25]; // min and max diameter of the nodes
         this.duration = 350
         this.degrees = 2*Math.PI
@@ -41,25 +42,18 @@ export class CategoryGraph {
             // clear the div content
             div.selectAll("*").remove();
 
-            let table = div.append("div").style("overflow", "hidden")
-                .style("font-size", "13px")
-                .attr("class", "categories_table table")
-                .attr("width", "100%")
-                .attr("height", "100%")
+            let table = div.append("div")
+                //.style("font-size", "13px")
+                .attr("class", "categories_table")
+                //.attr("width", "100%")
+                //.attr("height", "100%")
 
             // append the search box
             let box = table
-                .append("div").attr("class", "row topnav")
-                .style("height", "45px")
+                .append("div").attr("class", "topnav")
+                //.style("height", "45px")
             // box.append("a").text("a")
             box = box.append("div").attr("class", "search-container")//.append("form")
-            let input = box.append("input")
-                .style("text-overflow", "ellipsis")
-                .style("width", "1000px")
-                .attr("id", "categorySearchBox")
-                .attr("type", "text")
-                .attr("placeholder", "category")
-                .attr("name", "search")
             box.append("button").on("click", () => {
                     // start over from the root Amazon
                     that.roots = that.roots.slice(0, 1)
@@ -82,7 +76,14 @@ export class CategoryGraph {
                         that.click(r)
                     }
                 })
+				.attr("class", "btn btn-success")
                 .append("i").attr("class", "fa fa-search")
+			
+			let input = box.append("input")
+                .attr("id", "categorySearchBox")
+                .attr("type", "text")
+                .attr("placeholder", "Search for a category...")
+                .attr("name", "search")
 
             // // <!-- search box -->
             // // <section class="webdesigntuts-workshop" >
@@ -170,15 +171,20 @@ export class CategoryGraph {
             //      </tr>
             //  </table>
 
-            let row = table.append("div").attr("class", "row")
+            let row = table.append("div").attr("id", "wrapper")
 
-            let col = row.append("div").attr("class", "column")
-            col.append("p").text("List view").attr("class","header")
-            this.list_view = col.append("div").attr("class", "categoryList")
+            let col = row.append("div").attr("id", "categoryColumn")
+			let header = col.append("div").attr("class", "catHeader")
+            header.append("h3").text("Selected category")
+			header.append("hr").attr("class", "small")
+            this.list_view = col.append("div").attr("class", "categoryList").append("ul");
 
-            col = row.append("div").attr("class", "column")
-            col.append("p").text("Tree view").attr("class","header")
-            let svg = col.append("svg")
+            col = row.append("div").attr("id", "categoryGraphColumn")
+			header = col.append("div").attr("class", "catHeader")
+            header.append("h1").text("Explore categories")
+			header.append("hr").attr("class", "small")
+			let svgContainer = col.append("div").attr("class", "svgContainer")
+            let svg = svgContainer.append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height)
                 .attr("class", "categories_graph")
                 // .style("width", this.width)
                 // .attr("height", this.height)
@@ -197,8 +203,10 @@ export class CategoryGraph {
 
             // update the width with the computed one
             let rect = svg.node().getBoundingClientRect()
-            this.width = rect.width
-            this.height = rect.height
+            //this.width = rect.width
+            //this.height = rect.height
+			//this.width = 650;
+			//this.height = 650;
 
             this.graph_view = svg.append("g")
                 .attr("transform", () => "translate(" + this.width / 2 + "," + (this.height / 2) + ")")
@@ -248,9 +256,12 @@ export class CategoryGraph {
                     .style("opacity", .9);
                 this.tooltip
                     .html(
-                        "<span><b>Number of products: </b>" + d.data.count.toLocaleString() + "</span>")
+                        "<span>" + d.data.count.toLocaleString() + " products in this category</span>")
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
+				if (d.data.url) {
+					this.tooltip.html(this.tooltip.html() + "<br /><b>Explore category</b>")
+				}
             })
             .on("mouseout", (d) => {
                 this.tooltip
@@ -368,18 +379,18 @@ export class CategoryGraph {
     appendToList(d) {
         let that = this
 
-        this.list_view.append("p")
+        this.list_view.append("li")
             .style("cursor", "pointer")
-            .text(d.data.names)
+            .html("<span>" + d.data.names + "</span>")
             .on("click", () => {
                 // delete all the roots up to this one
                 that.roots = that.roots.slice(0, that.roots.indexOf(d))
                 collapse(d);
 
-                while (that.list_view.select("p:last-child").text() != d.data.names) {
-                    that.list_view.select("p:last-child").remove()
+                while (that.list_view.select("li:last-child").text() != d.data.names) {
+                    that.list_view.select("li:last-child").remove()
                 }
-                that.list_view.select("p:last-child").remove()
+                that.list_view.select("li:last-child").remove()
 
                 that.click(d)
             });
@@ -414,7 +425,7 @@ export class CategoryGraph {
             this.roots.pop();
 
             // remove the last element from the list
-            this.list_view.select("p:last-child").remove()
+            this.list_view.select("li:last-child").remove()
         } else {
             // expand tree
             d.children = d._children;
@@ -435,11 +446,11 @@ export class CategoryGraph {
     fill_category(node) {
         if (!node._children && !node.children) {
             // leaf
-            return "#935347";
+            return "#5cb85c";
         }
 
         if (node._children) { // collapsed
-            return "#b19a79";
+            return "#E0E0E0";
         }
 
         return "#fff" // expanded
@@ -471,7 +482,7 @@ function categories_names(tree){
     // build a map from the name to the respective node
     function inner(tree, path) {
         let name = tree.data.names
-        name = path ? path + " -> " + name: name // append the path
+        name = path ? path + " → " + name: name // append the path
         map[name] = tree
         if (tree.children)
             tree.children.forEach(c => inner(c, name))
