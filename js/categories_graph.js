@@ -41,7 +41,7 @@ export class CategoryGraph {
             // clear the div content
             div.selectAll("*").remove();
 
-            let table = div.append("div")
+            let table = div.append("div").style("overflow", "hidden")
                 .style("font-size", "13px")
                 .attr("class", "categories_table table")
                 .attr("width", "100%")
@@ -236,7 +236,7 @@ export class CategoryGraph {
             .data(nodes, (d) => d.id || (d.id = ++this.i));
         let nodeEnter = node.enter().append('g')
             .attr('cursor', 'pointer')
-            .attr('class', 'node')
+            .attr('class', (d) => 'node ' + nodeClass(d))
             .attr("transform", (d) => "translate(" + radialPoint(source.x0, source.y0, this.degrees) + ")")
             .on('click', (d) => this.click(d))
             // show the tooltip
@@ -263,7 +263,8 @@ export class CategoryGraph {
         // Add Circle for the nodes
         nodeEnter.append("circle")
             .attr('r', 1e-6)
-            .style("stroke", (d) => this.stroke(d))
+            .attr("class", (d) => nodeClass(d))
+            // .style("stroke", (d) => this.stroke(d))
             .style("fill", (d) => this.fill_category(d));
 
         let degrees_half = this.degrees /2
@@ -290,8 +291,9 @@ export class CategoryGraph {
             .attr("transform", (d) => "translate(" + radialPoint(d.x, d.y, this.degrees) + ")");
 
         // Update the node attributes and style
-        nodeUpdate.select("circle")
+        nodeUpdate.selectAll("circle")
             .attr("r", (d) => this.diameterScale(Math.sqrt(d.data.count)))
+            .attr("class", (d) => nodeClass(d))
             .style("fill", (d) => that.fill_category(d))
             // for the node in the middle show a "back" image
             .filter((d) => d.data.names == curr_root.data.names && d.data.names != "Amazon")
@@ -299,11 +301,11 @@ export class CategoryGraph {
             .attr("fill", "url(#back_image)");
 
         // update the text on the new root node
-        nodeUpdate.select("text")
+        nodeUpdate.selectAll("text")
             .attr("text-anchor", (d) => d.x < degrees_half ? "start" : "end")
             .attr("transform", (d) =>
                 "rotate(" + (d.x < degrees_half ? d.x - degrees_half / 2 : d.x + degrees_half / 2) * 180 / degrees_half + ")" +
-                "translate(" + (d.x < degrees_half ? 15 : -15) +")")
+                "translate(" + (d.x < degrees_half ? (5+this.diameterScale(Math.sqrt(d.data.count))) : -(5+this.diameterScale(Math.sqrt(d.data.count)))) +")")
             // .style("fill-opacity", 1)
             .attr("class", "") // remove all previous classes (if it was a root before...)
             .filter((d) =>
@@ -313,7 +315,6 @@ export class CategoryGraph {
             .attr("transform", (d) => "rotate(0)translate(0," + (this.diameterScale(Math.sqrt(d.data.count)) + 10 * d.data.names.split("&").length) + ")") //todo?
             .attr("text-anchor", "middle")
             .attr("class", "root_node")
-        // .attr('cursor', 'pointer'); todo ?
 
         // Remove any exiting nodes
         let nodeExit = node.exit().transition()
@@ -434,22 +435,22 @@ export class CategoryGraph {
     fill_category(node) {
         if (!node._children && !node.children) {
             // leaf
-            return "LightGreen";
+            return "#935347";
         }
 
         if (node._children) { // collapsed
-            return "lightsteelblue";
+            return "#b19a79";
         }
 
         return "#fff" // expanded
     }
 
-    stroke(node) {
-        if (node.isleaf || (!node._children && !node.children)) {
-            return "#006400";
-        }
-        return "blue";
-    }
+    // stroke(node) {
+    //     if (!node._children && !node.children) {
+    //         return "#006400";
+    //     }
+    //     return "blue";
+    // }
 
 // function convert_map(map){
 //     return Object.keys(map).map((name) => {
@@ -513,4 +514,20 @@ function ArrayEquals (array1, array2) {
         }
     }
     return true;
+}
+
+function nodeClass(node){
+    if (isLeaf(node))
+        return "leaf"
+    if (isCollapsed(node))
+        return "ancestors"
+    return "expanded"
+}
+
+function isLeaf(node){
+    return !node._children && !node.children
+}
+
+function isCollapsed(node){
+    return (node._children)? true : false
 }
