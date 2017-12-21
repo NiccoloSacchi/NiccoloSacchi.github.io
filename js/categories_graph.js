@@ -41,9 +41,16 @@ export class CategoryGraph {
             // clear the div content
             div.selectAll("*").remove();
 
+            let table = div.append("div")
+                .style("font-size", "13px")
+                .attr("class", "categories_table table")
+                .attr("width", "100%")
+                .attr("height", "100%")
+
             // append the search box
-            let box = div
-                .append("div").attr("class", "topnav")
+            let box = table
+                .append("div").attr("class", "row topnav")
+                .style("height", "45px")
             // box.append("a").text("a")
             box = box.append("div").attr("class", "search-container")//.append("form")
             let input = box.append("input")
@@ -162,19 +169,26 @@ export class CategoryGraph {
             //          </td>
             //      </tr>
             //  </table>
-            let table = div.append("table")
-                .attr("class", "categories_table")
-                .attr("width", "100%")
-                .attr("height", "100%")
-            let row1 = table.append("tr")
-            row1.append("th").html("List view")
-            row1.append("th").html("Tree view")
-            let row2 = table.append("tr")
-            this.list_view = row2.append("td") // here we show the lis of visited categories
-            let svg = row2.append("td").append("svg")
+
+            let row = table.append("div").attr("class", "row")
+
+            let col = row.append("div").attr("class", "column")
+            col.append("p").text("List view").attr("class","header")
+            this.list_view = col.append("div").attr("class", "categoryList")
+
+            col = row.append("div").attr("class", "column")
+            col.append("p").text("Tree view").attr("class","header")
+            let svg = col.append("svg")
                 .attr("class", "categories_graph")
-                .attr("width", this.width)
-                .attr("height", this.height)
+                // .style("width", this.width)
+                // .attr("height", this.height)
+
+            // let row2 = table.append("div").attr("class", "row")
+            // this.list_view = row2.append("div").attr("class", "column")// here we show the lis of visited categories
+            // let svg = row2.append("div").attr("class", "column").append("svg")
+            //     .attr("class", "categories_graph")
+            //     .attr("width", this.width)
+            //     .attr("height", this.height)
             svg.append("defs")
                 .append("pattern")
                 .attr("id", "back_image")
@@ -228,6 +242,7 @@ export class CategoryGraph {
             // show the tooltip
             .on("mouseover", (d) => {
                 this.tooltip
+                    .style("display", "block")
                     .transition()
                     .duration(200)
                     .style("opacity", .9);
@@ -239,6 +254,7 @@ export class CategoryGraph {
             })
             .on("mouseout", (d) => {
                 this.tooltip
+                    .style("display", "none")
                     .transition()
                     .duration(500)
                     .style("opacity", 0);
@@ -375,6 +391,7 @@ export class CategoryGraph {
             if (this.callback) {
                 this.callback(d.data.url) // pass also the name of the file of the product graph
                 this.tooltip
+                    .style("display", "none")
                     .transition()
                     .duration(500)
                     .style("opacity", 0);

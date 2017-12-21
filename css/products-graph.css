@@ -170,6 +170,7 @@ div.productImg{
 
 /* tooltip */
 div.tooltip {
+    display: none;
     position: absolute;
     text-align: center;
     width: auto;
@@ -201,29 +202,3 @@ div.tooltip {
 /*div .right {*/
     /*float:right;*/
 /*}*/
-
-
-.table {
-    display: table;
-    width: 100%;
-    margin: 0px;
-    padding: 0px;
-    clear:both;
-}
-
-.table .row {
-    display: table-row;
-    margin: 0px;
-    padding: 0px;
-}
-
-.table .row .column {
-    float:left;
-    display: table-cell;
-    margin: 0px;
-    padding: 0px;
-}
-
-.table .row .column:first-child{
-    width:auto;
-}

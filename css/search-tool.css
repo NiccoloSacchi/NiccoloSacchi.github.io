@@ -2,7 +2,6 @@
 
 body {
     margin: 0px;
-    background-color: #e9e9e9;
     overflow-x: hidden;
     font-size: 0px;
 }
@@ -16,6 +15,7 @@ body {
     background: linear-gradient(to bottom, #dac099, #c9af89);
     /*background: url("../img/gray_background4.jpg");*/
     /*border-bottom: 1px solid #935347;*/
+    height: 45px;
 }
 
 .topnav a {

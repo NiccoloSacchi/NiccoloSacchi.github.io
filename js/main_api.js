@@ -2,7 +2,6 @@ import {CategoryGraph} from './categories_graph.js'
 import {ProductGraph} from './products_graph.js'
 
 let p, c
-p = new ProductGraph()
 c = new CategoryGraph()
 
 // // functions to manage search and autocompletion
@@ -18,10 +17,11 @@ c = new CategoryGraph()
 // functions to manage search and autocompletion
 export function pageInit() {
     c.drawGraph('search-tool', 'data/categories.json', category_callback)
-    setTimeout(()=>category_callback("tools-home-improvement--building-supplies--heating-cooling--ducting.json"), 500)
+    // setTimeout(()=>category_callback("tools-home-improvement--building-supplies--heating-cooling--ducting.json"), 500)
 }
 
 function category_callback(url){
+    p = new ProductGraph()
     p.drawGraph('search-tool', 'data/graphs/'+url, product_callback, true, true, true);
 }
 

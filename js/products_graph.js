@@ -65,8 +65,8 @@ export class ProductGraph {
         // bestProducts: boolean to indicate whether show the best products
         //             of the showed graph
 
-        if (this.height == "100%")
-            this.height = d3.select("body").node().getBoundingClientRect().height - 70
+        // if (this.height == "100%")
+        //     this.height = d3.select("body").node().getBoundingClientRect().height - 70
 
         let that = this
 
@@ -114,6 +114,8 @@ export class ProductGraph {
             // .attr("class", "bestProducts")
         }
 
+        let table = div.append("div").attr("class", "table")
+
         if(searchbox_callback) {
             // append the search box
             // <div class="topnav">
@@ -125,8 +127,9 @@ export class ProductGraph {
             //         </form>
             //     </div>
             // </div>
-            let box = div
-                .append("div").attr("class", "topnav")
+            let box = table
+                .append("div").attr("class", "row topnav")
+                .style("height", "45px")
             box.append("a").text("CATEGORIES").on("click", searchbox_callback)
                 .style("cursor", "pointer")
 
@@ -163,7 +166,7 @@ export class ProductGraph {
             //     .text("back")
         }
 
-        let table = div.append("div").attr("class", "table")
+        // let table = div.append("div").attr("class", "table")
         let row1 = table.append("div")
             .attr("class", "row")
             .style("padding", "0px")
@@ -180,7 +183,7 @@ export class ProductGraph {
             .attr("class", "column")
             .style("padding", "0px")
             .style("width", productWindow? "70%":"100%")//(100/ncolumns) + "%")
-            .style("height", this.height+"px")
+            .style("height", "100%")
 
         if (productWindow){
             // then create a table, on the left we show the graph
@@ -189,7 +192,7 @@ export class ProductGraph {
                 .attr("class", "column")
                 .style("width", "30%")//(100/ncolumns) + "%")
                 .style("padding", "0px")
-                .style("height", this.height+"px")
+                .style("height", "100%")
             let title = column.append("p")
                 .text("SELECTED PRODUCT")
                 .attr("class", "productSectionTitle")
@@ -471,7 +474,9 @@ export class ProductGraph {
                         (n) => this.updateFocus.call(this, n, true))
                 }
                 else{
-                    this.tooltip.transition()
+                    this.tooltip
+                        .style("display", "block")
+                        .transition()
                         .duration(200)
                         .style("opacity", .9);
                     this.tooltip.html(d.createTooltip())
@@ -483,9 +488,11 @@ export class ProductGraph {
                 this.updateFocus(d, false)
             })
             .on("mouseout", (d) => {
-                this.tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+                this.tooltip
+                    .style("display", "none")
+                    .transition()
+                    .duration(500)
+                    .style("opacity", 0);
             })
             .call(d3.drag()
                 .on("start", (d) => {

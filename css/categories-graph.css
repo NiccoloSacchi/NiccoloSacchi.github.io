@@ -1,27 +1,50 @@
 /* table for selecting the categories */
 .categories_table{
-    margin: auto;
+    /*margin: auto;*/
     /*margin: 20px 0px;*/
 }
 
-.categories_table tr th{
-    background: inherit;
+.categories_table .row:nth-child(2){
+    background: linear-gradient(to bottom, #ede9ce, #d3c193)
+}
+
+.categories_table .row:nth-child(2) .column:first-child{
+    width: 150px !important;
+}
+
+.categories_table .row:nth-child(2) .column:last-child{
+    width: calc(100% - 150px);
+}
+
+.header{
+    /* titles */
     text-align: center;
-}
-
-.categories_table tr:last-child td:first-child{
-    min-width: 150px;
-    width: 150px;
-    vertical-align: text-top;
-    margin: 10px 0px;
     font-weight: 600;
+    margin: 5px 0px;
+    font-size: 16px;
 }
 
-.categories_table tr:last-child td:first-child p{
-    margin: 7px 0;
+.categoryList{
+    margin: 5px 5px;
+    font-weight: 600;
+    font-size: 14px;
 }
+
+/*.categories_table .row .column:first-child{*/
+    /*vertical-align: text-top;*/
+    /*font-weight: 600;*/
+/*}*/
+
+/*.categories_table .row:nth-child(3) .column:first-child p{*/
+    /*margin: 7px 0;*/
+/*}*/
 
 /* category graph */
+.categories_graph{
+    height: 100%;
+    width: 100%;
+}
+
 .categories_graph .node {
     cursor: pointer;
 }
@@ -52,6 +75,7 @@
 
 /* tooltip */
 div.tooltip {
+    display: none;
     position: absolute;
     text-align: center;
     width: auto;
