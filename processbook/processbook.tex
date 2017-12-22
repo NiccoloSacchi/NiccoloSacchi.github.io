@@ -64,7 +64,7 @@
 	frame=single
 }
 
-\title{Data visualization -- Process Book\\\textbf{Work in progress}}
+\title{Process Book -- Data visualization 2017}
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
  
@@ -74,36 +74,51 @@
 \begin{document}
 \pagenumbering{arabic}
 \maketitle
-\todo[inline]{add table of contents?}
+{
+	\hypersetup{linkcolor=black}
+	\tableofcontents
+}
+
+\newpage
 \section{Introduction}
 \label{sec:introduction}
-Buying from huge e-commerce websites such as \emph{Amazon} has many advantages, but paradoxically, users are often confused by the vast variety of products that are offered. Users may have a rough idea about the characteristics of the product they want to buy, but they often undergo the same process of comparing similar products. We aim to remove this redundancy and aid them in their purchases, suggesting the best or most popular products that correspond to their search. For instance, comparing smartphones or laptops may be difficult due to the wide price range and the required technical knowledge. With our platform, customers can easily visualise in a graphical way what products match their needs, and among them, the most popular and favourite ones.
+Buying from huge e-commerce websites such as \emph{Amazon} has many advantages, but paradoxically, users are often confused by the vast variety of products that are offered. Users may have a rough idea about the characteristics of the product they want to buy, but they often undergo the same process of comparing similar products. We aim to remove this redundancy and aid them in their purchases, suggesting the best or most popular products that correspond to their search. For instance, comparing smartphones or laptops may be difficult due to the wide price range and the required technical knowledge. With our platform, users can easily visualise in a graphical way the most popular products that match their needs.
 
 \subsection{Idea and related work}
 Amazon's website already offers a sophisticated search system, which allows users to select category, price range and some technical characteristics of the product they want to buy. But would it not be nice to query among similar articles without explicitly providing to the website such features? For instance, product description  \href{https://www.amazon.com/Acer-E5-575-33BM-15-6-Inch-Notebook-Generation/dp/B01K1IO3QW/ref=sr_1_3?s=pc&ie=UTF8&qid=1512207600&sr=1-3&keywords=laptop}{pages} already contain relevant information about related articles, such as \textit{similar items}, \textit{items bought together} and \textit{items that customers buy after viewing this item}. These links suggest alternatives to the customer; however, they only show \textit{neighbouring} offers and not the whole overview of offers. To overcome this limitation, we have decided to develop a graphical and interactive visualization that shows such relations among multiple articles.
 
-If products are showed as a network, as pictured in \Cref{fig:graphNav}, it is clear to see which ones users usually end up buying. Imagine a user who wishes to buy some professional studio headphones and has a rough idea of their characteristics. By querying the graph, he/she can highlight relevant products and follow the highlighted path towards an optimal product. Of course, defining what articles may be \emph{optimal} is not a trivial task; however, if many clients buy the same product after reviewing a set of other products, then it is very likely that the former is more appealing. 
+On our platform, products are shown as a network (\Cref{fig:graphNav}), where it is clear to see which are the items that users usually end up buying. Imagine a user who wishes to buy some professional studio headphones and has a rough idea of their characteristics. By typing some keywords, he/she can highlight relevant products and follow the highlighted path towards an optimal product. Of course, defining which articles may be \emph{optimal} is not a trivial task; however, if many clients buy the same product after reviewing a set of other products, then it is very likely that the former is more appealing. 
 
-There may also be groups of products in which it is not possible to identify an optimal one, i.e. users are often uncertain in choosing one of them. Each one of these groups represent a cluster of \textit{competing products}.
-\todo[inline]{show an example of clique}
+There may also be groups of products in which it is not possible to identify an optimal one, i.e. users are often uncertain in choosing one of them. Each one of these groups represent a cluster of \textit{competing products}, which allows users to find alternatives to their search.
+
+In conclusion, we aim to exploit product relations produced by previous users' queries to help new users in their search, in a way that is not (directly) available on Amazon.
+
 
 \begin{figure}[H]
 	\centering{}
 	\includegraphics[width=\textwidth]{img/graph_example.png}
-	\caption{Subgraph of the \emph{Headphones} category. As can be seen, some nodes (products) are \emph{attractors}, in the sense that users end up buying those after reviewing a large number of other products.}
+	\caption{Subgraph of the \emph{Headphones} category. As can be seen, some nodes (products) are \emph{attractors}, in the sense that users end up buying those after visualizing a large number of other products.}
 	\label{fig:graphNav}
 \end{figure}
 \subsection{Assumptions}
-At this point, it could be argued that graph edges provide meaningful relations. We supposed that when users navigate through Amazon's offers, they already have an idea of the product that they want to buy. It can be a technical characteristic, a brand or merely a budget. Our dataset should therefore provide relations contain products that must be similar according to some \textit{human-made} criteria, which would be difficult to extrapolate with a algorithm or a machine learning model.
+At this point, it could be argued that graph edges provide meaningful relations. We supposed that when users navigate through Amazon's offers, they already have an idea of the product that they want to buy. It can be a technical characteristic, a brand or merely a budget. Our dataset should therefore provide relations of products that must be similar according to some \textit{human-made} criteria, which would be difficult to extrapolate with an algorithm or a machine learning model.
 
 \subsection{Target audience and use cases}
-With our platform we want to address both customers and vendors. Customers may take advantage of previous people's choices to decide what product is worth buying, or to get an idea about alternative items. On the other hand, vendors may explore the visualization to search competitors and see the characteristics of the most popular items in category. \todo{add pictures as example}.
+With our platform we want to address both customers and vendors. Customers may take advantage of previous people's choices to decide what product is worth buying, or to get an idea about alternative items. On the other hand, vendors may explore the visualization to search competitors to their products and see the characteristics of the most popular items in category.
+
+%\begin{figure}[H]
+%	\centering{}
+%	\includegraphics[width=0.2\textwidth]{img/clique.png}
+%	\caption{Group of competitive products. It can be seen that nodes are completely interconnected.}
+%	\label{fig:clique}
+%\end{figure}
 
 \newpage
 
 \section{Dataset}
 \label{sec:dataset}
-We have been provided with a dataset of \href{http://jmcauley.ucsd.edu/data/amazon/}{Amazon products} that contains relations among the articles, such as ``bought together'', ``also viewed'', and/or ``buy after viewing''. Such relations have been exploited to create our graph, as explained in \Cref{sec:graph}.
+We have been provided with a dataset of \href{http://jmcauley.ucsd.edu/data/amazon/}{Amazon products} that contains the following relations among the articles: ``bought together'', ``also viewed'', and/or ``buy after viewing''. \Cref{sec:graph} explains how we have exploited such relations to create our network. The dataset contains products from every category on Amazon, but we have decided to work exclusively on selected ones. We have focused only on categories where it is possible to compare products in an objective manner, and where the purchase choice does not merely depend on users' personal preferences. In the latter case, examples are clothes, music and books. Finally, we have built our platform upon the following macro-categories:  \textit{Electronics}, \textit{Cell Phones and Accessories}, \textit{Automotive}, \textit{Tools and Home Improvement}, and \textit{Musical Instruments}. 
+
 % What about this part?
 %These relations will be used for creating a graph that represents competing products with similar characteristics, i.e. products that are viewed together but not bought together. Our assumption is that people interested in a certain product would have visualized and compared similar products prior to buying whichever they consider the best.
 
@@ -115,27 +130,30 @@ The dataset consists of two JSON files:
 \end{itemize}
 
 \subsection{Preprocessing}
-Due to the large size of the file, we decided not to exploit the reviews. We created a single dataset where, for each product, we extracted average rating, number of reviews, and their \textit{helpfulness} score. These fields have been then merged with \textit{metadata}.
-\todo[inline]{explanation on how components are created. It can be put here, or in the graph section. Also explains the graph as been exported in such a way that keeps categories independet}
+Due to the large size of the files, we decided not to include individual reviews. We created a single dataset where, for each product, we extracted the average rating, number of reviews, and their \textit{helpfulness} score. These fields have been then merged with \textit{metadata}.
+
+Additionally, for the purposes of the visualization, we further reduced the size of the dataset. Some categories contain several thousands of elements, but a real-time interactive visualization is able to handle at most a few hundred elements (and the bandwidth requirements must as well be considered). Instead of randomly sampling the graph, we came up with a cleverer approach. Initially, we label the connected component of the graph, then we remove the smallest ones until we reach a target graph size (300 to 500 nodes per category). This approach, while achieving the goal, ensures that the most relevant relations are preserved in the reduced graph (that is, we remove only products that have few relations with other nodes).
+
+It is worth noting that our visualization does not rely on server-side scripts or databases (we use GitHub pages). For this reason, we preprocessed all the data in local and exported a set of JSON files. Each (sub)category (or, equivalently, each graph) corresponds to a specific JSON file of 200-300 kB that is loaded dynamically (and asynchronously) during the category selection. The file \texttt{categories.json} contains the index of the categories (tree and URL of every dataset).
 
 \section{The graph}
 \label{sec:graph}
 The dataset has been transformed into a directed graph, where nodes represent products and edges represent \textit{competitions} between products. 
 \subsection{Structure}
-The graph structure follows precise rules. An edge from product A to product B is added if clients \textbf{buy} B after viewing A (\textit{buy after viewing} relation), but such edge is removed if A and B are frequently bought together (\textit{bought together} relation). The former means direct competition, i.e. an article has been preferred over another, while the latter means no competition, i.e. the two articles are complementary (e.g. a cellphone and a cover). In our context, a directed edge from A to B means ``B is preferred over A``, whereas an undirected edge (or, equivalently, two opposite directed edges) means ``A is competing with B''. It is easy to extend this definition to groups of competing products, that is, max-cliques. If some groups are totally interconnected, we can assume that they are in direct competition and that one is not necessarily better than the other. 
+The graph structure follows precise rules. An edge from product A to product B is added if clients \textbf{buy} B after viewing A (\textit{buy after viewing} relation), but such edge is removed if A and B are frequently bought together (\textit{bought together} relation). The former means direct competition, i.e. an article has been preferred over another, while the latter means no competition, i.e. the two articles are complementary (e.g. a cellphone and a cover). In our context, a directed edge from A to B means ``B is preferred over A'', whereas an undirected edge (or, equivalently, two opposite directed edges) means ``A is competing with B''. It is easy to extend this definition to groups of competing products, that is, max-cliques. If some groups are totally interconnected, we can assume that they are in direct competition and that one is not necessarily better than the other. We explicitly show them in our visualization.
 
 In previous experiments, we tried to build the graph by adding edges between products that are viewed together (\textit{also viewed} relation). This relation does not imply that any of the products has been actually bought, and it produces a graph that is too dense to give meaningful results.
 
 \subsection{Insights}
 By visually inspecting the graph, it is possible to identify some common structures.
 \begin{itemize}
-	\item \textbf{Accumulators:} these are popular products that have many incoming edges.
+	\item \textbf{Accumulators:} these are popular products that have many incoming edges. To put this into numbers, we can associate a fan-in metric (or in-degree) with every node.
 	\item \textbf{Max-cliques:} groups of products that are totally interconnected. In many cases, these products are also accumulators. Cliques represent products that are in direct competition with each other (and it is not really clear which one ``wins"). Note that these competition relations might even comprehend products of the same brand.
 \end{itemize}
 \begin{figure}
 	\centering{}
 	\includegraphics[width=0.45\textwidth]{img/insights.png}
-	\caption{Portion of the graph of a category. The stars represent accumulators, whereas the groups represent cliques.}
+	\caption{Portion of the graph of a category. The stars represent accumulators, whereas the coloured halos represent cliques.}
 	\label{fig:insights}
 \end{figure}
 We have inspected such figures to insure that they have a meaningful representation, both manually and by means of specific algorithms. We could confirm that accumulators represent popular products and cliques represent products with very similar characteristics.
@@ -198,23 +216,34 @@ In summary, the visualization guides the user from their idea of product to the 
 \section{Implementation}
 
 
-\subsection{Graph algorithm}
+\subsection{Graph algorithms}
+A question easily comes to mind: how do provide recommendations to users? More specifically, how do we decide, for every product, the path that leads to the best product? What constitutes a ``best product''?
+According to our idea, products with many incoming edges (fan-in metric) are regarded as superior by people. However, using a simple threshold does not produce satisfying results, as its choice is crucial (and could be different for each category). Instead, we use a graph visit algorithm that works as follows:
+\begin{enumerate}
+	\item We sort the nodes (products) by fan-in in decreasing order.
+	\item We start with the node that has the highest fan-in and we mark it as ``best product''. Afterwards, we run a BFS (breadth-first search) graph visit from that node, following all edges in reverse order. All visited nodes are labelled so that they point towards the best product. Additionally, the BFS gives us the shortest paths to the latter.
+	\item We move onto the next node in the list, and, if it has not been visited, it is marked as ``best product'' and expanded in the same way as before.
+	\item The algorithm ends once all the nodes in the graph have been labeled.
+\end{enumerate}
+
 \todo[inline]{please Dario help me}
 
+
 \subsection{Visualization}
-The graph must show to users the most relevant products in an intuitive manner. As a crucial requirement, users should find the information of interest "at first glance", without need to interpret the graph. However, making intuitive a graph is not a simple task. In order to achieve the goal we undertook the following steps:
+The graph must show to users the most relevant products in an intuitive manner. As a crucial requirement, users should find the information of interest ``at first glance", without need to interpret the graph. However, making intuitive a graph is not a simple task. In order to achieve the goal we undertook the following steps:
 \begin{enumerate}
-	\item \textit{Product Graph choice}. We opted for \href{http://bl.ocks.org/GerHobbelt/3071239}{this} collapsible graph which would allow to "hide" all the competing products in one node and expand it only if the user is really interested in analazying them. 
+	\item \textit{Product Graph choice}. We opted for \href{http://bl.ocks.org/GerHobbelt/3071239}{this} collapsible graph which would allow to ``hide" all the competing products in one node and expand it only if the user is really interested in analazying them. 
 
 	\item \textit{Product Graph: code cleaning and improvements}. After diving in the code of that example we realized how many were the problems. Changes were needed in order to satisfy all our requirements since the code was not versatile, inefficient (e.g. the graph was initially recomputed every time a node was collapsed/expanded) and it used d3 v2. We needed both a structure that would allow to easily update the graph (exclude/include nodes) and code easy to maintain (so to apport changes easily). Therefore, we restructured most of the code implementing classes (which improved versatility and manageability), removed a couple of features we did not need and improved the efficiency. Then, we converted the code to d3 v4 (non easy task, we discovered d3 v4 is not much retro-compatible) so to obtain something more versatile and efficient. However, we understood that collapsing and expanding a node would imply non trivial changes to our graph algorithms, e.g. finding and highlighting the path to the best product (depending whether a clique is expanded or not the path to be highlighted changes). Moreover, the cliques are small and few and the time spent in implementing ad-hoc graph algorithms to keep collapsible nodes would not be worth much. So we decided to indicate the cliques with polygon hulls (d3.polygonHull) so to keep indicating the them. Finally we added arrows instead of edges, since the direction of the edge is of major importance in our algorithm.  We ended up with a graph where cliques were well distinguishable but it was still not very intuitive as the user wouldn't see products but only dots connected by edges.
 
 	\item \textit{Product Graph: add interactivity}. Once we display all the products of a category as a graph the next step is to choose an intuitive and easy way to explore and/or select only the parts of the graph in which the user is interested. To accomplish the task we added several features.
 		\begin{itemize}
-			\item When the user mouseover a node, we show photo, link, and other imformation of the product. Moreover we also  highlight the path to the best product, i.e. a star.
-			\item We add a search box to filter the graph using a keyword. This searchbox has autocompletion and it suggests the words that have been extracted from the title of the products so that the user does not end up in selecting an empty graph. In particular, we show not only the products related to that keyword but also all the reachable nodes and the direct parents. In this way we both show all the better products and also the fan-in of the filtered products (note: the fan in is the metric we choose for selecting the best product between competing products, i.e. products belonging to the same clique).
-			\item We show in an hamburger menu the list of computed best products of the whole graph. Those products are also indicated by stars on the graph so to show that the best products are the ones with many incoming edges.
-			\item We used the color to encode the price. In particular we sort all the product prices, split them in six bins and then give a color to each bin. However, outliers, e.g. products with very high prices, end up in having the same color of products with a very different price. To reduce this problem we add a brushable price bar with which the user can focus on the products whose price belong to a specific interval. Notice that we keep all the products since filtering out the products that does not belong to the interval could also filter out the best products, e.g. the user could select the price interval 50€-70€ while the best product costs 40€. 
-		\begin{itemize}
+			\item When the user \emph{mouseover}s a node, we show the photo, link, and other information related to the product. Moreover, we also highlight the path to the best product, i.e. a star.
+			\item We add a search box to filter the graph using a keyword. This search box has auto-completion and it suggests the words that have been extracted from the title of the products so that the user does not end up in selecting an empty graph. In particular, we show not only the products related to that keyword but also all the reachable nodes and the direct parents. This way, we both show all the better products and also the fan-in (also referred to as in-degree) of the filtered products (note: the fan-in is the metric we choose for selecting the best product between competing products, i.e. products belonging to the same clique).
+			\item We show in a hamburger menu the list of computed best products of the whole graph. Those products are also indicated by stars on the graph so to show that the best products are the ones with many incoming edges.
+			\item The nodes are colored according to the price of the corresponding product. In particular, we adopted a 6-class RdYlGn (red-yellow-green) diverging color pattern (obtained from ColorBrewer) which is mapped to the products through a quantile distribution.
+			To do this, we sort all the product prices, split them into six bins and then give a color to each bin. However, outliers, e.g. products with very high prices, end up in having the same color of products with a very different price. To reduce this problem we add a brushable price bar with which the user can focus on the products whose price belongs to a specific interval. Notice that we keep all the products, since filtering out the products that does not belong to the interval could also filter out the best products, e.g. the user could select the price interval 50\$-70\$ while the best product costs 40\$. 
+		\end{itemize}
 
 	\item \textit{Category Graph}. To allow the user select a category and see as well the number of products, we implement an expandible radial tree accompanied by the list (on the left) of explored categories. 
 
