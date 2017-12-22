@@ -2,7 +2,6 @@
 
 body {
     margin: 0px;
-    /*overflow-x: hidden;*/
     font-size: 0px;
 }
 
@@ -13,14 +12,7 @@ body {
 
 .topnav {
     font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    /*overflow: hidden;*/
-    /*border: none;*/
-    /*background: #c2d4d8;*/
-    /*background: #c7ad88;*/
-    /*background: linear-gradient(to bottom, #dac099, #c9af89);*/
 	background: #F5F5F5;
-    /*background: url("../img/gray_background4.jpg");*/
-    /*border-bottom: 1px solid #935347;*/
 	border-bottom: 1px solid #EAEAEA;
     height: 47px;
 }
@@ -45,27 +37,18 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-
-    /*width: 200px;*/
     display: table-cell;
     vertical-align: middle;
     text-align: center;
 }
-
-/*.topnav .category-label td {*/
-    /*display: block; !* or inline-block *!*/
-/*}*/
 
 .topnav .topnav-buttons:first-child{
     margin-left: 15px;
 }
 
 .topnav .search-container {
-    /*display: inline;*/
-    /* categories search bar*/
     float: right;
 	width: 80%;
-    /*height: 44px;*/
 }
 
 .topnav .search-container-small{
@@ -75,7 +58,6 @@ body {
 }
 
 .topnav input[type=text]{
-    /*width: 90%;*/
     padding: 6px;
     margin: 7px;
 	float: right;
@@ -104,17 +86,9 @@ body {
     padding: 6px 10px;
     margin-top: 7px;
     margin-right: 16px;
-    /*background: #ede9ce;*/
     font-size: 13px;
-    /*border: none;*/
-    /*border-bottom: 1px solid #935347;*/
-    /*border-right: 1px solid #935347;*/
     cursor: pointer;
 }
-
-/*.topnav .search-container button:hover {
-    background: #dbd7be;
-}*/
 
 @media screen and (max-width: 600px) {
     .topnav .search-container {
