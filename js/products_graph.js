@@ -75,9 +75,10 @@ export class ProductGraph {
                 .style("cursor", "pointer")
                 .attr("class", "closebtn")
                 .on("click", closeNav)
-            let title = bestProductDiv.append("p")
+            let title = bestProductDiv.append("h4")
                 .text("RECOMMENDATIONS")
                 .attr("class", "productSectionTitle")
+                .append("hr").attr("class", "small")
             title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.bestProducts["view"] =
                 bestProductDiv
@@ -101,11 +102,13 @@ export class ProductGraph {
             let box = table
                 .append("div").attr("class", "topnav")
 
-            box.append("a").text("CATEGORIES").on("click", searchbox_callback)
-                .style("cursor", "pointer")
+            box.append("button").attr("class", "btn btn-success topnav-buttons")
+                .text("CATEGORIES")
+                .on("click", searchbox_callback)
 
-            box.append("a").text("RECOMMENDATIONS").on("click", openNav) // todo delete
-                .style("cursor", "pointer")
+            box.append("button").attr("class", "btn btn-success topnav-buttons")
+                .text("RECOMMENDATIONS")
+                .on("click", openNav) // todo delete
 
             box = box.append("div").attr("class", "search-container-small")//.append("form")
 			let input
@@ -162,13 +165,15 @@ export class ProductGraph {
             // on the right the details of the product
             let column = table.append("div")
                 .attr("id", "selectionColumn")
-            let title = column.append("p")
+            let title = column.append("h4")
                 .text("SELECTED PRODUCT")
                 .attr("class", "productSectionTitle")
+                .append("hr").attr("class", "small")
             title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.productWindow =
                 // .style("height", this.height+"px")
                  column.append("div")
+                     .attr("class", "selected-product")
                      .style("width", "100%")
                      .style("height", "calc(100% - 50px)")
                      .style("overflow-y", "scroll")
@@ -189,7 +194,7 @@ export class ProductGraph {
                 .style("font-size", "13px")
 
             this.priceBrush = row2
-                .append("svg").style("overflow", "visible")
+                .append("svg")
                 .attr("class", "priceBrush")
                 .attr("height", this.brushHeight)
                 .attr('transform', 'translate(-3, 2)')
@@ -883,8 +888,7 @@ class ProductNode {
         let main = div.append("div").attr("class", "main-product") // contain only the main product
             .on("click", () => click(this))
         main.append("h5")
-            .append("a")
-            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+            // .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(rank_str + this.name)
         main.append("div")
             .attr("class", "productImg")
@@ -899,9 +903,14 @@ class ProductNode {
         if (clique && clique.length > 0){
             let clique_view = div.append("div")
                 .attr("class", "competing-products")
+
             clique_view.append("h5")
-                .text("Competing products")
-            // div = clique_view.append("div")
+                    .text("COMPETING PRODUCTS")
+                .append("hr").attr("class", "small")
+
+            clique_view = clique_view
+                .append("div")
+                .attr("class", "competing-products-view")
 
             for (let node of clique){
                 if (node != this)
@@ -916,9 +925,8 @@ class ProductNode {
         
         let main = div.append("div")
             .on("click", () => click(this))
-        main.append("h5")
-            .append("a")
-            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+        main.append("h6")
+            // .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(this.name)
         main.append("div")
             .attr("class", "productImg")

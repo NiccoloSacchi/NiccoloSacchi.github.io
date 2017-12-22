@@ -25,44 +25,53 @@ body {
     height: 47px;
 }
 
-.topnav a {
+.topnav .topnav-buttons {
+    float: left !important;
     width:180px;
-    float: left;
-    display: block;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 600;
-    font-family: "Roboto",sans-serif;
-    /*background-color: #f6f6f6;*/
-    color: #ede9ce;
-    /*border: 1px solid #ede9ce;*/
-    /*background: url("../img/gray_background2.jpg");*/
 }
 
-.topnav a:first-child{
-    /*background: #f2efe8;*/
-    background: #64706c;
-    background: linear-gradient(to top, #788480, #6b7a76);
+.topnav .topnav-buttons:first-child{
+    margin-left: 15px;
 }
 
-.topnav a:nth-child(2){
-    /*background-color: #dbe9d8;*/
-    background: #935347;
-    background: linear-gradient(to top, #ac654e, #8b4c46);
-}
+/*.topnav a {*/
+    /*width:180px;*/
+    /*float: left;*/
+    /*display: block;*/
+    /*text-align: center;*/
+    /*padding: 14px 16px;*/
+    /*text-decoration: none;*/
+    /*font-size: 13px;*/
+    /*font-weight: 600;*/
+    /*font-family: "Roboto",sans-serif;*/
+    /*!*background-color: #f6f6f6;*!*/
+    /*color: #ede9ce;*/
+    /*!*border: 1px solid #ede9ce;*!*/
+    /*!*background: url("../img/gray_background2.jpg");*!*/
+/*}*/
 
-.topnav a:hover {
-    /*background-color: #d1d1d1;*/
-    opacity: 0.8;
-    /*color: black;*/
-}
+/*.topnav a:first-child{*/
+    /*!*background: #f2efe8;*!*/
+    /*background: #64706c;*/
+    /*background: linear-gradient(to top, #788480, #6b7a76);*/
+/*}*/
 
-.topnav a.active {
-    background-color: #2196F3;
-    color: white;
-}
+/*.topnav a:nth-child(2){*/
+    /*!*background-color: #dbe9d8;*!*/
+    /*background: #935347;*/
+    /*background: linear-gradient(to top, #ac654e, #8b4c46);*/
+/*}*/
+
+/*.topnav a:hover {*/
+    /*!*background-color: #d1d1d1;*!*/
+    /*opacity: 0.8;*/
+    /*!*color: black;*!*/
+/*}*/
+
+/*.topnav a.active {*/
+    /*background-color: #2196F3;*/
+    /*color: white;*/
+/*}*/
 
 .topnav .search-container {
     /* categories search bar*/
