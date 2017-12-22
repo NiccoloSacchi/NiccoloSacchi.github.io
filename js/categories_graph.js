@@ -58,7 +58,11 @@ export class CategoryGraph {
             let box = table
                 .append("div").attr("class", "topnav")
 
-                // .append("div").attr("class", "topnav")
+            box.append("button")
+                .attr("class", "btn btn-success btn-back")
+                .on("click", () => window.open("./data-viz.html", "_self"))
+                .append("i").attr("class", "fa fa-home") //fa-arrow-left
+
             box = box.append("div").attr("class", "search-container")//.append("form")
             box.append("button").on("click", () => {
                     // start over from the root Amazon
