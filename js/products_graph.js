@@ -113,7 +113,7 @@ export class ProductGraph {
             box.append("a").text("RECOMMENDATIONS").on("click", openNav) // todo delete
                 .style("cursor", "pointer")
 
-            box = box.append("div").attr("class", "search-container")//.append("form")
+            box = box.append("div").attr("class", "search-container-small")//.append("form")
 			let input
 			const btn = box.append("button").on("click", () => this.filterProducts(input.node().value))
 				.attr("class", "btn btn-success")
@@ -444,7 +444,9 @@ export class ProductGraph {
                         this.productWindow,
                         null,
                         d.groups.reduce((acc, group) => this.net.cliques[group]? acc.concat(this.net.cliques[group].nodes):acc, []).filter(n => n!=undefined),
-                        (n) => this.updateFocus.call(this, n, true))
+                        (n) => this.updateFocus.call(this, n, true),
+                        false
+                    )
                 }
                 else{
                     this.tooltip
@@ -535,7 +537,9 @@ export class ProductGraph {
                     this.bestProducts["view"],
                     rank,
                     n.groups.reduce((acc, group) => this.net.cliques[group]? acc.concat(this.net.cliques[group].nodes):acc, []).filter(n => n!=undefined),
-                    (n) => this.updateFocus.call(this, n, true))
+                    (n) => this.updateFocus.call(this, n, true),
+                    false
+                )
                 rank++
             }
         }
@@ -876,33 +880,26 @@ class ProductNode {
         return "<a href='https://www.amazon.com/dp/"+ this.asin +"'> url </a>"
     }
 
-    appendTo(div, rank, clique, click){
-        // Given a div (d3 selector), appends to the info about the product to it
-        // click: function when the user clicks on the div
-        // clique: clique to which the product belongs
+    appendTo(div, rank, clique, click, small){
+        // div: d3 selector to which append the info about the product
+        // rank: string, int or null. If sepecified, will be appended to the product's title
+        // clique: list of competing product
+        // click: function called when the user clicks on the div
+        // small: bool. Specifies whether the window of the product should be big or small
 
         div = div.append("div")
-            .attr("class", "productCard table")
+            .attr("class", "productCard")
         // let size = div.append("div").node().getBoundingClientRect()
         let rank_str = rank? rank + ". " : "" // if no rank is passed then don't specify it
-        let row = div.append("div")
-            .attr("class", "row")
-        let main = row.append("div").attr("class", "column")
-            .style("width", "100%")
-        main.style('cursor', 'pointer')
+        let main = div.append("div").attr("class", "main-product")
             .on("click", () => click(this))
         main.append("h5")
             .append("a")
-            .style("color", "inherit")
-            .style("font-family", "\"Roboto\",sans-serif")
             .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(rank_str + this.name)
         main.append("div")
             .attr("class", "productImg")
             .append("img")
-            .style("border", "#999999 2px outset")
-            .style("max-width", "100%")
-            .style("max-height", "100%")
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")
         main.append("h6")
@@ -911,31 +908,32 @@ class ProductNode {
 
         // show also the competing products
         if (clique && clique.length > 0){
-            let h_start = main.node().getBoundingClientRect().height
+            let h_start = div.node().getBoundingClientRect().height
 
-            main.style("width", "70%")
+            // main.style("width", "70%")
 
-            let clique_view = row.append("div").attr("class", "column")
+            let clique_view = div.append("div")
+                .attr("class", "competing-products")
                 .style("padding", "0px")
-                .style("width", "30%")
+                // .style("width", "30%")
                 .append("div")
                 .style("overflow-y", "scroll")
                 .style("overflow-x", "hidden")
                 // .attr("class", "nice_scrollbar")
-            // a little hack to set the height properly
-            let i = 0
-            let int = setInterval(() =>
-                {
-                    i++
-                    if (i>10)
-                        clearInterval(int)
-                    let h = main.node().getBoundingClientRect().height
-                    if (h_start < h) {
-                        clique_view.style("height", h + "px")
-                        clearInterval(int)
-                    }
-                }, 200
-            )
+            // hack to set the height properly
+            // let i = 0
+            // let int = setInterval(() =>
+            //     {
+            //         i++
+            //         if (i>10)
+            //             clearInterval(int)
+            //         let h = main.node().getBoundingClientRect().height
+            //         if (h_start < h) {
+            //             clique_view.style("height", h + "px")
+            //             clearInterval(int)
+            //         }
+            //     }, 200
+            // )
             clique_view.style("height", h_start+"px")
             clique_view.append("h5").text("Competing products")
                 .style("text-align", "center")
@@ -944,7 +942,7 @@ class ProductNode {
 
             for (let node of clique){
                 if (node != this)
-                    node.appendTo(div, null, null, click)
+                    node.appendTo(div, null, null, click, true)
             }
         }
     }
