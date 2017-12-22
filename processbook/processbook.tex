@@ -117,7 +117,8 @@ With our platform we want to address both customers and vendors. Customers may t
 
 \section{Dataset}
 \label{sec:dataset}
-We have been provided with a dataset of \href{http://jmcauley.ucsd.edu/data/amazon/}{Amazon products} that contains relations among the articles, such as ``bought together'', ``also viewed'', and/or ``buy after viewing''. Such relations have been exploited to create our graph, as explained in \Cref{sec:graph}.
+We have been provided with a dataset of \href{http://jmcauley.ucsd.edu/data/amazon/}{Amazon products} that contains the following relations among the articles: ``bought together'', ``also viewed'', and/or ``buy after viewing''. \Cref{sec:graph} explains how we have exploited such relations to create our network. The dataset contains products from every category on Amazon, but we have decided to work exclusively on selected ones. We have focused only on categories where it is possible to compare products in an objective manner, and the purchase choice does not merely depend on users' personal preferences. In the latter case, examples are clothes, music and books. Finally, we have built our platform upon the following macro-categories:  \textit{Electronics}, \textit{Cell Phones and Accessories}, \textit{Automotive}, \textit{Tools and Home Improvement}, and \textit{Musical Instruments}. 
+
 % What about this part?
 %These relations will be used for creating a graph that represents competing products with similar characteristics, i.e. products that are viewed together but not bought together. Our assumption is that people interested in a certain product would have visualized and compared similar products prior to buying whichever they consider the best.
 
