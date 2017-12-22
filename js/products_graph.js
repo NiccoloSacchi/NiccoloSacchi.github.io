@@ -20,37 +20,14 @@ export class ProductGraph {
         this.drawHull = (d) =>
             d3.line().curve(d3.curveCardinalClosed.tension(.85))(d.path); // 0.8
 
+		// 6-class RdYlGn diverging pattern (from colorbrewer.org)
         this.redToGreen = [
-            "#FF0000",
-            "#FF1100",
-            "#FF2300",
-            "#FF3400",
-            "#FF4600",
-            "#FF5700",
-            "#FF6900",
-            "#FF7B00",
-            "#FF8C00",
-            "#FF9E00",
-            "#FFAF00",
-            "#FFC100",
-            "#FFD300",
-            "#FFE400",
-            "#FFF600",
-            "#F7FF00",
-            "#E5FF00",
-            "#D4FF00",
-            "#C2FF00",
-            "#B0FF00",
-            "#9FFF00",
-            "#8DFF00",
-            "#7CFF00",
-            "#6AFF00",
-            "#58FF00",
-            "#47FF00",
-            "#35FF00",
-            "#24FF00",
-            "#12FF00",
-            "#00FF00"
+            "#d73027",
+			"#fc8d59",
+			"#fee08b",
+			"#d9ef8b",
+			"#91cf60",
+			"#1a9850"
         ]
     }
 
@@ -72,8 +49,8 @@ export class ProductGraph {
 
         // select the div
         let div = d3.select("#"+divId)
-            .style("width", this.width)
-            .style("height", this.height)
+            //.style("width", this.width)
+            //.style("height", this.height)
         // clear the div content
         div.selectAll("*").remove();
 
@@ -114,7 +91,7 @@ export class ProductGraph {
             // .attr("class", "bestProducts")
         }
 
-        let table = div.append("div").attr("class", "table")
+        let table = div.append("div").attr("class", "products_table")
 
         if(searchbox_callback) {
             // append the search box
@@ -128,8 +105,7 @@ export class ProductGraph {
             //     </div>
             // </div>
             let box = table
-                .append("div").attr("class", "topnav row")
-                .style("height", "45px")
+                .append("div").attr("class", "topnav")
 
             box.append("a").text("CATEGORIES").on("click", searchbox_callback)
                 .style("cursor", "pointer")
@@ -138,13 +114,16 @@ export class ProductGraph {
                 .style("cursor", "pointer")
 
             box = box.append("div").attr("class", "search-container")//.append("form")
-            let input = box.append("input")
+			let input
+			const btn = box.append("button").on("click", () => this.filterProducts(input.node().value))
+				.attr("class", "btn btn-success")
+                .append("i").attr("class", "fa fa-search")
+            input = box.append("input")
                 .attr("id", "productSearchBox")
                 .attr("type", "text")
-                .attr("placeholder", "product keyword")
+                .attr("placeholder", "Filter products by keyword...")
                 .attr("name", "search")
-            box.append("button").on("click", () => this.filterProducts(input.node().value))
-                .append("i").attr("class", "fa fa-search")
+            
 
             // // <!-- search box -->
             // // <section class="webdesigntuts-workshop" >
@@ -168,32 +147,27 @@ export class ProductGraph {
         }
 
         // let table = div.append("div").attr("class", "table")
-        let row1 = table.append("div")
+        /*let row1 = table.append("div")
             .attr("class", "row")
             .style("padding", "0px")
             // .style("font-family", "\"Roboto\",sans-serif")
             .style("height", "100%")
             .style("width", "100%")
-            .style("border", "none")
+            .style("border", "none")*/
 
         // let row1 = table.append("div")
         //     .attr("class", "row")
         // let ncolumns = 1 + productWindow
 
-        let graph_view = row1.append("div")
-            .attr("class", "column")
-            .style("padding", "0px")
-            .style("width", productWindow? "70%":"100%")//(100/ncolumns) + "%")
-            .style("height", "100%")
+        let graph_view = table.append("div")
+            .attr("id", "productGraphColumn")
+            .style("width", productWindow ? "70%":"100%")
 
         if (productWindow){
             // then create a table, on the left we show the graph
             // on the right the details of the product
-            let column = row1.append("div")
-                .attr("class", "column")
-                .style("width", "30%")//(100/ncolumns) + "%")
-                .style("padding", "0px")
-                .style("height", "100%")
+            let column = table.append("div")
+                .attr("id", "selectionColumn")
             let title = column.append("p")
                 .text("SELECTED PRODUCT")
                 .attr("class", "productSectionTitle")
@@ -211,11 +185,9 @@ export class ProductGraph {
         if (priceBrush){
             // let margin = {top: 0, right: 5, bottom: 0, left: 5}
             let row2 = table
-                .append("div").attr("class", "row priceBrushDiv")
-                .append("div").style("padding", "0px")
-                .append("div").style("margin", "0px 15px")
+                .append("div").attr("id", "priceBrushDiv")
 
-            row2.append("p").text("SELECT A PRICE INTERVAL")
+            row2.append("p").text("Desired price range ($)")
                 // .style("margin", "auto")
                 .style("text-align", "center")
                 .style("margin", "0px")
@@ -227,6 +199,10 @@ export class ProductGraph {
                 .attr("class", "priceBrush")
                 .attr("height", this.brushHeight)
                 .attr('transform', 'translate(-3, 2)')
+				
+			d3.select(window).on('resize', () => {
+				this.updatePriceBrush()
+			})
         }
 
         this.zoom = d3.zoom()
@@ -237,12 +213,9 @@ export class ProductGraph {
             })
         // append the svg to draw the graph
 
-        this.svg = graph_view.append("div").style("width", "100%")
-            .style("height", "100%").append("svg")
+        this.svg = graph_view.append("svg")
             .attr("class", "product_graph")
             // set height and width, add zoom and drag
-            .style("width", "100%")
-            .style("height", "100%")
             .call(this.zoom);
 
         // define arrows markers for graph links (directed edges)
@@ -371,13 +344,12 @@ export class ProductGraph {
             // set the color of each node (done only one time, computed splitting the price in quantiles)
             // sort descending prices
             let sorted = this.net.nodes.sort((a, b) => b.price - a.price)
-            let quantile_size = Math.ceil(sorted.length/this.redToGreen.length)
-            for (let curr_quantile = 0; curr_quantile < this.redToGreen.length; curr_quantile++){
-                // assign each color to a quantile
-                for (let i = curr_quantile*quantile_size; i<(curr_quantile+1)*quantile_size && i < sorted.length; i++){
-                    sorted[i].fill_color = this.redToGreen[curr_quantile]
-                }
-            }
+			const bins = this.redToGreen.length
+			
+			sorted.forEach((product, i) => {
+				const t = Math.floor(i / sorted.length * bins) // Uniform quantization
+				product.fill_color = this.redToGreen[t]
+			});
 
             this.updateGraph(true);
             this.updatePriceBrush();

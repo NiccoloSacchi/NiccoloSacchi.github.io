@@ -1,7 +1,30 @@
+.products_table {
+    /*margin: auto;*/
+    /*margin: 20px 0px;*/
+	font-size: 13px;
+	height: 100%;
+}
+
+#productGraphColumn {
+	float: left;
+	width: 70%;
+	height: calc(100% - 137px);
+	overflow-y: hidden;
+}
+
+#selectionColumn {
+	float: left;
+	width: 30%;
+	height: calc(100% - 137px);
+	padding: 0px;
+}
+
 /* style for the product graph */
 .product_graph {
     /*border: 1px solid #ccc;*/
     margin: 0px;
+	width: 100%;
+	height: 100%;
     background: #ADA996;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to right, #EAEAEA, #e7e7e7, #F2F2F2, #ccc8b0);  /* Chrome 10-25, Safari 5.1-6 */
     /*background: radial-gradient(circle at center, #EAEAEA, #F2F2F2, #e7e7e7, #dbd7bd); !* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ *!*/
@@ -62,7 +85,7 @@ div.productImg{
 /*}*/
 
 /* Price brush */
-.priceBrushDiv{
+#priceBrushDiv {
     font-family: "Roboto",sans-serif;
     font-size: 15px;
     font-weight: 800;
@@ -70,12 +93,16 @@ div.productImg{
     margin: 0px;
     background: #935347;
     color: #ede9ce;
+	height: 90px;
+	width: 100%;
+	clear: both;
+	padding: 0px 30px;
 }
 
 .priceBrush,
 .priceBrush g {
     width: 100%;
-    height: 100%;
+    height: 50px;
     margin: auto;
 }
 
