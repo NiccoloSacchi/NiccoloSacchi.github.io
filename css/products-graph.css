@@ -7,14 +7,14 @@
 
 #productGraphColumn {
 	float: left;
-	width: 70%;
+	width: calc(100% - 400px);
 	height: calc(100% - 137px);
 	overflow-y: hidden;
 }
 
 #selectionColumn {
 	float: left;
-	width: 30%;
+	width: 400px;
 	height: calc(100% - 137px);
 	padding: 0px;
 }
@@ -54,22 +54,36 @@
 /* fields of the products window*/
 div.productCard{
     /*padding: 6px 5px;*/
+    clear: both;
+    height: 300px;
 }
 
 div.productCard .main-product,
 div.productCard .competing-products{
     /* main product card (left) and competing products (right)*/
+    height: 100%;
     float: left;
     padding: 0px 10px;
-    height: 400px;
+}
+
+div.productCard .main-product,
+div.productCard .competing-products div {
     cursor: pointer;
 }
 
-div.productCard main-product{
+div.productCard .main-product{
     width: calc(100% - 150px);
 }
 div.productCard .competing-products{
     width: 150px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 0px;
+    text-align: center; /* for title "Competing products" */
+}
+
+div.productCard .competing-products div {
+    text-align: left;
 }
 
 div.productCard h5 a {
@@ -77,24 +91,30 @@ div.productCard h5 a {
     font-family: "Roboto",sans-serif;
 }
 
-div.productCard .productImg{
+div.productCard .productImg {
+    background: white;
+    display:table-cell;
+    vertical-align:middle;
+    border: #999999 2px outset;
+}
+div.productCard .main-product .productImg{
     height: 200px;
     width: 200px;
 }
-div.productCard .productImg-small{
+div.productCard .competing-products .productImg{
     height: 50px;
     width: 50px;
 }
 
-div.productCard .productImg img,
-div.productImg-small img{
+div.productCard img{
     max-width: 100%;
     max-height: 100%;
-    border: #999999 2px outset;
+    /*margin: auto;*/
+    /*display: block;*/
 }
 
 .productSectionTitle{
-    height: 7%;
+    height: 50px;
     margin: 0px;
     text-align: center;
     vertical-align: middle;
@@ -107,9 +127,11 @@ div.productImg-small img{
 }
 
 /* List of best Products */
-/*.bestProducts{*/
-    /*width: ;*/
-/*}*/
+.best-products{
+    height: calc(100% - 50px);
+    overflow-y: scroll;
+    margin: 0px;
+}
 
 /* Price brush */
 #priceBrushDiv {

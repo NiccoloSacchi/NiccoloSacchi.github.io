@@ -78,17 +78,11 @@ export class ProductGraph {
             let title = bestProductDiv.append("p")
                 .text("RECOMMENDATIONS")
                 .attr("class", "productSectionTitle")
-                .style("height", "46px")
             title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.bestProducts["view"] =
                 bestProductDiv
                     .append("div")
-                    .style("width", "100%")
-                    .style("height", "93%")
-                    .style("overflow-y", "scroll")
-                    // .attr("class", "nice_scrollbar")
-                    .style("margin", 0+"px")
-            // .attr("class", "bestProducts")
+                    .attr("class", "best-products")
         }
 
         let table = div.append("div").attr("class", "products_table")
@@ -161,7 +155,7 @@ export class ProductGraph {
 
         let graph_view = table.append("div")
             .attr("id", "productGraphColumn")
-            .style("width", productWindow ? "70%":"100%")
+            // .style("width", productWindow ? "70%":"100%")
 
         if (productWindow){
             // then create a table, on the left we show the graph
@@ -176,7 +170,7 @@ export class ProductGraph {
                 // .style("height", this.height+"px")
                  column.append("div")
                      .style("width", "100%")
-                     .style("height", "93%")
+                     .style("height", "calc(100% - 50px)")
                      .style("overflow-y", "scroll")
                      // .attr("class", "nice_scrollbar")
                      .style("margin", 0+"px")
@@ -444,9 +438,7 @@ export class ProductGraph {
                         this.productWindow,
                         null,
                         d.groups.reduce((acc, group) => this.net.cliques[group]? acc.concat(this.net.cliques[group].nodes):acc, []).filter(n => n!=undefined),
-                        (n) => this.updateFocus.call(this, n, true),
-                        false
-                    )
+                        (n) => this.updateFocus.call(this, n, true))
                 }
                 else{
                     this.tooltip
@@ -537,9 +529,7 @@ export class ProductGraph {
                     this.bestProducts["view"],
                     rank,
                     n.groups.reduce((acc, group) => this.net.cliques[group]? acc.concat(this.net.cliques[group].nodes):acc, []).filter(n => n!=undefined),
-                    (n) => this.updateFocus.call(this, n, true),
-                    false
-                )
+                    (n) => this.updateFocus.call(this, n, true))
                 rank++
             }
         }
@@ -880,18 +870,17 @@ class ProductNode {
         return "<a href='https://www.amazon.com/dp/"+ this.asin +"'> url </a>"
     }
 
-    appendTo(div, rank, clique, click, small){
+    appendTo(div, rank, clique, click){
         // div: d3 selector to which append the info about the product
         // rank: string, int or null. If sepecified, will be appended to the product's title
         // clique: list of competing product
         // click: function called when the user clicks on the div
         // small: bool. Specifies whether the window of the product should be big or small
 
-        div = div.append("div")
-            .attr("class", "productCard")
+        div = div.append("div").attr("class", "productCard") // contains both the main product and the competing ones
         // let size = div.append("div").node().getBoundingClientRect()
         let rank_str = rank? rank + ". " : "" // if no rank is passed then don't specify it
-        let main = div.append("div").attr("class", "main-product")
+        let main = div.append("div").attr("class", "main-product") // contain only the main product
             .on("click", () => click(this))
         main.append("h5")
             .append("a")
@@ -908,43 +897,37 @@ class ProductNode {
 
         // show also the competing products
         if (clique && clique.length > 0){
-            let h_start = div.node().getBoundingClientRect().height
-
-            // main.style("width", "70%")
-
             let clique_view = div.append("div")
                 .attr("class", "competing-products")
-                .style("padding", "0px")
-                // .style("width", "30%")
-                .append("div")
-                .style("overflow-y", "scroll")
-                .style("overflow-x", "hidden")
-                // .attr("class", "nice_scrollbar")
-            // hack to set the height properly
-            // let i = 0
-            // let int = setInterval(() =>
-            //     {
-            //         i++
-            //         if (i>10)
-            //             clearInterval(int)
-            //         let h = main.node().getBoundingClientRect().height
-            //         if (h_start < h) {
-            //             clique_view.style("height", h + "px")
-            //             clearInterval(int)
-            //         }
-            //     }, 200
-            // )
-            clique_view.style("height", h_start+"px")
-            clique_view.append("h5").text("Competing products")
-                .style("text-align", "center")
-                .style("margin", "5px 0px")
-            div = clique_view.append("div")
+            clique_view.append("h5")
+                .text("Competing products")
+            // div = clique_view.append("div")
 
             for (let node of clique){
                 if (node != this)
-                    node.appendTo(div, null, null, click, true)
+                    node.appendToCompeting(clique_view, click)
             }
         }
+    }
+
+    appendToCompeting(div, click){
+        // div: d3 selector to which append the info about the product
+        // click: function called when the user clicks on the div
+        
+        let main = div.append("div")
+            .on("click", () => click(this))
+        main.append("h5")
+            .append("a")
+            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+            .text(this.name)
+        main.append("div")
+            .attr("class", "productImg")
+            .append("img")
+            .attr("src", this.imUrl)
+            .attr("alt", "product image not available")
+        main.append("h6")
+            .text("Price: ")
+            .append("label").text(this.price)
     }
 }
 
