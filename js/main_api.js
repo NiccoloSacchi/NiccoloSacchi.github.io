@@ -1,17 +1,18 @@
 let p, c
 c = new CategoryGraph()
 
-// functions to manage search and autocompletion
 function pageInit() {
+    d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
     c.drawGraph('search-tool', 'data/categories.json', category_callback)
-    // setTimeout(()=>category_callback("tools-home-improvement--building-supplies--heating-cooling--ducting.json", "ducting"), 500)
 }
 
-function category_callback(url, categoryName){
+function category_callback(url, currHierarchy){
     p = new ProductGraph()
-    p.drawGraph('search-tool', 'data/graphs/'+url, categoryName, product_callback, true, true, true);
+    p.drawGraph('search-tool', 'data/graphs/'+url, currHierarchy, product_callback, true, true, true);
 }
 
-function product_callback() {
-    c.drawGraph('search-tool', 'data/categories.json', category_callback)
+function product_callback(currHierarchy) {
+    c.drawGraph('search-tool', 'data/categories.json', category_callback, currHierarchy)
 }

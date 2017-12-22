@@ -13,9 +13,11 @@ class ProductGraph {
 
         this.brushHeight = 50
         // this.simulation; this.hullg; this.linkg; this.nodeg; these are set at runtime
-        this.tooltip = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
+        this.tooltip = d3.select(".tooltip")
+        if (this.tooltip.empty())
+            d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
 
         this.drawHull = (d) =>
             d3.line().curve(d3.curveCardinalClosed.tension(.85))(d.path); // 0.8
@@ -31,7 +33,7 @@ class ProductGraph {
         ]
     }
 
-    drawGraph(divId, file, categoryName, searchbox_callback, productWindow, priceBrush, bestProducts){
+    drawGraph(divId, file, currHierarchy, searchbox_callback, productWindow, priceBrush, bestProducts){
         // divId: id of the div in which to draw the search bar and the graph
         // file: path to the file containing the graph
         // searchbox_callback: if passed a searchbox will be drawn. searchbox is a function that will be called when "back is pressed"
@@ -46,8 +48,6 @@ class ProductGraph {
 
         // select the div
         let div = d3.select("#"+divId)
-            //.style("width", this.width)
-            //.style("height", this.height)
         // clear the div content
         div.selectAll("*").remove();
 
@@ -79,7 +79,7 @@ class ProductGraph {
 
             box.append("button")
                 .attr("class", "btn btn-success btn-back")
-                .on("click", searchbox_callback)
+                .on("click", () => searchbox_callback(currHierarchy))
                 .append("i").attr("class", "fa fa-arrow-left")
 
             box.append("button").attr("class", "btn btn-success topnav-buttons")
@@ -88,7 +88,7 @@ class ProductGraph {
 
             box.append("div").attr("class", "category-label")
                 .append("label")
-                .text(categoryName)
+                .text(currHierarchy[currHierarchy.length-1])
 
             box = box.append("div").attr("class", "search-container-small")//.append("form")
 			let input
@@ -381,12 +381,12 @@ class ProductGraph {
                         (n) => this.updateFocus.call(this, n, true))
                 }
                 else{
-                    this.tooltip
+                    let tooltip = d3.select(".tooltip")
                         .style("display", "block")
                         .transition()
                         .duration(200)
                         .style("opacity", .9);
-                    this.tooltip.html(d.createTooltip())
+                    tooltip.html(d.createTooltip())
                         .style("left", (d3.event.pageX) + "px")
                         .style("top", (d3.event.pageY - 28) + "px");
                 }
@@ -395,7 +395,7 @@ class ProductGraph {
                 this.updateFocus(d, false)
             })
             .on("mouseout", (d) => {
-                this.tooltip
+                d3.select(".tooltip")
                     .style("display", "none")
                     .transition()
                     .duration(500)

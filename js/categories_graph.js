@@ -10,14 +10,16 @@ class CategoryGraph {
         this.choices = []
     }
 
-    drawGraph(divId, file, callback){
+    drawGraph(divId, file, callback, currHierarchy){
         // callback: function that is called when an leaf category has been selected
         this.callback = callback
         let that = this
 
-        this.tooltip = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
+        this.tooltip = d3.select(".tooltip")
+        if (this.tooltip.empty())
+            d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
 
         // Load the data, draw the table and start the graph
         d3.json(file, (error, data) => {
@@ -141,6 +143,13 @@ class CategoryGraph {
             curr_root.children.forEach(collapse); // start with all children collapsed
             this.update(curr_root); // update the graph
             this.appendToList(curr_root); // update the list
+
+            if (currHierarchy) {
+                for (let i = 0; i < currHierarchy.length-1; i++) {
+                    curr_root = curr_root.children.find(n => n.data.names == currHierarchy[i])
+                    this.click(curr_root)
+                }
+            }
         });
     }
 
@@ -321,7 +330,13 @@ class CategoryGraph {
         if (!d._children && !d.children) {
             // leaf
             if (this.callback) {
-                this.callback(d.data.url, d.data.names) // pass also the name of the file of the product graph
+                let curr = d
+                let currHierarchy = [d]
+                while(curr.parent.data.names != "Amazon" && curr.parent) {
+                    curr = curr.parent
+                    currHierarchy.push(curr)
+                }
+                this.callback(d.data.url, currHierarchy.map(n=>n.data.names).reverse()) // pass also the name of the file of the product graph
                 this.tooltip
                     .style("display", "none")
                     .transition()
