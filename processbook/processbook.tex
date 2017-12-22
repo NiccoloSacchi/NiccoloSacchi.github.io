@@ -239,6 +239,13 @@ The graph must show to users the most relevant products in an intuitive manner. 
 	\label{fig:collapsible_graph}
 \end{figure}
 	\item \textit{Product Graph: code cleaning and improvements}. After diving in the code of that example we realized that there were several problems. Changes were needed in order to satisfy all our requirements since the code was not versatile, inefficient (e.g. the graph was initially recomputed every time a node was collapsed/expanded) and it used d3 v2. We needed both a structure that would allow us to easily update the graph (exclude/include nodes) and to maintain the code easily. Therefore, we restructured most of the code implementing classes (which improved versatility and manageability), removed a couple of features we did not need and improved the efficiency. Then, we converted the code to d3 v4 (it was not an easy task, as we discovered that d3 v4 is not much retro-compatible) so as to obtain something more versatile and efficient. However, we understood that collapsing and expanding a node would have implied non-trivial changes to our graph algorithm, i.e. finding and highlighting the path to the best product would have been difficult according to the expansion state of a group. Moreover, the cliques are small and few and the time spent in implementing ad-hoc graph algorithms to keep collapsible nodes would not be worth much. So we decided to indicate the cliques with polygon hulls (d3.polygonHull) so as to keep indicating them. Finally we added arrows to edges, since the direction of the edge is of major importance in our algorithm.  We ended up with a graph where cliques were well distinguishable but it was still not very intuitive as the user would not see products but only dots connected by edges.
+	
+		\begin{figure}[H]
+			\centering{}
+			\includegraphics[width=0.8\textwidth]{img/products_graph.png}
+			\caption{Products graph UI.}
+			\label{fig:products_graph}
+		\end{figure}
 
 	\item \textit{Product Graph: add interactivity}. Once we display all the products of a category as a graph the next step is to choose an intuitive and easy way to explore and/or select only the parts of the graph in which the user is interested. To accomplish the task we added several features.
 		\begin{itemize}
@@ -290,7 +297,10 @@ Our visualization has some room for improvement. The following points could be a
 \end{itemize}
 
 \subsection{Work disclaimer}
-In the initial project proposal form, we stated that our Data visualization project was jointed to our Applied data analysis project. Although we have deployed the same dataset in both courses and we reused parts of the data processing pipeline, the goals (and the developments) of the two project have significantly diverged. In this course we have focused merely on the visualization of the graph, whereas in the other one we have exploited it for a deep analysis (machine learning and statistics). In addition, for this course we needed some different and more suitable preprocessing of the data for the visualization.
+In the initial project proposal form, we stated that our Data visualization project was jointed with our Applied data analysis project. Although we have deployed the same dataset in both courses and we reused parts of the data processing pipeline, the goals (and the development) of the two projects have significantly diverged. In this course we have focused merely on the visualization of the graph, whereas in the other one we have exploited it for a deep analysis (machine learning and statistics). In addition, for this course we needed some different and more suitable preprocessing of the data for the visualization.
 
 Furthermore, the Amazon dataset is not public and is available only under request. For this reason, we did not upload it under a GitHub repository (so as to avoid copyright issues), but made it available under a different link.
+
+The website is partially based on Beautiful Jekyll, a template generator.
+
 \end{document}
