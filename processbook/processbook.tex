@@ -202,7 +202,15 @@ In summary, the visualization guides the user from their idea of product to the 
 
 
 \subsection{Graph algorithms}
-A question easily comes to mind: how do 
+A question easily comes to mind: how do provide recommendations to users? More specifically, how do we decide, for every product, the path that leads to the best product? What constitutes a ``best product''?
+According to our idea, products with many incoming edges (fan-in metric) are regarded as superior by people. However, using a simple threshold does not produce satisfying results, as its choice is crucial (and could be different for each category). Instead, we use a graph visit algorithm that works as follows:
+\begin{enumerate}
+	\item We sort the nodes (products) by fan-in in decreasing order.
+	\item We start with the node that has the highest fan-in and we mark it as ``best product''. Afterwards, we run a BFS (breadth-first search) graph visit from that node, following all edges in reverse order. All visited nodes are labelled so that they point towards the best product. Additionally, the BFS gives us the shortest paths to the latter.
+	\item We move onto the next node in the list, and, if it has not been visited, it is marked as ``best product'' and expanded in the same way as before.
+	\item The algorithm ends once all the nodes in the graph have been labeled.
+\end{enumerate}
+
 \todo[inline]{please Dario help me}
 
 
