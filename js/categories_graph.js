@@ -41,11 +41,18 @@ export class CategoryGraph {
             // clear the div content
             div.selectAll("*").remove();
 
-            let table = div.append("div")//.style("overflow", "visible")
-                .style("font-size", "13px")
-                .attr("class", "categories_table table")
-                .attr("width", "100%")
-                .attr("height", "100%")
+// <<<<<<< HEAD
+//             let table = div.append("div")//.style("overflow", "visible")
+//                 .style("font-size", "13px")
+//                 .attr("class", "categories_table table")
+//                 .attr("width", "100%")
+//                 .attr("height", "100%")
+// =======
+            let table = div.append("div")
+                //.style("font-size", "13px")
+                .attr("class", "categories_table")
+                //.attr("width", "100%")
+                //.attr("height", "100%")
 
             // append the search box
             let box = table

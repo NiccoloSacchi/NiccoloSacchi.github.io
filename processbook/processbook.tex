@@ -197,20 +197,28 @@ In summary, the visualization guides the user from their idea of product to the 
 
 \section{Implementation}
 
+
 \subsection{Graph algorithm}
 \todo[inline]{please Dario help me}
 
 \subsection{Visualization}
-
-The graph must show to users the most relevant products in an intuitive manner. As a crucial requirement, users should find the information of interest "at first glance", without need to interpret the graph.
+The graph must show to users the most relevant products in an intuitive manner. As a crucial requirement, users should find the information of interest "at first glance", without need to interpret the graph. However, making intuitive a graph is not a simple task. In order to achieve the goal we undertook the following steps:
 \begin{enumerate}
-	\item We opted for \href{http://bl.ocks.org/GerHobbelt/3071239}{this} collapsible graph which would allow to "hide" all the competing products in one node and expand it only if the user is really interested in analazying them. 
-	\item Once we display all the products of a category the next step is to choose an intuitive and easy way to select only the parts of the graph in which the user is interested. A simple search box and more advanced visualization (e.g. highlight the path to the bests products, show a list of computed best products, photos and links to the products) will accomplish the task.
-	\todo{this whole part must be reviewed. chronological steps must be added}
-	
-	\todo[inline]{choice of colors, and price bar}
-	\todo[inline]{burger menu}
-	\todo[inline]{explain why we kept arrows and we higlight paths}
+	\item \textit{Product Graph choice}. We opted for \href{http://bl.ocks.org/GerHobbelt/3071239}{this} collapsible graph which would allow to "hide" all the competing products in one node and expand it only if the user is really interested in analazying them. 
+
+	\item \textit{Product Graph: code cleaning and improvements}. After diving in the code of that example we realized how many were the problems. Changes were needed in order to satisfy all our requirements since the code was not versatile, inefficient (e.g. the graph was initially recomputed every time a node was collapsed/expanded) and it used d3 v2. We needed both a structure that would allow to easily update the graph (exclude/include nodes) and code easy to maintain (so to apport changes easily). Therefore, we restructured most of the code implementing classes (which improved versatility and manageability), removed a couple of features we did not need and improved the efficiency. Then, we converted the code to d3 v4 (non easy task, we discovered d3 v4 is not much retro-compatible) so to obtain something more versatile and efficient. However, we understood that collapsing and expanding a node would imply non trivial changes to our graph algorithms, e.g. finding and highlighting the path to the best product (depending whether a clique is expanded or not the path to be highlighted changes). Moreover, the cliques are small and few and the time spent in implementing ad-hoc graph algorithms to keep collapsible nodes would not be worth much. So we decided to indicate the cliques with polygon hulls (d3.polygonHull) so to keep indicating the them. Finally we added arrows instead of edges, since the direction of the edge is of major importance in our algorithm.  We ended up with a graph where cliques were well distinguishable but it was still not very intuitive as the user wouldn't see products but only dots connected by edges.
+
+	\item \textit{Product Graph: add interactivity}. Once we display all the products of a category as a graph the next step is to choose an intuitive and easy way to explore and/or select only the parts of the graph in which the user is interested. To accomplish the task we added several features.
+		\begin{itemize}
+			\item When the user mouseover a node, we show photo, link, and other imformation of the product. Moreover we also  highlight the path to the best product, i.e. a star.
+			\item We add a search box to filter the graph using a keyword. This searchbox has autocompletion and it suggests the words that have been extracted from the title of the products so that the user does not end up in selecting an empty graph. In particular, we show not only the products related to that keyword but also all the reachable nodes and the direct parents. In this way we both show all the better products and also the fan-in of the filtered products (note: the fan in is the metric we choose for selecting the best product between competing products, i.e. products belonging to the same clique).
+			\item We show in an hamburger menu the list of computed best products of the whole graph. Those products are also indicated by stars on the graph so to show that the best products are the ones with many incoming edges.
+			\item We used the color to encode the price. In particular we sort all the product prices, split them in six bins and then give a color to each bin. However, outliers, e.g. products with very high prices, end up in having the same color of products with a very different price. To reduce this problem we add a brushable price bar with which the user can focus on the products whose price belong to a specific interval. Notice that we keep all the products since filtering out the products that does not belong to the interval could also filter out the best products, e.g. the user could select the price interval 50€-70€ while the best product costs 40€. 
+		\begin{itemize}
+
+	\item \textit{Category Graph}. To allow the user select a category and see as well the number of products, we implement an expandible radial tree accompanied by the list (on the left) of explored categories. 
+
+	\item \textit{Packaging}. Once we have both the product graph and the category graph there is the more important setp: package them in good looking and easy usable way.
 \end{enumerate}
 
 \section{Conclusion}
