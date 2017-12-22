@@ -31,7 +31,7 @@ export class ProductGraph {
         ]
     }
 
-    drawGraph(divId, file, searchbox_callback, productWindow, priceBrush, bestProducts){
+    drawGraph(divId, file, categoryName, searchbox_callback, productWindow, priceBrush, bestProducts){
         // divId: id of the div in which to draw the search bar and the graph
         // file: path to the file containing the graph
         // searchbox_callback: if passed a searchbox will be drawn. searchbox is a function that will be called when "back is pressed"
@@ -75,9 +75,10 @@ export class ProductGraph {
                 .style("cursor", "pointer")
                 .attr("class", "closebtn")
                 .on("click", closeNav)
-            let title = bestProductDiv.append("p")
+            let title = bestProductDiv.append("h4")
                 .text("RECOMMENDATIONS")
                 .attr("class", "productSectionTitle")
+                .append("hr").attr("class", "small")
             title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.bestProducts["view"] =
                 bestProductDiv
@@ -101,11 +102,23 @@ export class ProductGraph {
             let box = table
                 .append("div").attr("class", "topnav")
 
-            box.append("a").text("CATEGORIES").on("click", searchbox_callback)
-                .style("cursor", "pointer")
+            // box.append("button").attr("class", "btn btn-success topnav-buttons")
+                // .text("CATEGORIES")
+                // .on("click", searchbox_callback)
+            box.append("button")
+                .attr("class", "btn btn-success btn-back")
+                .on("click", searchbox_callback)
+                .append("i").attr("class", "fa fa-arrow-left")
 
-            box.append("a").text("RECOMMENDATIONS").on("click", openNav) // todo delete
-                .style("cursor", "pointer")
+            box.append("button").attr("class", "btn btn-success topnav-buttons")
+                .text("RECOMMENDATIONS")
+                .on("click", openNav)
+
+            // let catName = file.substring(file.lastIndexOf("--")+2, file.lastIndexOf(".")).toUpperCase().replace(/-/g , " ")
+            // catName = catName+catName+catName+catName
+            box.append("div").attr("class", "category-label")
+                .append("label")
+                .text(categoryName)
 
             box = box.append("div").attr("class", "search-container-small")//.append("form")
 			let input
@@ -162,18 +175,15 @@ export class ProductGraph {
             // on the right the details of the product
             let column = table.append("div")
                 .attr("id", "selectionColumn")
-            let title = column.append("p")
+            let title = column.append("h4")
                 .text("SELECTED PRODUCT")
                 .attr("class", "productSectionTitle")
+                .append("hr").attr("class", "small")
             title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.productWindow =
                 // .style("height", this.height+"px")
                  column.append("div")
-                     .style("width", "100%")
-                     .style("height", "calc(100% - 50px)")
-                     .style("overflow-y", "scroll")
-                     // .attr("class", "nice_scrollbar")
-                     .style("margin", 0+"px")
+                     .attr("class", "selected-product")
         }
 
         if (priceBrush){
@@ -189,7 +199,7 @@ export class ProductGraph {
                 .style("font-size", "13px")
 
             this.priceBrush = row2
-                .append("svg").style("overflow", "visible")
+                .append("svg")
                 .attr("class", "priceBrush")
                 .attr("height", this.brushHeight)
                 .attr('transform', 'translate(-3, 2)')
@@ -250,7 +260,7 @@ export class ProductGraph {
         }
 
         defs.append("pattern")
-            .attr("id", "star")
+            .attr("id", "background-star")
             .attr("x", "0%").attr("y", "0%").attr("height", "100%").attr("width", "100%").attr("viewBox", "0 0 512 512")
             .append("image").attr("x", "0%").attr("y", "0%").attr("height", "512").attr("width", "512").attr("href", "img/star.svg")
 
@@ -665,7 +675,7 @@ export class ProductGraph {
         this.focusednode.attr("stroke", (d) => d.stroke(this.net))
         // focus on the new one
         let asins = this.bestProducts["nodes"].map(n=>n.asin)
-        if (asins.includes(newNode.asin) )
+        if (asins.includes(newNode.asin))
             this.focusednode = d3.select("circle#" + newNode.asin).attr("stroke", "black")
         else
             this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "white")
@@ -836,7 +846,7 @@ class ProductNode {
 
     fill() {
         if (this.best)
-            return "url(#star)"
+            return "url(#background-star)"
         return this.fill_color
     }
 
@@ -883,30 +893,61 @@ class ProductNode {
         let main = div.append("div").attr("class", "main-product") // contain only the main product
             .on("click", () => click(this))
         main.append("h5")
-            .append("a")
-            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+        // .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(rank_str + this.name)
         main.append("div")
             .attr("class", "productImg")
             .append("img")
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")
-        main.append("h6")
-            .text("Price: ")
-            .append("label").text(this.price)
+
+        this.appendMetadata(main, rank_str)
 
         // show also the competing products
         if (clique && clique.length > 0){
             let clique_view = div.append("div")
                 .attr("class", "competing-products")
-            clique_view.append("h5")
-                .text("Competing products")
-            // div = clique_view.append("div")
 
+            clique_view.append("h5")
+                    .text("COMPETING PRODUCTS")
+                .append("hr").attr("class", "small")
+
+            clique_view = clique_view
+                .append("div")
+                .attr("class", "competing-products-view")
+
+            let i = 0
+            // let ids = []
             for (let node of clique){
-                if (node != this)
+                if (node != this) {
+                    if (i!=0)
+                        clique_view
+                            .append("hr")
+                            .attr("class", "small")
+                            .style("max-width","50px")
+                            .style("border-width", "2px")
                     node.appendToCompeting(clique_view, click)
+                    // ids.push(node.asin+"Info")
+                    i++
+                }
             }
+            //
+            // if (ids.length > 2) {
+            //     let fadeinBox = $("#"+ids[0]);
+            //     let fadeoutBox = $("#"+ids[1]);
+            //
+            //     function fade() {
+            //         fadeinBox.stop(true, true).fadeIn(2000);
+            //         fadeoutBox.stop(true, true).fadeOut(2000, function () {
+            //             let temp = fadeinBox;
+            //             fadeinBox = fadeoutBox;
+            //             fadeoutBox = temp;
+            //             setTimeout(fade, 1000);
+            //         });
+            //     }
+            //
+            //     fade();
+            // }
         }
     }
 
@@ -915,20 +956,76 @@ class ProductNode {
         // click: function called when the user clicks on the div
         
         let main = div.append("div")
+            .attr("id", this.asin+"Info")
             .on("click", () => click(this))
-        main.append("h5")
-            .append("a")
-            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+        main.append("h6")
+            // .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(this.name)
         main.append("div")
             .attr("class", "productImg")
             .append("img")
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")
-        main.append("h6")
-            .text("Price: ")
-            .append("label").text(this.price)
+
+        this.appendMetadata(main)
     }
+
+    appendMetadata(main){
+        // price
+        main.append("h6")
+            .attr("class", "metadata")
+            .text("Price: ")
+            .append("label").text(this.price + " $")
+        // this.imUrl, this.averageRating, this.numReviews
+
+        // amazon link
+        main.append("div")
+            .attr("class", "amazon-ref")
+            .append("h6")
+            .attr("class", "metadata")
+            .text("View on ")
+            .append("a")
+            .text("Amazon")
+            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+
+        // averahe rating
+        let avRating = Math.round(this.averageRating*100)/100
+        let rating = main.append("div")
+            .attr("class", "rating")
+        let n_stars = Math.round(avRating*2)/2;
+        let i=0
+        for (; i< Math.trunc(n_stars); i++) {
+            rating.append("img")
+                .attr("class", "star")
+                .attr("src", "./img/stars/fullStar.png")
+        }
+        if (n_stars % 1 != 0){
+            i++
+            rating.append("img")
+                .attr("class", "star")
+                .attr("src", "./img/stars/halfStar.png")
+        }
+        while (i<5){
+            i++
+            rating.append("img")
+                .attr("class", "star empty-star")
+                .attr("src", "./img/stars/emptyStar.png")
+        }
+        rating.append("label").text("("+this.numReviews+")")
+
+        // sales rank
+        let strRank
+        if (this.salesRank && this.salesRankCategory)
+            strRank = this.salesRank + " (" + this.salesRankCategory + ")"
+        else
+            strRank = "Not available"
+        main.append("h6")
+            .attr("class", "metadata")
+            .text("Sales rank: ")
+            .append("label").text(strRank)
+
+    }
+
 }
 
 class Link {

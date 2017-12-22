@@ -17,6 +17,13 @@
 	width: 400px;
 	height: calc(100% - 137px);
 	padding: 0px;
+
+    background: #eee;
+    border-radius: 6px;
+
+    border-left: 1px solid #a9a9a9;
+    border-top: 1px solid #a9a9a9;
+    border-bottom: 1px solid #a9a9a9;
 }
 
 /* style for the product graph */
@@ -27,9 +34,10 @@
 	height: 100%;
     background: #ADA996;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to right, #EAEAEA, #e7e7e7, #F2F2F2, #ccc8b0);  /* Chrome 10-25, Safari 5.1-6 */
-    /*background: radial-gradient(circle at center, #EAEAEA, #F2F2F2, #e7e7e7, #dbd7bd); !* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ *!*/
-    background: radial-gradient(circle at center, #ede9ce, #d3c193);
-    /*background-color: #e9e9e9;*/
+    /*background: radial-gradient(circle at center, #ede9ce, #d3c193);*/
+    background: radial-gradient(circle at center, #f2f2f2, #d0d0d0);
+    border-radius: 6px;
+    border: 1px solid #a9a9a9;
 }
 
 .product_graph circle.node {
@@ -51,12 +59,30 @@
     pointer-events: none;
 }
 
-/* fields of the products window*/
+
+
+/* product views */
+
+
+/* fields of the products window (main product + competing products)*/
 div.productCard{
     /*padding: 6px 5px;*/
     clear: both;
-    height: 300px;
+    height: 430px;
+
+    background: #f2f2f2;
+    border-radius: 6px;
+    border: 1px solid #bcbcbc;
 }
+
+div.productCard .metadata{
+    padding: 0px;
+    margin: 8px 0px 0px 0px;
+}
+
+/*.amazon-ref h6{*/
+    /*display: inline-block;*/
+/*}*/
 
 div.productCard .main-product,
 div.productCard .competing-products{
@@ -76,22 +102,39 @@ div.productCard .main-product{
 }
 div.productCard .competing-products{
     width: 150px;
-    overflow-y: scroll;
+    height: 100%;
     overflow-x: hidden;
     padding: 0px;
     text-align: center; /* for title "Competing products" */
 }
 
-div.productCard .competing-products div {
+div.productCard .competing-products h5{
+    height: 45px;
+    margin: 0px;
+    margin-top: 5px;
+}
+
+div.productCard .competing-products h5 .small{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+div.productCard .competing-products .competing-products-view{
+    height: calc(100% - 60px);
+    overflow-y: scroll;
+    overflow-x: hidden;
     text-align: left;
+
+    /*position: absolute;*/
 }
 
 div.productCard h5 a {
     color: inherit;
-    font-family: "Roboto",sans-serif;
+    /*font-family: "Roboto",sans-serif;*/
 }
 
 div.productCard .productImg {
+    /* center the images in the middle of the div */
     background: white;
     display:table-cell;
     vertical-align:middle;
@@ -109,43 +152,91 @@ div.productCard .competing-products .productImg{
 div.productCard img{
     max-width: 100%;
     max-height: 100%;
-    /*margin: auto;*/
-    /*display: block;*/
+}
+
+div.productCard .rating{
+    margin-top: 10px;
+}
+
+div.productCard .rating label{
+    cursor: pointer;
+    font-size: 13px;
+    height: 20px;
+    /*line-height: 20px;*/
+    vertical-align: middle;
+    padding: 0px;
+    margin: 0px 0px 0px 4px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif important;
+}
+
+div.productCard .rating .star{
+    /*border-style: none !important;*/
+    /*border: 0 !important;*/
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
 }
 
 .productSectionTitle{
-    height: 50px;
+    height: 60px;
     margin: 0px;
     text-align: center;
     vertical-align: middle;
-    font-family: "Roboto",sans-serif;
-    font-size: 15px;
-    font-weight: 800;
+
+    padding-top: 10px;
+    border: 1px solid #a9a9a9;
+    background: linear-gradient(to bottom, #f8f8f8, #f3f3f3);
+    /*font-family: "Roboto",sans-serif;*/
+    /*font-size: 15px;*/
+    /*font-weight: 800;*/
     /*background: #b0aac2;*/
-    background: #935347;
-    color: #ede9ce;
+    /*background: #935347;*/
+    /*color: #ede9ce;*/
 }
 
 /* List of best Products */
 .best-products{
-    height: calc(100% - 50px);
+    height: calc(100% - 70px);
     overflow-y: scroll;
     margin: 0px;
 }
 
+/* div containing the best product  */
+.selected-product{
+    height: calc(100% - 70px);
+    overflow-y: scroll;
+    margin: 0px;
+    width: 100%;
+}
+
 /* Price brush */
 #priceBrushDiv {
-    font-family: "Roboto",sans-serif;
+    /*font-family: "Roboto",sans-serif;*/
     font-size: 15px;
     font-weight: 800;
     text-align: center;
     margin: 0px;
-    background: #935347;
-    color: #ede9ce;
+    /*background: #935347;*/
+    color: black;
+    /*border-top: 1px solid #EAEAEA;*/
+    /*background: #F5F5F5;*/
+    /*background: rgb(224, 224, 224);*/
 	height: 90px;
 	width: 100%;
 	clear: both;
 	padding: 0px 30px;
+
+    background: #eee;
+    border-radius: 6px;
+
+    border-left: 1px solid #a9a9a9;
+    border-top: 1px solid #a9a9a9;
+    border-right: 1px solid #a9a9a9;
+}
+
+.priceBrush {
+    overflow: visible !important;
 }
 
 .priceBrush,
@@ -160,26 +251,26 @@ div.productCard img{
 }
 
 .priceBrush .axis--grid .domain {
-    fill: #ddd;
+    fill: rgb(224, 224, 224);
     /*stroke: none;*/
-    stroke: #c7ad88;
+    stroke: black;
     opacity: 0.1;
 }
 
 .priceBrush .axis--x .domain,
 .priceBrush .axis--grid .tick line {
     /*stroke: #64706c;*/
-    stroke: #c7ad88;
+    stroke: rgb(133, 133, 133);
 }
 
 .priceBrush .axis--x .tick line{
-    stroke: #ffdfae;
-    stroke-width: 2px;
+    stroke: black;
+    stroke-width: 1.5px;
 }
 
 .priceBrush .axis--x .tick text{
     /*fill: #444444;*/
-    fill: #ffddae;
+    fill: black;
     font-size: 13px;
 }
 
@@ -188,8 +279,8 @@ div.productCard img{
 }
 
 .brush .selection{
-    fill: #c7ad88;
-    fill-opacity: 0.7;
+    fill: rgb(147, 136, 209);
+    fill-opacity: 0.6;
 }
 
 .nice_scrollbar::-webkit-scrollbar-track
@@ -221,10 +312,16 @@ div.productCard img{
     z-index: 1; /* Stay on top */
     top: 0;
     left: 0;
-    background-color: #e9e9e9; /* Black*/
+    /*background-color: white; !* Black*!*/
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 0px; /* Place content 60px from the top */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+    border-right: 1px solid #a9a9a9;
+    /*border-top: 1px solid #a9a9a9;*/
+    /*border-bottom: 1px solid #a9a9a9;*/
+
+    background: #eee;
+    border-radius: 8px;
 }
 
 /* Position and style the close button (top right corner) */
@@ -241,7 +338,7 @@ div.productCard img{
 
 /* When you mouse over the navigation links, change their color */
 .sidenav .closebtn:hover{
-    color: #adadad;
+    color: #575757;
 }
 
 /* tooltip */

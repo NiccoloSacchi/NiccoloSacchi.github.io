@@ -12,7 +12,7 @@ body {
 }
 
 .topnav {
-    font-family: "Roboto",sans-serif;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     /*overflow: hidden;*/
     /*border: none;*/
     /*background: #c2d4d8;*/
@@ -25,46 +25,43 @@ body {
     height: 47px;
 }
 
-.topnav a {
+.topnav .topnav-buttons {
+    float: left !important;
     width:180px;
-    float: left;
-    display: block;
+    font-weight: bold;
+}
+
+.topnav .category-label {
+    font-size: 15px;
+    float:left;
+    display: table;
+    table-layout:fixed;
+    height: 100%;
+    width: calc(100% - 680px);
+    overflow: hidden;
+}
+
+.topnav .category-label label{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    /*width: 200px;*/
+    display: table-cell;
+    vertical-align: middle;
     text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 600;
-    font-family: "Roboto",sans-serif;
-    /*background-color: #f6f6f6;*/
-    color: #ede9ce;
-    /*border: 1px solid #ede9ce;*/
-    /*background: url("../img/gray_background2.jpg");*/
 }
 
-.topnav a:first-child{
-    /*background: #f2efe8;*/
-    background: #64706c;
-    background: linear-gradient(to top, #788480, #6b7a76);
-}
+/*.topnav .category-label td {*/
+    /*display: block; !* or inline-block *!*/
+/*}*/
 
-.topnav a:nth-child(2){
-    /*background-color: #dbe9d8;*/
-    background: #935347;
-    background: linear-gradient(to top, #ac654e, #8b4c46);
-}
-
-.topnav a:hover {
-    /*background-color: #d1d1d1;*/
-    opacity: 0.8;
-    /*color: black;*/
-}
-
-.topnav a.active {
-    background-color: #2196F3;
-    color: white;
+.topnav .topnav-buttons:first-child{
+    margin-left: 15px;
 }
 
 .topnav .search-container {
+    /*display: inline;*/
     /* categories search bar*/
     float: right;
 	width: 80%;
@@ -83,7 +80,7 @@ body {
     margin: 7px;
 	float: right;
     font-size: 14px;
-    font-family: "Roboto",sans-serif;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 	text-overflow: ellipsis;
 	border: none;
 	box-shadow: inset 0 0 0 1px #ccc;
@@ -95,6 +92,11 @@ body {
 
 .topnav input::placeholder {
     font-size: 13px;
+}
+
+.topnav button.btn-back{
+    float: left !important;
+    margin-left: 16px;
 }
 
 .topnav button.btn-success {
@@ -136,7 +138,7 @@ body {
 /* Autocompletion suggestion windows*/
 .autocomplete-suggestions {
     font-size: 14px;
-    font-family: "Roboto",sans-serif;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     text-align: left; cursor: default; border: 1px solid #ccc; border-top: 0; background: #fff; box-shadow: -1px 1px 3px rgba(0,0,0,.1);
 
     /* core styles should not be changed */

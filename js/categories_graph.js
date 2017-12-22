@@ -57,8 +57,12 @@ export class CategoryGraph {
             // append the search box
             let box = table
                 .append("div").attr("class", "topnav")
-                //.style("height", "45px")
-            // box.append("a").text("a")
+
+            box.append("button")
+                .attr("class", "btn btn-success btn-back")
+                .on("click", () => window.open("./data-viz.html", "_self"))
+                .append("i").attr("class", "fa fa-home") //fa-arrow-left
+
             box = box.append("div").attr("class", "search-container")//.append("form")
             box.append("button").on("click", () => {
                     // start over from the root Amazon
@@ -407,7 +411,7 @@ export class CategoryGraph {
         if (!d._children && !d.children) {
             // leaf
             if (this.callback) {
-                this.callback(d.data.url) // pass also the name of the file of the product graph
+                this.callback(d.data.url, d.data.names) // pass also the name of the file of the product graph
                 this.tooltip
                     .style("display", "none")
                     .transition()
