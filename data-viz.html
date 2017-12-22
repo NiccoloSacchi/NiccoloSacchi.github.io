@@ -97,7 +97,7 @@
 					<p> 
 					When you look at a <a href="https://www.amazon.com/Acer-E5-575-33BM-15-6-Inch-Notebook-Generation/dp/B01K1IO3QW/ref=sr_1_3?s=pc&ie=UTF8&qid=1512207600&sr=1-3&keywords=laptop">product on Amazon</a>, 
 					you may notice a small window at the bottom of the page that indicates what <i> other </i> products users usually buy instead.
-					We call it a <i> competitive </i> relation. What do we do is just to build a network of these relations among all products for each category.
+					We call it a <i> competition </i> relation. What do we do is just to build a network of these relations among all products for each category.
 					If a product is associated with many of these relations, it means that users have preferred it many times over the others.
 					This new way of defining popular products allows us to group them according to human-made criteria: the brand, the price or some peculiar
 					characteristics. But <i> how </i> is decided by humans, not algorithms. Just like you.
@@ -119,7 +119,8 @@
 							Choose a category
                         </h3>
                         <div class="post-entry">
-							Categories are rapresented as a hierarchy, and you can click on the dots to navigate through it. 
+							<img src="img/home/category_graph.png" alt="" />
+							Categories are represented as a hierarchy, and you can click on the dots to navigate through it. 
 							You can also directly type on the search bar the category that you are looking for.
 							On the left, the timeline shows your current category, and it allows you to undo your steps.
 							Green dots indicate that you have reached the end of the hierarchy, and by clicking on them, you can jump into the
@@ -133,11 +134,12 @@
                             Explore the network
                         </h3>
                         <div class="post-entry">
+							<img src="img/home/products_graph.png" alt="" />
 							Now you are inside a category, where you can see a large network of coloured dots.
 							They represent products, and they are connected together according to customers' shopping trends.
 							If an arrow points from a dot to another, it means that users usually buy the second after viewing the first.
-							You can also notice some stars, which are pointed by many more arrows. Those are products that have been chosen
-							many more times than the others by customers. In simpler words, they are the most popular products in category.
+							You can also notice some stars, which are pointed by many arrows. Those are products that have been chosen
+							several times over the others by customers. In simpler words, they are the most popular products in category.
 							Finally, you may wonder what the colours represent. They show the price of the product. 
 							Cheaper products are shown as green, while more expensive products are shown as red. With all the shades in between, of course.
                         </div>
@@ -146,10 +148,11 @@
 					
 					<article class="post-preview">
                         <h3 class="post-subtitle">
-                            Competitive products
+                            Competing products
                         </h3>
                         <div class="post-entry">
-							Some products are surrounded by a coloured halo. We call them <i> competitive products </i>. 
+							<img src="img/home/cliques.png" alt="" />
+							Some products are surrounded by a coloured halo. We call them <i> competing products </i>. 
 							If you look closely, they are groups in which each product points to and is pointed by the others.
 							These items have very similar characteristics, and not necessarily one is better than the others. 
 							The choice is up to you!
@@ -162,6 +165,7 @@
                             Searching
                         </h3>
                         <div class="post-entry">
+							<img src="img/home/slider.png" alt="" />
 							Of course you are not required to navigate through the network to search your product. 
 							You can use the search bar on the top of the page to filter the network according to some keywords.
 							You can also use the slider on the bottom of the page to filter the products according to a price range.
@@ -174,7 +178,7 @@
                             Recommendations
                         </h3>
                         <div class="post-entry">
-							By clicking on the button <i> Recommendations </i>, you can immediately see the most popular products in category, and if any,
+							By clicking on the button <i> Recommendations</i>, you can immediately see the most popular products in category, and if any,
 							their competitors.
 							If you click on the picture, the product is zoomed and highlighted on the network.
                         </div>
@@ -183,7 +187,11 @@
 					
                     <!-- setting the margin so to go beyond the width of the parent -->
                     <!--<div id="product_graph" style="width: 120%; margin-left: -10%;"></div>-->
-					<a class="btn btn-success btn-lg get-started-btn" href="products.html">Give me a try</a>
+					<div style="text-align:center; margin-top: 10px;">
+							<a class="btn btn-success btn-lg get-started-btn" href="products.html">Try it out!</a>
+                        <!--<div id="product_graph" style="margin-top: 20px; width: 800px"></div>-->
+                    </div>
+					
                 </div>
 
             </div>
