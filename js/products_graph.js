@@ -108,7 +108,13 @@ export class ProductGraph {
 
             box.append("button").attr("class", "btn btn-success topnav-buttons")
                 .text("RECOMMENDATIONS")
-                .on("click", openNav) // todo delete
+                .on("click", openNav)
+
+            let catName = file.substring(file.lastIndexOf("--")+2, file.lastIndexOf(".")).toUpperCase().replace(/-/g , " ")
+            // catName = catName+catName+catName+catName
+            box.append("div").attr("class", "category-label")
+                .append("label")
+                .text(catName)
 
             box = box.append("div").attr("class", "search-container-small")//.append("form")
 			let input
@@ -883,27 +889,15 @@ class ProductNode {
         let main = div.append("div").attr("class", "main-product") // contain only the main product
             .on("click", () => click(this))
         main.append("h5")
-            // .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+        // .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(rank_str + this.name)
         main.append("div")
             .attr("class", "productImg")
             .append("img")
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")
-        main.append("h6")
-            .attr("class", "metadata")
-            .text("Price: ")
-            .append("label").text(this.price)
 
-        // this.imUrl, this.averageRating, this.numReviews
-        main.append("div")
-            .attr("class", "amazon-ref")
-            .append("h6")
-            .attr("class", "metadata")
-            .text("See on ")
-            .append("a")
-            .text("Amazon")
-            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+        this.appendMetadata(main, rank_str)
 
         // show also the competing products
         if (clique && clique.length > 0){
@@ -918,9 +912,18 @@ class ProductNode {
                 .append("div")
                 .attr("class", "competing-products-view")
 
+            let i = 0
             for (let node of clique){
-                if (node != this)
+                if (node != this) {
+                    if (i!=0)
+                        clique_view
+                            .append("hr")
+                            .attr("class", "small")
+                            .style("max-width","50px")
+                            .style("border-width", "2px")
                     node.appendToCompeting(clique_view, click)
+                    i++
+                }
             }
         }
     }
@@ -939,18 +942,63 @@ class ProductNode {
             .append("img")
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")
+
+        this.appendMetadata(main)
+    }
+
+    appendMetadata(main){
+        // price
         main.append("h6")
+            .attr("class", "metadata")
             .text("Price: ")
-            .append("label").text(this.price)
+            .append("label").text(this.price + " $")
+        // this.imUrl, this.averageRating, this.numReviews
+
+        // amazon link
         main.append("div")
             .attr("class", "amazon-ref")
             .append("h6")
             .attr("class", "metadata")
-            .text("See on ")
+            .text("View on ")
             .append("a")
             .text("Amazon")
             .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
+
+        // averahe rating
+        let avRating = Math.round(this.averageRating*100)/100
+        let rating = main.append("div")
+            .attr("class", "rating")
+        let n_stars = Math.round(avRating*2)/2;
+        let i=0
+        for (; i< Math.trunc(n_stars); i++) {
+            rating.append("img")
+                .attr("class", "star full-star")
+        }
+        if (n_stars % 1 != 0){
+            i++
+            rating.append("img")
+                .attr("class", "star half-star")
+        }
+        while (i<5){
+            i++
+            rating.append("img")
+                .attr("class", "star empty-star")
+        }
+        rating.append("label").text("("+this.numReviews+")")
+
+        // sales rank
+        let strRank
+        if (this.salesRank && this.salesRankCategory)
+            strRank = this.salesRank + " (" + this.salesRankCategory + ")"
+        else
+            strRank = "Not available"
+        main.append("h6")
+            .attr("class", "metadata")
+            .text("Sales rank: ")
+            .append("label").text(strRank)
+
     }
+
 }
 
 class Link {

@@ -57,8 +57,8 @@ export class CategoryGraph {
             // append the search box
             let box = table
                 .append("div").attr("class", "topnav")
-                //.style("height", "45px")
-            // box.append("a").text("a")
+
+                // .append("div").attr("class", "topnav")
             box = box.append("div").attr("class", "search-container")//.append("form")
             box.append("button").on("click", () => {
                     // start over from the root Amazon

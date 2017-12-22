@@ -68,7 +68,7 @@
 div.productCard{
     /*padding: 6px 5px;*/
     clear: both;
-    height: 400px;
+    height: 450px;
 
 
     background: #f2f2f2;
@@ -129,7 +129,7 @@ div.productCard .competing-products .competing-products-view{
 
 div.productCard h5 a {
     color: inherit;
-    font-family: "Roboto",sans-serif;
+    /*font-family: "Roboto",sans-serif;*/
 }
 
 div.productCard .productImg {
@@ -151,6 +151,42 @@ div.productCard .competing-products .productImg{
 div.productCard img{
     max-width: 100%;
     max-height: 100%;
+}
+
+div.productCard .rating{
+    margin-top: 10px;
+}
+
+div.productCard .rating label{
+    cursor: pointer;
+    font-size: 13px;
+    height: 20px;
+    /*line-height: 20px;*/
+    vertical-align: middle;
+    padding: 0px;
+    margin: 0px 0px 0px 4px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif important;
+}
+
+div.productCard .rating .star{
+    /*border-style: none !important;*/
+    /*border: 0 !important;*/
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+div.productCard .rating .full-star{
+    background: url("../img/stars/fullStar.png");
+}
+
+div.productCard .rating .half-star{
+    background: url("../img/stars/halfStar.png");
+}
+
+div.productCard .rating .empty-star{
+    background: url("../img/stars/emptyStar.png");
 }
 
 .productSectionTitle{
@@ -187,7 +223,7 @@ div.productCard img{
 
 /* Price brush */
 #priceBrushDiv {
-    font-family: "Roboto",sans-serif;
+    /*font-family: "Roboto",sans-serif;*/
     font-size: 15px;
     font-weight: 800;
     text-align: center;
@@ -313,7 +349,7 @@ div.productCard img{
 
 /* When you mouse over the navigation links, change their color */
 .sidenav .closebtn:hover{
-    color: #adadad;
+    color: #575757;
 }
 
 /* tooltip */
