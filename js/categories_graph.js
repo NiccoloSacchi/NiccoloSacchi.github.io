@@ -1,4 +1,4 @@
-export class CategoryGraph {
+class CategoryGraph {
     constructor(){
         // default initializations of the parameters (can be changed to modify the graph)
         //this.height = 530;
@@ -8,16 +8,17 @@ export class CategoryGraph {
         this.duration = 350
         this.degrees = 2*Math.PI
         this.choices = []
-        //create the tooltip that will be show on mouse over the nodes
-        this.tooltip = d3.select("body").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
     }
 
     drawGraph(divId, file, callback){
         // callback: function that is called when an leaf category has been selected
         this.callback = callback
         let that = this
+
+        this.tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
         // Load the data, draw the table and start the graph
         d3.json(file, (error, data) => {
             if (error) throw error;
@@ -41,18 +42,8 @@ export class CategoryGraph {
             // clear the div content
             div.selectAll("*").remove();
 
-// <<<<<<< HEAD
-//             let table = div.append("div")//.style("overflow", "visible")
-//                 .style("font-size", "13px")
-//                 .attr("class", "categories_table table")
-//                 .attr("width", "100%")
-//                 .attr("height", "100%")
-// =======
             let table = div.append("div")
-                //.style("font-size", "13px")
                 .attr("class", "categories_table")
-                //.attr("width", "100%")
-                //.attr("height", "100%")
 
             // append the search box
             let box = table
@@ -95,46 +86,6 @@ export class CategoryGraph {
                 .attr("placeholder", "Search for a category...")
                 .attr("name", "search")
 
-            // // <!-- search box -->
-            // // <section class="webdesigntuts-workshop" >
-            // //     <div>
-            // //         <input id="productSearchBox" placeholder="product">
-            // //         <button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>
-            // //     </div>
-            // // </section>
-            // let box = div.append("section")
-            //     .attr("class", "webdesigntuts-workshop")
-            //     .append("div")
-            // let input = box.append("input")
-            //     .attr("id", "categorySearchBox")
-            //     .attr("placeholder", "category")
-            // box.append("button")
-            //     .on("click", () => {
-            //         // start over from the root Amazon
-            //         that.roots = that.roots.slice(0, 1)
-            //         let amazon = that.roots[0]
-            //         amazon.children.forEach(collapse);
-            //         this.list_view.selectAll("*").remove()
-            //         this.update(amazon); // update the graph
-            //         this.appendToList(amazon); // update the list
-            //
-            //         // collect all the intermediate categories down to the selected one
-            //         let node = that.choices[input.node().value]
-            //         let roots_reversed = []
-            //         while(node != amazon) {
-            //             roots_reversed.push(node)
-            //             node = node.parent
-            //         }
-            //
-            //         // simulate the click down the selected one
-            //         for (let r of roots_reversed.reverse()){
-            //             that.click(r)
-            //         }
-            //
-            //     })
-            //     .text("search")
-
-
             // give the autocompletion all the splitted names
             this.choices = categories_names(curr_root)
             new autoComplete({
@@ -156,31 +107,6 @@ export class CategoryGraph {
                 }
             });
 
-            // let longest = Object.keys(that.choices).sort((a, b)=> b.length - a.length)[0];
-            // input.node().value =longest
-            // append a table to show all the visited categories and the the graph at the
-            // same time
-            // <table class="categories_table"> <!--categories_table_search-page-->
-            //      <tr>
-            //          <th>List view</th>
-            //          <th>Tree view</th>
-            //      </tr>
-            //      <tr>
-            //          <td id="category_view">
-            //          </td>
-            //          <td style="width: 700px;">
-            //              <svg id="categories_graph" width="500px">
-            //                  <defs>
-            //                        <pattern id="image" x="0%" y="0%" height="100%" width="100%"
-            //                        viewBox="0 0 512 512">
-            //                            <image x="0%" y="0%" width="512" height="512"  xlink:href="img/back.png"></image>
-            //                        </pattern>
-            //                  </defs>
-            //              </svg>
-            //          </td>
-            //      </tr>
-            //  </table>
-
             let row = table.append("div").attr("id", "wrapper")
 
             let col = row.append("div").attr("id", "categoryColumn")
@@ -196,27 +122,11 @@ export class CategoryGraph {
 			let svgContainer = col.append("div").attr("class", "svgContainer")
             let svg = svgContainer.append("svg").attr("viewBox", "0 0 " + this.width + " " + this.height)
                 .attr("class", "categories_graph")
-                // .style("width", this.width)
-                // .attr("height", this.height)
-
-            // let row2 = table.append("div").attr("class", "row")
-            // this.list_view = row2.append("div").attr("class", "column")// here we show the lis of visited categories
-            // let svg = row2.append("div").attr("class", "column").append("svg")
-            //     .attr("class", "categories_graph")
-            //     .attr("width", this.width)
-            //     .attr("height", this.height)
             svg.append("defs")
                 .append("pattern")
                 .attr("id", "back_image")
                 .attr("x", "0%").attr("y", "0%").attr("height", "100%").attr("width", "100%").attr("viewBox", "0 0 512 512")
                 .append("image").attr("x", "0%").attr("y", "0%").attr("height", "512").attr("width", "512").attr("href", "img/back.png")
-
-            // update the width with the computed one
-            let rect = svg.node().getBoundingClientRect()
-            //this.width = rect.width
-            //this.height = rect.height
-			//this.width = 650;
-			//this.height = 650;
 
             this.graph_view = svg.append("g")
                 .attr("transform", () => "translate(" + this.width / 2 + "," + (this.height / 2) + ")")
@@ -465,24 +375,6 @@ export class CategoryGraph {
 
         return "#fff" // expanded
     }
-
-    // stroke(node) {
-    //     if (!node._children && !node.children) {
-    //         return "#006400";
-    //     }
-    //     return "blue";
-    // }
-
-// function convert_map(map){
-//     return Object.keys(map).map((name) => {
-//         return {
-//             'names': name.split(/ & |, /), // split the name into several categories
-//             'children': convert_map(map[name][0]),
-//             'count': map[name][1],
-//             'isleaf': Object.keys(map[name][0]).length == 0 // has no children
-//         }
-//     });
-// }
 }
 
 function categories_names(tree){

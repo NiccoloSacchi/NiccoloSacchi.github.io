@@ -133,6 +133,4 @@ let main = {
   }
 };
 
-// 2fc73a3a967e97599c9763d05e564189
-
 document.addEventListener('DOMContentLoaded', main.init);

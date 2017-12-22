@@ -1,4 +1,4 @@
-export class ProductGraph {
+class ProductGraph {
     constructor() {
         // default initializations of the parameters (can be changed to modify the graph)
         // height and width of the whole div
@@ -42,9 +42,6 @@ export class ProductGraph {
         // bestProducts: boolean to indicate whether show the best products
         //             of the showed graph
 
-        // if (this.height == "100%")
-        //     this.height = d3.select("body").node().getBoundingClientRect().height - 70
-
         let that = this
 
         // select the div
@@ -55,18 +52,6 @@ export class ProductGraph {
         div.selectAll("*").remove();
 
         if (bestProducts){
-            // append a div with the best products that will be show only when the button will be clicked
-            // <div id="sideNavigation" class="sidenav">
-            //     <a class="closebtn" onclick="closeNav()" style="cursor: pointer;">&times;</a>
-            // </div>
-        // <a class="closebtn" style="cursor: pointer;">&amp;times;</a>
-            // in this.bestProducts["view"] we will show the first 10 shown nodes
-            // of this.bestProducts["nodes"]
-
-            // let column = row1.append("div")!!!
-            //     .style("width", (100/ncolumns) + "%")
-            //     .style("padding", 3+"px")
-            //     .style("height", this.height+"px")
             let bestProductDiv = div.append("div")
                 .attr("id", "sideNavigation")
                 .attr("class","sidenav")
@@ -89,22 +74,9 @@ export class ProductGraph {
         let table = div.append("div").attr("class", "products_table")
 
         if(searchbox_callback) {
-            // append the search box
-            // <div class="topnav">
-            //     <a href="#about">Categories</a>
-            //     <div class="search-container">
-            //         <form action="/action_page.php">
-            //             <input type="text" placeholder="Search.." name="search">
-            //             <button type="submit"><i class="fa fa-search"></i></button>
-            //         </form>
-            //     </div>
-            // </div>
             let box = table
                 .append("div").attr("class", "topnav")
 
-            // box.append("button").attr("class", "btn btn-success topnav-buttons")
-                // .text("CATEGORIES")
-                // .on("click", searchbox_callback)
             box.append("button")
                 .attr("class", "btn btn-success btn-back")
                 .on("click", searchbox_callback)
@@ -114,8 +86,6 @@ export class ProductGraph {
                 .text("RECOMMENDATIONS")
                 .on("click", openNav)
 
-            // let catName = file.substring(file.lastIndexOf("--")+2, file.lastIndexOf(".")).toUpperCase().replace(/-/g , " ")
-            // catName = catName+catName+catName+catName
             box.append("div").attr("class", "category-label")
                 .append("label")
                 .text(categoryName)
@@ -130,41 +100,7 @@ export class ProductGraph {
                 .attr("type", "text")
                 .attr("placeholder", "Filter products by keyword...")
                 .attr("name", "search")
-            
-
-            // // <!-- search box -->
-            // // <section class="webdesigntuts-workshop" >
-            // //     <div>
-            // //         <input id="productSearchBox" placeholder="product">
-            // //         <button onclick="filterProducts(document.getElementById('productSearchBox').value)">Search</button>
-            // //     </div>
-            // // </section>
-            // let box = div.append("section")
-            //     .attr("class", "webdesigntuts-workshop")
-            //     .append("div")
-            // let input = box.append("input").style("width", "60%")
-            //     .attr("id", "productSearchBox")
-            //     .attr("placeholder", "product")
-            // box.append("button")
-            //     .on("click", () => this.filterProducts(input.node().value))
-            //     .text("search")
-            // box.append("button")
-            //     .on("click", () => searchbox_callback())
-            //     .text("back")
         }
-
-        // let table = div.append("div").attr("class", "table")
-        /*let row1 = table.append("div")
-            .attr("class", "row")
-            .style("padding", "0px")
-            // .style("font-family", "\"Roboto\",sans-serif")
-            .style("height", "100%")
-            .style("width", "100%")
-            .style("border", "none")*/
-
-        // let row1 = table.append("div")
-        //     .attr("class", "row")
-        // let ncolumns = 1 + productWindow
 
         let graph_view = table.append("div")
             .attr("id", "productGraphColumn")
@@ -181,13 +117,11 @@ export class ProductGraph {
                 .append("hr").attr("class", "small")
             title.style("line-height", title.node().getBoundingClientRect().height+"px")
             this.productWindow =
-                // .style("height", this.height+"px")
                  column.append("div")
                      .attr("class", "selected-product")
         }
 
         if (priceBrush){
-            // let margin = {top: 0, right: 5, bottom: 0, left: 5}
             let row2 = table
                 .append("div").attr("id", "priceBrushDiv")
 
@@ -210,8 +144,6 @@ export class ProductGraph {
         }
 
         this.zoom = d3.zoom()
-        //        .scaleExtent([1, 40])
-        //        .translateExtent([[-100, -100], [width + 90, height + 100]])
             .on("zoom", () => {
                 this.svg.selectAll("g").attr("transform", d3.event.transform);
             })
@@ -272,15 +204,6 @@ export class ProductGraph {
 
         d3.json(file, (error, json) => {
             if (error) throw error;
-            // json =
-            // {"nodes":
-            //      [{"asin": "B00AEVCRME", "name": "asd", "imUrl": "... .jpg", "price": 60.13, "numReviews": 36, "averageRating": 4.2, "helpfulFraction": 0.68, "brand": "CAD Audio", "salesRankCategory": "Musical Instruments", "salesRank": 38611, "group": 0, "component": 0, "hashColor": "#5feceb"}, ...]
-            //  "links":
-            //      [{"source": nodeId, "target": nodeId, "right": false, "left": true, "value": 1}, ...]}
-
-            // let i =0
-            // alert(json.nodes.length)
-            // json.nodes.forEach(n=> n.groups=[i++])
             // convert the nodes to ProductNode
             this.net.nodes = json.nodes
                 .map(n => new ProductNode(n.asin, n.name, n.imUrl, n.price, n.numReviews, n.averageRating, n.helpfulFraction, n.brand, n.salesRankCategory, n.salesRank, n.groups, n.component, n.hashColor));
@@ -319,7 +242,7 @@ export class ProductGraph {
                 .force("link", d3.forceLink()) //.distance(() => 50)
                 .force("charge", d3.forceManyBody())
                 .force("center", d3.forceCenter(svgsize.width / 2, svgsize.height / 2))
-                .velocityDecay(0.85)
+                .velocityDecay(0.5)
                 // regulate the shape of the whole cluster
                 .force("x", d3.forceX().strength(.1))
                 .force("y", d3.forceY().strength(.2))
@@ -386,6 +309,13 @@ export class ProductGraph {
                     }
                 });
             }
+
+            // todo
+            // this.svg
+            //     .call(this.zoom.transform, d3.zoomIdentity
+            //         .translate(svgsize.width / 2, svgsize.height / 2)
+            //         .scale(2)
+            //         .translate(svgsize.width / 2, svgsize.height / 2));
 
         });
     }
@@ -508,7 +438,6 @@ export class ProductGraph {
                 d3.forceLink(link_show.filter((l) => l.source.groups.some(g => g in l.target.groups)))
                     .strength(str))
 
-        // this.simulation.restart()
         this.simulation.alphaTarget(0.3).restart()
 
         let hull_data = this.convexHulls()
@@ -544,9 +473,6 @@ export class ProductGraph {
             }
         }
         )
-
-        // alert(this.nodeg.selectAll("circle").size())
-
     }
 
     convexHulls() {
@@ -606,8 +532,7 @@ export class ProductGraph {
         })
     }
 
-    filterProducts(keywords){
-        // todo change (keywords will be an array)
+    filterProducts(keyword){
         function bfs_show(nodes) {
             // the bfs is done considering only the product nodes
 
@@ -623,14 +548,14 @@ export class ProductGraph {
             }
         }
 
-        if (keywords == ""){
+        if (keyword == ""){
             this.net.nodes.forEach(n => n.reachable = true)
         }
         else {
             // set show to true only the product nodes corresponding with the keyword
             let products = this.net.nodes.filter(n => {
                     //todo change for keywords = array
-                    n.reachable = n.keywords.includes(keywords)
+                    n.reachable = n.keywords.includes(keyword)
                     return n.reachable
                 }
             )
@@ -728,9 +653,8 @@ export class ProductGraph {
         this.priceBrush.append("g")
             .attr("class", "axis axis--x")
             .call(d3.axisBottom(priceScale)
-                    .ticks(10)//(brushWidth, 6)
+                    .ticks(10)
                     .tickPadding(0)
-                // .tickSize(10)
             )
             .attr("text-anchor", "middle")
             .selectAll("text")
@@ -752,7 +676,10 @@ export class ProductGraph {
             .append("circle")
             .attr("r", (d) => d.best? 6 : 3)
             .attr("fill", n => n.fill())
-            .attr("opacity", (d) => d.best? "1":"0.7")
+            .attr("stroke", "gray")
+            .attr('stroke-width', (d) => d.best?0:1)
+            .attr('stroke-opacity', 0.3)
+            .attr("opacity", 1)
             .attr("cx", (d) => priceScale(d.price))
             .attr("cy", (d) => gaussianRandom(y_start(d), y_end(d)))
         let price_update = price_enter.merge(price_selection);
@@ -782,7 +709,6 @@ export class ProductGraph {
             }
             else{
                 let price_interval = d3.event.selection.map(priceScale.invert) // map pixels to prices
-                // d1 = price_interval.map(p => round p?); // don't round
                 that.net.nodes.forEach(n => n.in_price_interval = (price_interval[0] < n.price && price_interval[1] > n.price))
             }
 
@@ -794,7 +720,6 @@ export class ProductGraph {
                 .style('marker-start', (d) => d.startArrow())
                 .style('marker-end', (d) => d.endArrow())
                 .style("stroke-opacity", (d) => d.opacity())
-                // .style("stroke-opacity", (l) => (l.source.in_price_interval && l.target.in_price_interval) + minopacity)
         }
     }
 }
@@ -853,7 +778,6 @@ class ProductNode {
     stroke(net){
         // change the stroke color if this node belongs to a clique and all the clique
         // is being shown
-        // if (this.group in net.cliques && this.name.indexOf("RH2C")>=0)
         if (this.best)
             return ""
         let cliques_id = this.groups.filter(g => g in net.cliques)
@@ -888,12 +812,10 @@ class ProductNode {
         // small: bool. Specifies whether the window of the product should be big or small
 
         div = div.append("div").attr("class", "productCard") // contains both the main product and the competing ones
-        // let size = div.append("div").node().getBoundingClientRect()
         let rank_str = rank? rank + ". " : "" // if no rank is passed then don't specify it
         let main = div.append("div").attr("class", "main-product") // contain only the main product
             .on("click", () => click(this))
         main.append("h5")
-        // .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
             .text(rank_str + this.name)
         main.append("div")
             .attr("class", "productImg")
@@ -917,7 +839,6 @@ class ProductNode {
                 .attr("class", "competing-products-view")
 
             let i = 0
-            // let ids = []
             for (let node of clique){
                 if (node != this) {
                     if (i!=0)
@@ -927,27 +848,9 @@ class ProductNode {
                             .style("max-width","50px")
                             .style("border-width", "2px")
                     node.appendToCompeting(clique_view, click)
-                    // ids.push(node.asin+"Info")
                     i++
                 }
             }
-            //
-            // if (ids.length > 2) {
-            //     let fadeinBox = $("#"+ids[0]);
-            //     let fadeoutBox = $("#"+ids[1]);
-            //
-            //     function fade() {
-            //         fadeinBox.stop(true, true).fadeIn(2000);
-            //         fadeoutBox.stop(true, true).fadeOut(2000, function () {
-            //             let temp = fadeinBox;
-            //             fadeinBox = fadeoutBox;
-            //             fadeoutBox = temp;
-            //             setTimeout(fade, 1000);
-            //         });
-            //     }
-            //
-            //     fade();
-            // }
         }
     }
 
@@ -976,7 +879,6 @@ class ProductNode {
             .attr("class", "metadata")
             .text("Price: ")
             .append("label").text(this.price + " $")
-        // this.imUrl, this.averageRating, this.numReviews
 
         // amazon link
         main.append("div")
@@ -988,7 +890,7 @@ class ProductNode {
             .text("Amazon")
             .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
 
-        // averahe rating
+        // average rating
         let avRating = Math.round(this.averageRating*100)/100
         let rating = main.append("div")
             .attr("class", "rating")
@@ -1099,10 +1001,8 @@ function gaussianRandom(start, end) {
 
 function openNav() {
     document.getElementById("sideNavigation").style.width = "400px";
-    // document.getElementById("main").style.marginLeft = "400px";
 }
 
 function closeNav() {
     document.getElementById("sideNavigation").style.width = "0";
-    // document.getElementById("main").style.marginLeft = "0";
 }
