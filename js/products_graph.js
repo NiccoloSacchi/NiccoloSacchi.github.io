@@ -174,11 +174,6 @@ export class ProductGraph {
                 // .style("height", this.height+"px")
                  column.append("div")
                      .attr("class", "selected-product")
-                     .style("width", "100%")
-                     .style("height", "calc(100% - 50px)")
-                     .style("overflow-y", "scroll")
-                     // .attr("class", "nice_scrollbar")
-                     .style("margin", 0+"px")
         }
 
         if (priceBrush){
@@ -896,8 +891,19 @@ class ProductNode {
             .attr("src", this.imUrl)
             .attr("alt", "product image not available")
         main.append("h6")
+            .attr("class", "metadata")
             .text("Price: ")
             .append("label").text(this.price)
+
+        // this.imUrl, this.averageRating, this.numReviews
+        main.append("div")
+            .attr("class", "amazon-ref")
+            .append("h6")
+            .attr("class", "metadata")
+            .text("See on ")
+            .append("a")
+            .text("Amazon")
+            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
 
         // show also the competing products
         if (clique && clique.length > 0){
@@ -936,6 +942,14 @@ class ProductNode {
         main.append("h6")
             .text("Price: ")
             .append("label").text(this.price)
+        main.append("div")
+            .attr("class", "amazon-ref")
+            .append("h6")
+            .attr("class", "metadata")
+            .text("See on ")
+            .append("a")
+            .text("Amazon")
+            .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
     }
 }
 

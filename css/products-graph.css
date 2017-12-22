@@ -17,6 +17,13 @@
 	width: 400px;
 	height: calc(100% - 137px);
 	padding: 0px;
+
+    background: #eee;
+    border-radius: 6px;
+
+    border-left: 1px solid #a9a9a9;
+    border-top: 1px solid #a9a9a9;
+    border-bottom: 1px solid #a9a9a9;
 }
 
 /* style for the product graph */
@@ -30,6 +37,7 @@
     /*background: radial-gradient(circle at center, #ede9ce, #d3c193);*/
     background: radial-gradient(circle at center, #f2f2f2, #d0d0d0);
     border-radius: 6px;
+    border: 1px solid #a9a9a9;
 }
 
 .product_graph circle.node {
@@ -60,8 +68,22 @@
 div.productCard{
     /*padding: 6px 5px;*/
     clear: both;
-    height: 300px;
+    height: 400px;
+
+
+    background: #f2f2f2;
+    border-radius: 6px;
+    border: 1px solid #bcbcbc;
 }
+
+div.productCard .metadata{
+    padding: 0px;
+    margin: 8px 0px 0px 0px;
+}
+
+/*.amazon-ref h6{*/
+    /*display: inline-block;*/
+/*}*/
 
 div.productCard .main-product,
 div.productCard .competing-products{
@@ -80,14 +102,10 @@ div.productCard .main-product{
     width: calc(100% - 150px);
 }
 div.productCard .competing-products{
-    padding: 10px 5px 5px 5px;
-    background: #eee;
-    border-radius: 6px;
-
     width: 150px;
     height: 100%;
     overflow-x: hidden;
-    /*padding: 0px;*/
+    padding: 0px;
     text-align: center; /* for title "Competing products" */
 }
 
@@ -101,9 +119,6 @@ div.productCard .competing-products h5 .small{
     margin-top: 5px;
     margin-bottom: 5px;
 }
-/*div.productCard .competing-products div {*/
-    /**/
-/*}*/
 
 div.productCard .competing-products .competing-products-view{
     height: calc(100% - 60px);
@@ -143,7 +158,10 @@ div.productCard img{
     margin: 0px;
     text-align: center;
     vertical-align: middle;
+
     padding-top: 10px;
+    border: 1px solid #a9a9a9;
+    background: linear-gradient(to bottom, #f2f2f2, #e1e1e1);
     /*font-family: "Roboto",sans-serif;*/
     /*font-size: 15px;*/
     /*font-weight: 800;*/
@@ -154,16 +172,17 @@ div.productCard img{
 
 /* List of best Products */
 .best-products{
-    height: calc(100% - 60px);
+    height: calc(100% - 70px);
     overflow-y: scroll;
     margin: 0px;
 }
 
 /* div containing the best product  */
 .selected-product{
-    height: calc(100% - 60px);
+    height: calc(100% - 70px);
     overflow-y: scroll;
     margin: 0px;
+    width: 100%;
 }
 
 /* Price brush */
@@ -175,13 +194,20 @@ div.productCard img{
     margin: 0px;
     /*background: #935347;*/
     color: black;
-    border-top: 1px solid #EAEAEA;
-    background: #F5F5F5;
+    /*border-top: 1px solid #EAEAEA;*/
+    /*background: #F5F5F5;*/
     /*background: rgb(224, 224, 224);*/
 	height: 90px;
 	width: 100%;
 	clear: both;
 	padding: 0px 30px;
+
+    background: #eee;
+    border-radius: 6px;
+
+    border-left: 1px solid #a9a9a9;
+    border-top: 1px solid #a9a9a9;
+    border-right: 1px solid #a9a9a9;
 }
 
 .priceBrush {
@@ -209,7 +235,7 @@ div.productCard img{
 .priceBrush .axis--x .domain,
 .priceBrush .axis--grid .tick line {
     /*stroke: #64706c;*/
-    stroke: rgb(224, 224, 224);
+    stroke: rgb(133, 133, 133);
 }
 
 .priceBrush .axis--x .tick line{
@@ -261,10 +287,16 @@ div.productCard img{
     z-index: 1; /* Stay on top */
     top: 0;
     left: 0;
-    background-color: white; /* Black*/
+    /*background-color: white; !* Black*!*/
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 0px; /* Place content 60px from the top */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+    border-right: 1px solid #a9a9a9;
+    /*border-top: 1px solid #a9a9a9;*/
+    /*border-bottom: 1px solid #a9a9a9;*/
+
+    background: #eee;
+    border-radius: 8px;
 }
 
 /* Position and style the close button (top right corner) */
