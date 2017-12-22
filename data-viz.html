@@ -85,21 +85,22 @@
 					What is our platform about?
 					</h2>
                     <p>
-					Buying from huge e-commerce websites such as <b> Amazon </b> has many advantages, but paradoxically, users are often confused by the vast variety of products that are offered. 
-					Users may have a rough idea about the characteristics of the product they want to buy, but they often undergo the same process of comparing similar products. 
+					Buying from huge e-commerce websites such as Amazon has many advantages, but paradoxically, users are often confused by the vast variety of products that are offered. 
+					Users may have a rough idea about the characteristics of the product they want to buy, but they often undergo the same process of comparing similar items. 
 					We aim to remove this redundancy and aid them in their purchases, suggesting the best or most popular products that correspond to their search. 
 					For instance, comparing smartphones or laptops may be difficult due to the wide price range and the required technical knowledge. 
-					With our platform, customers can easily visualise in a graphical way what products match their needs, and among them, the most popular ones.
+					With our platform, users can easily search in a graphical way the most popular products that match their needs.
                     </p>
 					<h2 class="post-subtitle">
 					Why is our solution effective?
 					</h2>
-					<p>
-					When you look at a product on Amazon, we are sure you have noticed at least once a small window at the bottom of the page that indicates what <i> other </i> products users usually buy instead.
-					We call it a <i> competitive </i> relation. What do we do is just to build a graph of these relations among all products of each category.
+					<p> 
+					When you look at a <a href="https://www.amazon.com/Acer-E5-575-33BM-15-6-Inch-Notebook-Generation/dp/B01K1IO3QW/ref=sr_1_3?s=pc&ie=UTF8&qid=1512207600&sr=1-3&keywords=laptop">product on Amazon</a>, 
+					you may notice a small window at the bottom of the page that indicates what <i> other </i> products users usually buy instead.
+					We call it a <i> competitive </i> relation. What do we do is just to build a network of these relations among all products for each category.
 					If a product is associated with many of these relations, it means that users have preferred it many times over the others.
 					This new way of defining popular products allows us to group them according to human-made criteria: the brand, the price or some peculiar
-					characteristics. But it is decided by <i> humans </i>, not just algorithms. Just like you.
+					characteristics. But <i> how </i> is decided by humans, not algorithms. Just like you.
 					<h2 class="post-subtitle">
 					Who should use our platform?
 					</h2>
@@ -113,54 +114,76 @@
                 <!--<div id="search-tool" style="width: 100%"></div>-->
                 <div class="posts-list">
                     <article class="post-preview">
-                        <h2 class="post-title">Part 1</h2>
+                        <h2 class="post-title">How to use it:</h2>
 						<h3 class="post-subtitle">
-                            We should put a kind of tutorial here.
-                        </h3>
-                        <h3 class="post-subtitle">
-                            Categories graph
+							Choose a category
                         </h3>
                         <div class="post-entry">
-                            We first create a graph to display all categories of the products,
-                            their hierarchical relations and the amount of products of a
-                            specific category. It helps the user have a intuitive
-                            and immediate view both of the type and the amount products offered
-                            by Amazon.
+							Categories are rapresented as a hierarchy, and you can click on the dots to navigate through it. 
+							You can also directly type on the search bar the category that you are looking for.
+							On the left, the timeline shows your current category, and it allows you to undo your steps.
+							Green dots indicate that you have reached the end of the hierarchy, and by clicking on them, you can jump into the
+							product network of that category.
                         </div>
                         <!--<div id="categories_graph"></div>-->
                     </article>
                     
                     <article class="post-preview">
-                        <h2 class="post-title">Part 2</h2>
                         <h3 class="post-subtitle">
-                            Products graph
+                            Explore the network
                         </h3>
                         <div class="post-entry">
-                            The objective of the project is to show the relations among the
-                            products. A search bar will allow the user to search
-                            and visualize the goods they want to analyze. Thanks to this
-                            graph a <b>customer</b> can intuitively identify which product is the
-                            best while a <b>vendor</b> could verify whether its product is
-                            preferred or not to the other ones.
-                            <br>
-                            The <i>red nodes</i> represent products while the <i>blue</i> nodes
-                            represent a cluster of competing products. The <i>arrows</i> point in the
-                            direction of the preferred product.
+							Now you are inside a category, where you can see a large network of coloured dots.
+							They represent products, and they are connected together according to customers' shopping trends.
+							If an arrow points from a dot to another, it means that users usually buy the second after viewing the first.
+							You can also notice some stars, which are pointed by many more arrows. Those are products that have been chosen
+							many more times than the others by customers. In simpler words, they are the most popular products in category.
+							Finally, you may wonder what the colours represent. They show the price of the product. 
+							Cheaper products are shown as green, while more expensive products are shown as red. With all the shades in between, of course.
                         </div>
                         <!--<div id="product_graph" style="margin-top: 20px; width: 800px"></div>-->
                     </article>
-                    <!-- setting the margin so to go beyond the width of the parent -->
-                    <!--<div id="product_graph" style="width: 120%; margin-left: -10%;"></div>-->
-
-                    <article class="post-preview">
-                        <h2 class="post-title">Part 3</h2>
+					
+					<article class="post-preview">
                         <h3 class="post-subtitle">
-                            ...
+                            Competitive products
                         </h3>
                         <div class="post-entry">
-                            ...
+							Some products are surrounded by a coloured halo. We call them <i> competitive products </i>. 
+							If you look closely, they are groups in which each product points to and is pointed by the others.
+							These items have very similar characteristics, and not necessarily one is better than the others. 
+							The choice is up to you!
                         </div>
+                        <!--<div id="product_graph" style="margin-top: 20px; width: 800px"></div>-->
                     </article>
+					
+					<article class="post-preview">
+                        <h3 class="post-subtitle">
+                            Searching
+                        </h3>
+                        <div class="post-entry">
+							Of course you are not required to navigate through the network to search your product. 
+							You can use the search bar on the top of the page to filter the network according to some keywords.
+							You can also use the slider on the bottom of the page to filter the products according to a price range.
+                        </div>
+                        <!--<div id="product_graph" style="margin-top: 20px; width: 800px"></div>-->
+                    </article>
+					
+					<article class="post-preview">
+                        <h3 class="post-subtitle">
+                            Recommendations
+                        </h3>
+                        <div class="post-entry">
+							By clicking on the button <i> Recommendations </i>, you can immediately see the most popular products in category, and if any,
+							their competitors.
+							If you click on the picture, the product is zoomed and highlighted on the network.
+                        </div>
+                        <!--<div id="product_graph" style="margin-top: 20px; width: 800px"></div>-->
+                    </article>
+					
+                    <!-- setting the margin so to go beyond the width of the parent -->
+                    <!--<div id="product_graph" style="width: 120%; margin-left: -10%;"></div>-->
+					<a class="btn btn-success btn-lg get-started-btn" href="products.html">Give me a try</a>
                 </div>
 
             </div>
