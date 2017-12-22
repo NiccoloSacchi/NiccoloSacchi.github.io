@@ -411,7 +411,7 @@ export class CategoryGraph {
         if (!d._children && !d.children) {
             // leaf
             if (this.callback) {
-                this.callback(d.data.url) // pass also the name of the file of the product graph
+                this.callback(d.data.url, d.data.names) // pass also the name of the file of the product graph
                 this.tooltip
                     .style("display", "none")
                     .transition()

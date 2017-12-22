@@ -31,7 +31,7 @@ export class ProductGraph {
         ]
     }
 
-    drawGraph(divId, file, searchbox_callback, productWindow, priceBrush, bestProducts){
+    drawGraph(divId, file, categoryName, searchbox_callback, productWindow, priceBrush, bestProducts){
         // divId: id of the div in which to draw the search bar and the graph
         // file: path to the file containing the graph
         // searchbox_callback: if passed a searchbox will be drawn. searchbox is a function that will be called when "back is pressed"
@@ -102,19 +102,23 @@ export class ProductGraph {
             let box = table
                 .append("div").attr("class", "topnav")
 
-            box.append("button").attr("class", "btn btn-success topnav-buttons")
-                .text("CATEGORIES")
+            // box.append("button").attr("class", "btn btn-success topnav-buttons")
+                // .text("CATEGORIES")
+                // .on("click", searchbox_callback)
+            box.append("button")
+                .attr("class", "btn btn-success btn-back")
                 .on("click", searchbox_callback)
+                .append("i").attr("class", "fa fa-arrow-left")
 
             box.append("button").attr("class", "btn btn-success topnav-buttons")
                 .text("RECOMMENDATIONS")
                 .on("click", openNav)
 
-            let catName = file.substring(file.lastIndexOf("--")+2, file.lastIndexOf(".")).toUpperCase().replace(/-/g , " ")
+            // let catName = file.substring(file.lastIndexOf("--")+2, file.lastIndexOf(".")).toUpperCase().replace(/-/g , " ")
             // catName = catName+catName+catName+catName
             box.append("div").attr("class", "category-label")
                 .append("label")
-                .text(catName)
+                .text(categoryName)
 
             box = box.append("div").attr("class", "search-container-small")//.append("form")
 			let input
@@ -256,7 +260,7 @@ export class ProductGraph {
         }
 
         defs.append("pattern")
-            .attr("id", "star")
+            .attr("id", "background-star")
             .attr("x", "0%").attr("y", "0%").attr("height", "100%").attr("width", "100%").attr("viewBox", "0 0 512 512")
             .append("image").attr("x", "0%").attr("y", "0%").attr("height", "512").attr("width", "512").attr("href", "img/star.svg")
 
@@ -671,7 +675,7 @@ export class ProductGraph {
         this.focusednode.attr("stroke", (d) => d.stroke(this.net))
         // focus on the new one
         let asins = this.bestProducts["nodes"].map(n=>n.asin)
-        if (asins.includes(newNode.asin) )
+        if (asins.includes(newNode.asin))
             this.focusednode = d3.select("circle#" + newNode.asin).attr("stroke", "black")
         else
             this.focusednode = d3.select("circle#" + newNode.asin).attr("fill", "white")
@@ -842,7 +846,7 @@ class ProductNode {
 
     fill() {
         if (this.best)
-            return "url(#star)"
+            return "url(#background-star)"
         return this.fill_color
     }
 
@@ -913,6 +917,7 @@ class ProductNode {
                 .attr("class", "competing-products-view")
 
             let i = 0
+            // let ids = []
             for (let node of clique){
                 if (node != this) {
                     if (i!=0)
@@ -922,9 +927,27 @@ class ProductNode {
                             .style("max-width","50px")
                             .style("border-width", "2px")
                     node.appendToCompeting(clique_view, click)
+                    // ids.push(node.asin+"Info")
                     i++
                 }
             }
+            //
+            // if (ids.length > 2) {
+            //     let fadeinBox = $("#"+ids[0]);
+            //     let fadeoutBox = $("#"+ids[1]);
+            //
+            //     function fade() {
+            //         fadeinBox.stop(true, true).fadeIn(2000);
+            //         fadeoutBox.stop(true, true).fadeOut(2000, function () {
+            //             let temp = fadeinBox;
+            //             fadeinBox = fadeoutBox;
+            //             fadeoutBox = temp;
+            //             setTimeout(fade, 1000);
+            //         });
+            //     }
+            //
+            //     fade();
+            // }
         }
     }
 
@@ -933,6 +956,7 @@ class ProductNode {
         // click: function called when the user clicks on the div
         
         let main = div.append("div")
+            .attr("id", this.asin+"Info")
             .on("click", () => click(this))
         main.append("h6")
             // .on("click", () => window.open('https://www.amazon.com/dp/'+ this.asin))
@@ -972,17 +996,20 @@ class ProductNode {
         let i=0
         for (; i< Math.trunc(n_stars); i++) {
             rating.append("img")
-                .attr("class", "star full-star")
+                .attr("class", "star")
+                .attr("src", "./img/stars/fullStar.png")
         }
         if (n_stars % 1 != 0){
             i++
             rating.append("img")
-                .attr("class", "star half-star")
+                .attr("class", "star")
+                .attr("src", "./img/stars/halfStar.png")
         }
         while (i<5){
             i++
             rating.append("img")
                 .attr("class", "star empty-star")
+                .attr("src", "./img/stars/emptyStar.png")
         }
         rating.append("label").text("("+this.numReviews+")")
 

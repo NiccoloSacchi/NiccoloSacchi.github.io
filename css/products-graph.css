@@ -68,8 +68,7 @@
 div.productCard{
     /*padding: 6px 5px;*/
     clear: both;
-    height: 450px;
-
+    height: 430px;
 
     background: #f2f2f2;
     border-radius: 6px;
@@ -125,6 +124,8 @@ div.productCard .competing-products .competing-products-view{
     overflow-y: scroll;
     overflow-x: hidden;
     text-align: left;
+
+    /*position: absolute;*/
 }
 
 div.productCard h5 a {
@@ -177,18 +178,6 @@ div.productCard .rating .star{
     padding: 0;
 }
 
-div.productCard .rating .full-star{
-    background: url("../img/stars/fullStar.png");
-}
-
-div.productCard .rating .half-star{
-    background: url("../img/stars/halfStar.png");
-}
-
-div.productCard .rating .empty-star{
-    background: url("../img/stars/emptyStar.png");
-}
-
 .productSectionTitle{
     height: 60px;
     margin: 0px;
@@ -197,7 +186,7 @@ div.productCard .rating .empty-star{
 
     padding-top: 10px;
     border: 1px solid #a9a9a9;
-    background: linear-gradient(to bottom, #f2f2f2, #e1e1e1);
+    background: linear-gradient(to bottom, #f8f8f8, #f3f3f3);
     /*font-family: "Roboto",sans-serif;*/
     /*font-size: 15px;*/
     /*font-weight: 800;*/
