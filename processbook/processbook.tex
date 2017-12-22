@@ -82,7 +82,7 @@
 \newpage
 \section{Introduction}
 \label{sec:introduction}
-Buying from huge e-commerce websites such as \emph{Amazon} has many advantages, but paradoxically, users are often confused by the vast variety of products that are offered. Users may have a rough idea about the characteristics of the product they want to buy, but they often undergo the same process of comparing similar products. We aim to remove this redundancy and aid them in their purchases, suggesting the best or most popular products that correspond to their search. For instance, comparing smartphones or laptops may be difficult due to the wide price range and the required technical knowledge. With our platform, users can easily visualise in a graphical way the most popular products that match their needs.
+Buying from huge e-commerce websites such as \emph{Amazon} has many advantages, but paradoxically, users are often confused by the vast variety of products that are offered. Users may have a rough idea about the characteristics of the product they want to buy, but they often undergo the same process of comparing similar products. We aim to remove this redundancy and aid them in their purchases, suggesting the best or most popular products that correspond to their search. For instance, comparing smartphones or laptops may be difficult due to the wide price range and the required technical knowledge. With our platform, users can easily search in a graphical way the most popular products that match their needs.
 
 \subsection{Idea and related work}
 Amazon's website already offers a sophisticated search system, which allows users to select category, price range and some technical characteristics of the product they want to buy. But would it not be nice to query among similar articles without explicitly providing to the website such features? For instance, product description  \href{https://www.amazon.com/Acer-E5-575-33BM-15-6-Inch-Notebook-Generation/dp/B01K1IO3QW/ref=sr_1_3?s=pc&ie=UTF8&qid=1512207600&sr=1-3&keywords=laptop}{pages} already contain relevant information about related articles, such as \textit{similar items}, \textit{items bought together} and \textit{items that customers buy after viewing this item}. These links suggest alternatives to the customer; however, they only show \textit{neighbouring} offers and not the whole overview of offers. To overcome this limitation, we have decided to develop a graphical and interactive visualization that shows such relations among multiple articles.
@@ -145,9 +145,9 @@ The graph structure follows precise rules. An edge from product A to product B i
 In previous experiments, we tried to build the graph by adding edges between products that are viewed together (\textit{also viewed} relation). This relation does not imply that any of the products has been actually bought, and it produces a graph that is too dense to give meaningful results.
 
 \subsection{Insights}
-By visually inspecting the graph, it is possible to identify some common structures.
+By visually inspecting the graph, it is possible to identify some common structures, which are depicted in \Cref{fig:insights}.
 \begin{itemize}
-	\item \textbf{Accumulators:} these are popular products that have many incoming edges. To put this into numbers, we can associate a fan-in metric (or in-degree) with every node.
+	\item \textbf{Accumulators:} these are popular products that have many incoming edges. To put this into numbers, we can associate a fan-in metric (or in-degree) with every node, and, expectedly, products with a high fan-in tend to be preferred over those with a lower one.
 	\item \textbf{Max-cliques:} groups of products that are totally interconnected. In many cases, these products are also accumulators. Cliques represent products that are in direct competition with each other (and it is not really clear which one ``wins"). Note that these competition relations might even comprehend products of the same brand.
 \end{itemize}
 \begin{figure}
@@ -168,7 +168,7 @@ We decided to keep categories independent for the following reasons:
 \begin{itemize}
 	\item The visualization is cleaner and faster to process. If items of multiple categories were mixed, the visualization would result slower and more difficult to interpret.
 	\item Items in cliques usually belong only to a single category. Indeed, it would be meaningless to cluster similar products if such products belong to different categories.
-	\item We show products that are most popular within only a single category.
+	\item Users are usually interested in one specific category, and its choice represents a pre-filtering mechanism.
 \end{itemize}
 
 \subsection{Navigation process}
@@ -226,36 +226,56 @@ According to our idea, products with many incoming edges (fan-in metric) are reg
 	\item The algorithm ends once all the nodes in the graph have been labeled.
 \end{enumerate}
 
-\todo[inline]{please Dario help me}
-
+This approach is very efficient as it runs in linear time (except for the sorting), and produces very reasonable results. Indeed, we observed that the paths comprehends products with similar characteristics, and a certain path could intuitively be interpreted as the ``average path that people follow from the first product they visit to the one that they buy''.
 
 \subsection{Visualization}
-The graph must show to users the most relevant products in an intuitive manner. As a crucial requirement, users should find the information of interest ``at first glance", without need to interpret the graph. However, making intuitive a graph is not a simple task. In order to achieve the goal we undertook the following steps:
+The graph must show to users the most relevant products in an intuitive manner. As a crucial requirement, users should find the information of interest ``at first glance", without needing to interpret the graph. However, making intuitive a graph is not a simple task. In order to achieve the goal we undertook the following steps:
 \begin{enumerate}
-	\item \textit{Product Graph choice}. We opted for \href{http://bl.ocks.org/GerHobbelt/3071239}{this} collapsible graph which would allow to ``hide" all the competing products in one node and expand it only if the user is really interested in analazying them. 
-
-	\item \textit{Product Graph: code cleaning and improvements}. After diving in the code of that example we realized how many were the problems. Changes were needed in order to satisfy all our requirements since the code was not versatile, inefficient (e.g. the graph was initially recomputed every time a node was collapsed/expanded) and it used d3 v2. We needed both a structure that would allow to easily update the graph (exclude/include nodes) and code easy to maintain (so to apport changes easily). Therefore, we restructured most of the code implementing classes (which improved versatility and manageability), removed a couple of features we did not need and improved the efficiency. Then, we converted the code to d3 v4 (non easy task, we discovered d3 v4 is not much retro-compatible) so to obtain something more versatile and efficient. However, we understood that collapsing and expanding a node would imply non trivial changes to our graph algorithms, e.g. finding and highlighting the path to the best product (depending whether a clique is expanded or not the path to be highlighted changes). Moreover, the cliques are small and few and the time spent in implementing ad-hoc graph algorithms to keep collapsible nodes would not be worth much. So we decided to indicate the cliques with polygon hulls (d3.polygonHull) so to keep indicating the them. Finally we added arrows instead of edges, since the direction of the edge is of major importance in our algorithm.  We ended up with a graph where cliques were well distinguishable but it was still not very intuitive as the user wouldn't see products but only dots connected by edges.
+	\item \textit{Product Graph choice}. We initially opted for a \href{http://bl.ocks.org/GerHobbelt/3071239}{collapsible graph} (d3 force layout with bundling, as depicted in \Cref{fig:collapsible_graph}), which would allow the user to ``hide" all the competing products into one node and expand it only if the user is really interested in analyzing them.
+\begin{figure}[H]
+	\centering{}
+	\includegraphics[width=0.45\textwidth]{img/collapsible_graph.png}
+	\caption{D3 force layout with bundling.}
+	\label{fig:collapsible_graph}
+\end{figure}
+	\item \textit{Product Graph: code cleaning and improvements}. After diving in the code of that example we realized that there were several problems. Changes were needed in order to satisfy all our requirements since the code was not versatile, inefficient (e.g. the graph was initially recomputed every time a node was collapsed/expanded) and it used d3 v2. We needed both a structure that would allow us to easily update the graph (exclude/include nodes) and to maintain the code easily. Therefore, we restructured most of the code implementing classes (which improved versatility and manageability), removed a couple of features we did not need and improved the efficiency. Then, we converted the code to d3 v4 (it was not an easy task, as we discovered that d3 v4 is not much retro-compatible) so as to obtain something more versatile and efficient. However, we understood that collapsing and expanding a node would have implied non-trivial changes to our graph algorithm, i.e. finding and highlighting the path to the best product would have been difficult according to the expansion state of a group. Moreover, the cliques are small and few and the time spent in implementing ad-hoc graph algorithms to keep collapsible nodes would not be worth much. So we decided to indicate the cliques with polygon hulls (d3.polygonHull) so as to keep indicating them. Finally we added arrows to edges, since the direction of the edge is of major importance in our algorithm.  We ended up with a graph where cliques were well distinguishable but it was still not very intuitive as the user would not see products but only dots connected by edges.
 
 	\item \textit{Product Graph: add interactivity}. Once we display all the products of a category as a graph the next step is to choose an intuitive and easy way to explore and/or select only the parts of the graph in which the user is interested. To accomplish the task we added several features.
 		\begin{itemize}
-			\item When the user \emph{mouseover}s a node, we show the photo, link, and other information related to the product. Moreover, we also highlight the path to the best product, i.e. a star.
-			\item We add a search box to filter the graph using a keyword. This search box has auto-completion and it suggests the words that have been extracted from the title of the products so that the user does not end up in selecting an empty graph. In particular, we show not only the products related to that keyword but also all the reachable nodes and the direct parents. This way, we both show all the better products and also the fan-in (also referred to as in-degree) of the filtered products (note: the fan-in is the metric we choose for selecting the best product between competing products, i.e. products belonging to the same clique).
+			\item When the user \emph{mouseover}s a node, we show the photo, link, and other information related to the product. Moreover, we highlight the path to the best product, i.e. a star.
+			\item We add a search box to filter the graph using a keyword. This search box has auto-completion and it suggests the words that have been extracted from the title of the products, so that the user does not end up in selecting an empty graph. In particular, we show not only the products related to that keyword but also all the reachable nodes and the direct parents. This way, we both show all the better products and also the fan-in (also referred to as in-degree) of the filtered products (note: the fan-in is the metric we choose for selecting the best product between competing products, i.e. products belonging to the same clique).
 			\item We show in a hamburger menu the list of computed best products of the whole graph. Those products are also indicated by stars on the graph so to show that the best products are the ones with many incoming edges.
-			\item The nodes are colored according to the price of the corresponding product. In particular, we adopted a 6-class RdYlGn (red-yellow-green) diverging color pattern (obtained from ColorBrewer) which is mapped to the products through a quantile distribution.
-			To do this, we sort all the product prices, split them into six bins and then give a color to each bin. However, outliers, e.g. products with very high prices, end up in having the same color of products with a very different price. To reduce this problem we add a brushable price bar with which the user can focus on the products whose price belongs to a specific interval. Notice that we keep all the products, since filtering out the products that does not belong to the interval could also filter out the best products, e.g. the user could select the price interval 50\$-70\$ while the best product costs 40\$. 
+			\item The nodes are colored according to the price of the corresponding product. In particular, we adopted a 6-class RdYlGn (red-yellow-green) diverging color pattern (obtained from ColorBrewer) that is mapped to the products through a quantile distribution, as the distribution of prices is not uniform.
+			To do this, we sort all the product prices, split them into six bins and then give a color to each bin. However, outliers, e.g. products with very high prices, end up in having the same color of products with a very different price. To reduce this problem we add a brushable price bar with which the user can focus on the products whose price belongs to a specific interval. Notice that we keep all the products (but we grey out irrelevant ones), since filtering out the products that do not belong to the interval could also filter out the best products, e.g. the user could select the price interval 50\$-70\$ while the best product costs 40\$. 
 		\end{itemize}
 
-	\item \textit{Category Graph}. To allow the user select a category and see as well the number of products, we implement an expandible radial tree accompanied by the list (on the left) of explored categories. 
+	\item \textit{Category Graph}. Allows the user to select a category and have an idea of the number of products. We implemented an expansible radial tree accompanied by a list/timeline (on the left) of explored categories. The result is shown in \Cref{fig:category_graph}.
+	
+	\begin{figure}[H]
+		\centering{}
+		\includegraphics[width=0.8\textwidth]{img/category_graph.png}
+		\caption{Category selection UI.}
+		\label{fig:category_graph}
+	\end{figure}
 
-	\item \textit{Packaging}. Once we have both the product graph and the category graph there is the more important setp: package them in good looking and easy usable way.
+	\item \textit{Merging}. Once we implemented both visualizations, we merged them into a single easy-to-use visualization.
 \end{enumerate}
 
 \section{Conclusion}
 We now conclude the process book self-evaluating our visualization and proposing further improvements.
 \subsection{Evaluation}
-\todo[inline]{judge our visualization, what to we learn from data and how does it answer the problem}
+Thanks to our visualization, we could clearly see that the Amazon product graph has a very structured topology, consisting of accumulators, connected components that are sparsely interconnected (i.e. clusters), and cliques. The visualization allowed us to observe many behavioural patterns that users adopt when choosing the products to buy. For instance, we initially thought that users would (almost) always buy the cheapest product in a group, but we actually observed that clusters tend to have the same price range (and there are consistent price variations among different clusters).
+
+In some categories, we observed that interpreting the graph is cumbersome because of the high number of overlapping edges, despite the graph being sparse. We tackled this issue by adding the possibility of filtering the products, but we decided anyway to keep the full visualization to give the user a ``feel'' of the graph.
+
 \subsection{Further improvements}
-\todo[inline]{Perfomance and visualization improvement}
+Our visualization has some room for improvement. The following points could be addressed:
+\begin{itemize}
+	\item Performance: the force layout has a high computational cost ($\mathcal{O}(n^2)$) by definition, and this limits the number of nodes that can be displayed at the same time (a few hundreds at most). Nonetheless, we believe that some clever tricks could increase this limit. Another option would be to pre-compute the node positions using an offline algorithm, although this would limit interactivity.
+	\item Design: although the graph meets the functional requirements, its design could be improved. Apart from stylistic characteristics (which are subjective), some dense areas of the graph are not easy to interpret. In some cases, the high number of edges requires zooming in order to ``untangle'' the visualization. We thought about possible solutions, and all of them involve some kind of trade-off that would reduce the information visible on the graph. Perhaps, some hierarchical subdivision of the graph would render it more clear.
+	\item More data: a server-side component could provide the user with the full graph, instead of a small sample of it. Search queries could be processed on the server, and the result would be returned to the user.
+	\item Guided tutorial: it could be useful to show the user some tooltips in the graph visualization, describing how certain patterns (e.g. cliques) should be interpreted. 
+\end{itemize}
 
 \newpage
 
@@ -264,11 +284,13 @@ We now conclude the process book self-evaluating our visualization and proposing
 \subsection{Peer evaluation}
 \begin{itemize}
 	\item Preparation: we have always shared all the necessary information by means of online communication channels, and we have never let a team member to be not up-to-date with the development status.
-	\item Contribution : every member of the team has put great effort to keep a constant and uniform pace during the development of the project.
+	\item Contribution : every member of the team has put great effort into keeping a constant and uniform pace during the development of the project.
 	\item Respect: we have always encouraged different ideas, even though sometimes it might have been tough to reach a consensual agreement. 
-	\item Flexibility: Overall, no team member has never complained about criticisms or divergences. We have always tried to ensure consensual agreement, and we have never imposed a solution over another (even in case of majority vote).
+	\item Flexibility: Overall, no team member has never complained about criticisms or divergences. We have always tried to ensure consensual agreement, and we have never imposed a solution over another.
 \end{itemize}
 
 \subsection{Work disclaimer}
-In the initial project proposal form, we stated that our Data visualization project was jointed to our Applied data analysis project. Although we have deployed the same dataset in both courses, the goals (and the developments) of the two project have significantly diverged. While in this course we have focused merely on the visualization of the graph, in the other one we have exploited it for a deep analysis (machine learning and statistics). In addition, for this course we needed some different and more suitable preprocessing of the data for the visualization. We therefore apologize, and we deny our original statement.
+In the initial project proposal form, we stated that our Data visualization project was jointed to our Applied data analysis project. Although we have deployed the same dataset in both courses and we reused parts of the data processing pipeline, the goals (and the developments) of the two project have significantly diverged. In this course we have focused merely on the visualization of the graph, whereas in the other one we have exploited it for a deep analysis (machine learning and statistics). In addition, for this course we needed some different and more suitable preprocessing of the data for the visualization.
+
+Furthermore, the Amazon dataset is not public and is available only under request. For this reason, we did not upload it under a GitHub repository (so as to avoid copyright issues), but made it available under a different link.
 \end{document}
